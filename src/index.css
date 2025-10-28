@@ -1,0 +1,200 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import './indicator.css';
+
+@keyframes custom-bounce {
+  0%, 100% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.8,0,1,1);
+  }
+  50% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0,0,0.2,1);
+  }
+}
+.slow-bounce {
+  animation: custom-bounce 150s infinite;
+}
+
+/* Navigation active and hover styles for Header.tsx */
+.active-nav-link, .nav-link {
+  position: relative;
+  color: #fff;
+  background: transparent;
+  /* use medium weight for all nav links */
+  font-weight: 500;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-radius: 0;
+  width: 8.5rem; /* Same as How It Works link width */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 200ms, background 200ms, opacity 200ms;
+}
+
+.active-nav-link {
+  color: #25A8A0 !important;
+  background: #000 !important;
+  /* keep active link at medium weight (not bold) */
+  font-weight: 500;
+  opacity: 0.7;
+  overflow: hidden;
+}
+.active-nav-link::after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: #ff0000;
+  top: 0;
+  width: 100%;
+}
+
+.nav-link:hover {
+  color: #fff !important;
+  background: #000 !important;
+  /* hover should not increase weight above medium */
+  font-weight: 500;
+  opacity: 0.7;
+}
+
+/* Remove triangle and underline from previous .nav-link:hover::after */
+.nav-link:hover::after {
+  display: none !important;
+}
+
+/* Floating / pill-shaped header styles (default hero state) and compact scrolled header */
+:root{
+  --header-height-lg: 6rem; /* 96px */
+  --header-height-sm: 4.5rem; /* 72px */
+}
+
+/* These utility classes are switched via JS in Header.tsx */
+.header-floating {
+  position: sticky;
+  top: 1rem; /* space around the pill so it feels floating */
+  width: calc(100% - 2rem);
+  margin: 0 auto;
+  border-radius: 9999px;
+  /* fully opaque brand green */
+  background: #25A8A0;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 8px 24px rgba(16,24,40,0.06);
+  border: 1px solid rgba(0,0,0,0.06);
+  transition: all 260ms cubic-bezier(.2,.9,.2,1);
+  height: var(--header-height-lg);
+}
+
+.header-scrolled {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  width: 100%;
+  margin: 0;
+  border-radius: 0;
+  /* semi-transparent scrolled gradient (50% opacity) so content behind subtly shows through */
+  background: linear-gradient(90deg, rgba(37,168,160,0.7), rgba(30,138,130,0.7));
+  /* add stronger backdrop blur so content under the header is more heavily blurred */
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+  box-shadow: 0 8px 28px rgba(16,24,40,0.16);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  /* transition specific properties for a smoother effect */
+  transition: background 200ms cubic-bezier(.2,.9,.2,1), height 200ms cubic-bezier(.2,.9,.2,1), backdrop-filter 200ms cubic-bezier(.2,.9,.2,1), box-shadow 200ms cubic-bezier(.2,.9,.2,1);
+  /* slightly taller when scrolled */
+  height: calc(var(--header-height-sm) + 0.90rem);
+}
+
+/* Use a milder blur on small screens for performance and readability */
+@media (max-width: 768px) {
+  .header-scrolled {
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 6px 18px rgba(16,24,40,0.12);
+  }
+}
+
+/* Make sure header contents compress nicely */
+.header-scrolled .container, .header-floating .container{
+  height: 100%;
+}
+
+/* Adjust nav link roundedness when header is floating vs scrolled */
+.header-floating .nav-link, .header-floating .active-nav-link{
+  border-radius: 9999px;
+}
+.header-scrolled .nav-link, .header-scrolled .active-nav-link{
+  /* Remove rounded corners when header is scrolled to present a simpler rectangular nav */
+  border-radius: 0;
+}
+
+/* Ensure the active-link pseudo-element is square when scrolled (no rounded edges) */
+.header-scrolled .active-nav-link::after {
+  border-radius: 0;
+}
+
+/* CTA buttons styling tweak to match the described design */
+.cta-outline {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.7);
+  color: white;
+}
+.cta-primary {
+  background: #0ea5ff; /* bright blue */
+  color: white;
+}
+
+/* Animated emphasis for hero keyword */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes hero-pulse {
+  0% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-4px) scale(1.02); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+.mental-animated {
+  display: inline-block;
+  /* allow gradient background movement */
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradientShift 6s linear infinite, hero-pulse 4s ease-in-out infinite;
+}
+
+/* Testimonial avatar border shadow enhancement */
+.testimonial-avatar {
+  /* stronger, soft shadow around the avatar border */
+  box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+}
+
+
+/* Make the hero/video bleed to the top behind the header so the video covers the uppermost edge */
+.hero-bleed {
+  /* Pull the section upward so the absolutely-positioned video can reach the viewport top */
+  margin-top: calc(-1 * var(--header-height-lg) - 1rem);
+  /* Add equivalent padding so inner content doesn't overlap the header area */
+  padding-top: calc(var(--header-height-lg) + 2rem);
+}
+
+/* Adjust for small screens (use smaller header height variable) */
+@media (max-width: 768px) {
+  .hero-bleed {
+    margin-top: calc(-1 * var(--header-height-sm) - 0.5rem);
+    padding-top: calc(var(--header-height-sm) + 1rem);
+  }
+}
