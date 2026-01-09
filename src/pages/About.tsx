@@ -4,7 +4,7 @@ import { Target, Lightbulb } from 'lucide-react';
 const About: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-12">
-      {/* Hero Section */}
+      {}
       <div className="text-center mb-16">
         <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">About SoulTalk</h1>
         <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
@@ -13,7 +13,7 @@ const About: React.FC = () => {
         </p>
       </div>
 
-      {/* Mission & Vision */}
+      {}
       <div className="grid md:grid-cols-2 gap-8 mb-16">
         <div className="bg-white border-0 shadow-lg rounded-lg p-6">
           <div className="w-12 h-12 bg-[#25A8A0] rounded-lg flex items-center justify-center mb-4">
@@ -40,7 +40,7 @@ const About: React.FC = () => {
         </div>
       </div>
 
-      {/* Our Story */}
+      {}
       <div className="mb-16">
         <div className="bg-white border-0 shadow-lg rounded-lg overflow-hidden">
           <div className="relative w-full h-64 bg-gradient-to-r from-blue-500 to-green-500">
@@ -58,7 +58,7 @@ const About: React.FC = () => {
         </div>
       </div>
 
-      {/* Values */}
+      {}
       <div className="mb-16">
         <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">Our Values</h2>
         <div className="grid md:grid-cols-3 gap-8">

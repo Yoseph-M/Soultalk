@@ -1,81 +1,119 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
+import type React from "react"
+import { useState, useEffect } from "react"
+import { Link, useNavigate } from "react-router-dom"
 import {
-  FaHeart, FaBrain, FaUsers, FaCalendarAlt, FaVideo, FaUserMd, 
-  FaSmile, FaFrown, FaMeh, FaGrinBeam, FaSadTear,
-   FaPlay, FaExclamationTriangle, FaCheckCircle,
-  FaClock, FaStar, FaRobot,
-  FaChartLine,
-  FaBell,
-  FaHistory,
-  FaEdit,
-  FaCalendarCheck,
-  FaTimes,
-  FaPlus,
-  FaUserFriends,
-  FaCreditCard,
-  FaQuestionCircle,
-  FaEye,
-  FaRedoAlt,
+  FaRobot,
+  FaCalendarAlt,
+  FaStar,
+  FaPhoneAlt,
+  FaExclamationTriangle,
+  FaWallet,
+  FaQuoteLeft,
+  FaVideo,
+  FaCalendarPlus,
+  FaClock,
+  FaComments,
+  FaFileMedical,
+  FaChevronRight
 } from "react-icons/fa"
-import { BiMessageSquareDetail } from "react-icons/bi"
-import { MdTrendingUp, MdTrendingDown } from "react-icons/md"
-import { HiOutlineEmojiHappy } from "react-icons/hi"
 import DashboardHeader from "./DashboardHeader"
 import { useTheme } from "../contexts/ThemeContext"
 import { useAuth } from "../contexts/AuthContext"
+import AICompanion from "../components/AICompanion"
 
-// Mood tracking component with slider
-const MoodTracker: React.FC<{ onMoodSelect: (mood: number) => void; currentMood: number }> = ({
-  onMoodSelect,
-  currentMood,
-}) => {
-  const { theme } = useTheme()
-  const moods = [
-    { icon: FaSadTear, label: "Very Low", value: 1, color: "text-red-500", emoji: "😢" },
-    { icon: FaFrown, label: "Low", value: 2, color: "text-orange-500", emoji: "😔" },
-    { icon: FaMeh, label: "Neutral", value: 3, color: "text-yellow-500", emoji: "😐" },
-    { icon: FaSmile, label: "Good", value: 4, color: "text-green-500", emoji: "😊" },
-    { icon: FaGrinBeam, label: "Excellent", value: 5, color: "text-emerald-500", emoji: "😄" },
+const DailyQuote: React.FC = () => {
+  const fallbackQuotes = [
+    { text: "What lies behind us and what lies before us are tiny matters compared to what lies within us.", author: "Ralph Waldo Emerson" },
+    { text: "The greatest discovery of my generation is that a human being can alter his life by altering his attitudes.", author: "William James" },
+    { text: "Healing takes time, and asking for help is a courageous step.", author: "Unknown" },
+    { text: "You don't have to see the whole staircase, just take the first step.", author: "Martin Luther King Jr." },
+    { text: "Self-care is not self-indulgence, it is self-preservation.", author: "Audre Lorde" }
   ]
 
-  const selectedMood = moods.find((m) => m.value === currentMood) || moods[2]
+  const [quote, setQuote] = useState(() => {
+    const cached = localStorage.getItem('daily_quote');
+    const lastFetch = localStorage.getItem('daily_quote_timestamp');
+    const now = Date.now();
+    const sixHours = 6 * 60 * 60 * 1000;
+
+    if (cached && lastFetch && (now - Number(lastFetch) < sixHours)) {
+      try {
+        return JSON.parse(cached);
+      } catch (e) {
+        return { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" };
+      }
+    }
+    return { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" };
+  })
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const fetchQuote = async () => {
+      const lastFetch = localStorage.getItem('daily_quote_timestamp');
+      const now = Date.now();
+      const sixHours = 6 * 60 * 60 * 1000;
+
+      // Only fetch if cache is missing or expired
+      if (lastFetch && (now - Number(lastFetch) < sixHours)) {
+        return;
+      }
+
+      setLoading(true)
+      try {
+        const response = await fetch('https://api.quotable.io/random?tags=motivational,inspirational,mental-health')
+        if (response.ok) {
+          const data = await response.json()
+          const newQuote = { text: data.content, author: data.author };
+          setQuote(newQuote)
+          localStorage.setItem('daily_quote', JSON.stringify(newQuote));
+          localStorage.setItem('daily_quote_timestamp', now.toString());
+        } else {
+          const random = fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)]
+          setQuote(random)
+          localStorage.setItem('daily_quote', JSON.stringify(random));
+          localStorage.setItem('daily_quote_timestamp', now.toString());
+        }
+      } catch (error) {
+        const random = fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)]
+        setQuote(random)
+        localStorage.setItem('daily_quote', JSON.stringify(random));
+        localStorage.setItem('daily_quote_timestamp', now.toString());
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchQuote()
+  }, [])
 
   return (
-    <div className="space-y-4">
-      <div className="text-center">
-        <div className="text-[90px] md:text-[120px] mb-2 leading-none">{selectedMood.emoji}</div>
-        <h3 className="text-lg font-semibold mb-2">How are you feeling today?</h3>
-        <p className={`text-sm ${selectedMood.color} font-medium`}>{selectedMood.label}</p>
+    <div className="flex flex-col items-center text-center px-6 py-4 relative overflow-hidden group">
+      <div className="mb-4 text-white/30 group-hover:text-white/50 transition-colors">
+        <FaQuoteLeft className="w-8 h-8" />
       </div>
-
-      <div className="px-4">
-        <input
-          type="range"
-          min="1"
-          max="5"
-          value={currentMood}
-          onChange={(e) => onMoodSelect(Number.parseInt(e.target.value))}
-          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-          style={{
-            background: `linear-gradient(to right, #ef4444 0%, #f97316 25%, #eab308 50%, #22c55e 75%, #10b981 100%)`,
-          }}
-        />
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
-          <span className="text-2xl md:text-3xl">😢</span>
-          <span className="text-2xl md:text-3xl">😔</span>
-          <span className="text-2xl md:text-3xl">😐</span>
-          <span className="text-2xl md:text-3xl">😊</span>
-          <span className="text-2xl md:text-3xl">😄</span>
+      {loading ? (
+        <div className="h-24 flex items-center justify-center">
+          <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
         </div>
-      </div>
+      ) : (
+        <div className="animate-in fade-in zoom-in-95 duration-1000">
+          <p className="text-xl md:text-3xl font-light italic mb-4 leading-tight max-w-2xl">
+            "{quote.text}"
+          </p>
+          <div className="flex items-center justify-center gap-3">
+            <div className="h-px w-6 bg-white/20"></div>
+            <p className="text-[10px] font-bold tracking-[0.2em] uppercase opacity-50">
+              {quote.author}
+            </p>
+            <div className="h-px w-6 bg-white/20"></div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
 
-// Countdown timer component
 const CountdownTimer: React.FC<{ targetTime: Date }> = ({ targetTime }) => {
   const [timeLeft, setTimeLeft] = useState("")
 
@@ -85,651 +123,394 @@ const CountdownTimer: React.FC<{ targetTime: Date }> = ({ targetTime }) => {
       const target = targetTime.getTime()
       const difference = target - now
 
-      if (difference > 0) {
-        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
-        setTimeLeft(`${hours}h ${minutes}m`)
+      if (difference > -600000) { // Available 10 min before (negative difference means future, but we want button to show up)
+        // Actually, difference = target - now.
+        // If target is 10:00, now is 9:50 -> diff = 10 min (600000ms).
+        // If target is 10:00, now is 10:10 -> diff = -10 min.
+        // The Timer is strictly for display "XXh YYm".
+        // The BUTTON logic is handled separately below.
+
+        if (difference > 0) {
+          const days = Math.floor(difference / (1000 * 60 * 60 * 24))
+          const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+          const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
+
+          if (days > 0) {
+            setTimeLeft(`${days}d ${hours}h ${minutes}m`)
+          } else {
+            setTimeLeft(`${hours}h ${minutes}m`)
+          }
+        } else {
+          setTimeLeft("Now")
+        }
       } else {
-        setTimeLeft("Now")
+        setTimeLeft("Past")
       }
     }, 1000)
 
     return () => clearInterval(timer)
   }, [targetTime])
 
-  return <span className="text-sm font-medium text-teal-600 bg-teal-100 px-2 py-1 rounded-full">{timeLeft}</span>
+  return <span className="text-xs font-black text-teal-600 bg-teal-50 dark:bg-teal-900/30 px-3 py-1.5 rounded-xl border border-teal-100 dark:border-teal-800">{timeLeft}</span>
 }
 
-// Mood chart component
 const MoodChart: React.FC<{ moodData: Array<{ date: string; mood: number }> }> = ({ moodData }) => {
-  const { theme } = useTheme()
   const maxMood = 5
 
+  const getBarColor = (mood: number) => {
+    if (mood === 1) return "bg-red-500 shadow-red-500/50"
+    if (mood === 2) return "bg-orange-500 shadow-orange-500/50"
+    if (mood === 3) return "bg-yellow-400 shadow-yellow-400/50"
+    if (mood === 4) return "bg-green-500 shadow-green-500/50"
+    return "bg-emerald-400 shadow-emerald-400/50"
+  }
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h4 className="font-semibold">Last 7 Days</h4>
-        <Link to="/mood-history" className="text-teal-600 text-sm hover:text-teal-700">
-          View All
+        <h4 className="font-black text-xl">Wellness Journey</h4>
+        <Link to="/mood-history" className="text-teal-600 text-sm font-bold hover:underline transition-all group flex items-center gap-1">
+          <span>Explore Patterns</span>
+          <FaChevronRight className="w-2.5 h-2.5 group-hover:translate-x-0.5 transition-transform" />
         </Link>
       </div>
 
-      <div className="flex items-end justify-between h-32 space-x-2">
-        {moodData.map((data, index) => (
-          <div key={index} className="flex flex-col items-center space-y-2">
-            <div
-              className="w-8 bg-gradient-to-t from-teal-500 to-teal-400 rounded-t-lg transition-all duration-300"
-              style={{ height: `${(data.mood / maxMood) * 100}%` }}
-            ></div>
-            <span className="text-xs text-gray-500">{data.date}</span>
-          </div>
-        ))}
-      </div>
+      <div className="relative h-56 w-full">
+        <div className="flex items-end justify-between h-full w-full relative z-10">
+          {moodData.map((data, index) => (
+            <div key={index} className="flex-1 flex flex-col items-center h-full justify-end group relative">
+              <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 absolute -top-12 z-20 bg-gray-900 text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-xl transform translate-y-2 group-hover:translate-y-0 pointer-events-none">
+                {data.mood}/5
+                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1 border-4 border-transparent border-t-gray-900"></div>
+              </div>
 
-      <div className="flex items-center justify-center space-x-4 text-sm">
-        <div className="flex items-center space-x-1">
-          <div className="w-3 h-3 bg-red-400 rounded-full"></div>
-          <span>Low</span>
-        </div>
-        <div className="flex items-center space-x-1">
-          <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-          <span>Neutral</span>
-        </div>
-        <div className="flex items-center space-x-1">
-          <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-          <span>Good</span>
+              <div className="w-full h-full flex items-end justify-center pb-8">
+                <div
+                  className={`w-3 md:w-4 rounded-full transition-all duration-500 ease-out group-hover:scale-110 origin-bottom shadow-lg ${getBarColor(data.mood)}`}
+                  style={{ height: `${(data.mood / maxMood) * 100}%` }}
+                ></div>
+              </div>
+
+              <div className="absolute bottom-0 text-xs font-bold text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">
+                {data.date}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
   )
 }
 
+const WalletWidget: React.FC = () => {
+  const { theme } = useTheme()
+  return (
+    <div className={`rounded-3xl p-8 transition-all duration-300 border ${theme === "dark" ? "bg-gray-800 border-gray-700 text-white" : "bg-white border-gray-100 shadow-sm"}`}>
+      <div className="flex items-center space-x-4 mb-6">
+        <div className="p-3 bg-teal-100 dark:bg-teal-900/30 rounded-2xl">
+          <FaWallet className="w-6 h-6 text-teal-600" />
+        </div>
+        <div>
+          <h3 className="text-xl font-black">Account</h3>
+          <p className="text-xs opacity-50">Current Plan & Subscription</p>
+        </div>
+      </div>
+      <div className="space-y-4">
+        <div className={`p-6 rounded-2xl border-2 ${theme === "dark" ? "bg-teal-900/10 border-teal-800" : "bg-teal-50 border-teal-100"}`}>
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[10px] font-black uppercase tracking-widest text-teal-600">Active Plan</p>
+            <span className="px-2 py-0.5 bg-teal-500 text-white text-[8px] font-black rounded-full shadow-lg shadow-teal-500/20">LIVE</span>
+          </div>
+          <p className="text-xl font-black text-teal-600">Premium Explorer</p>
+        </div>
+        <Link to="/billing" className="block w-full py-3.5 bg-teal-600 hover:bg-teal-700 text-white text-center rounded-2xl font-black text-sm transition-all hover:shadow-lg hover:shadow-teal-500/20 active:scale-95">
+          Manage Plan
+        </Link>
+      </div>
+    </div>
+  )
+}
+
+const CrisisCorner: React.FC = () => {
+  const { theme } = useTheme()
+  return (
+    <div className={`rounded-3xl p-8 transition-all duration-300 border ${theme === "dark" ? "bg-red-900/10 border-red-950 text-white" : "bg-red-50/50 border-red-100"}`}>
+      <div className="flex items-center space-x-4 mb-4">
+        <div className="p-3 bg-red-100 dark:bg-red-900/50 rounded-2xl">
+          <FaExclamationTriangle className="w-6 h-6 text-red-600" />
+        </div>
+        <h3 className="text-xl font-black text-red-600">Crisis Help</h3>
+      </div>
+      <p className={`text-xs mb-6 leading-relaxed ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
+        Need immediate support? Help is available 24/7.
+      </p>
+      <Link to="/crisis-support" className="uppercase tracking-[0.2em] block w-full py-4 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-black flex items-center justify-center gap-3 transition-all active:scale-95 shadow-lg shadow-red-500/10">
+        <FaPhoneAlt className="w-3 h-3" />
+        <span className="text-xs">Emergency Support</span>
+      </Link>
+    </div>
+  )
+}
+
 const Dashboard: React.FC = () => {
   const { theme } = useTheme()
-  const { user } = useAuth()
-  const [currentMood, setCurrentMood] = useState(4)
-  const [currentTime, setCurrentTime] = useState(new Date())
+  const { user, fetchWithAuth, isLoading } = useAuth()
 
-  // Mock data - in real app, this would come from API
-  const [moodData] = useState([
-    { date: "Mon", mood: 3 },
-    { date: "Tue", mood: 4 },
-    { date: "Wed", mood: 2 },
-    { date: "Thu", mood: 3 },
-    { date: "Fri", mood: 4 },
-    { date: "Sat", mood: 5 },
-    { date: "Sun", mood: 4 },
-  ])
-
-  const [upcomingAppointments] = useState([
-    {
-      id: 1,
-      date: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours from now
-      listenerName: "Dr. Sarah Johnson",
-      listenerImage: "/placeholder.svg?height=40&width=40",
-      type: "Video Session",
-      specialty: "Anxiety & Depression",
-      rating: 4.9,
-    },
-    {
-      id: 2,
-      date: new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
-      listenerName: "Michael Chen",
-      listenerImage: "/placeholder.svg?height=40&width=40",
-      type: "Chat Session",
-      specialty: "Stress Management",
-      rating: 4.8,
-    },
-  ])
-
-  const [sessionHistory] = useState([
-    {
-      id: 1,
-      date: "2024-01-20",
-      listenerName: "Dr. Emily Rodriguez",
-      type: "Video Session",
-      duration: "50 min",
-      status: "completed",
-      feedbackGiven: true,
-      rating: 5,
-      notes: "Great session on coping strategies",
-    },
-    {
-      id: 2,
-      date: "2024-01-18",
-      listenerName: "James Wilson",
-      type: "Chat Session",
-      duration: "30 min",
-      status: "completed",
-      feedbackGiven: false,
-      rating: 4,
-      notes: "Discussed work-life balance",
-    },
-    {
-      id: 3,
-      date: "2024-01-15",
-      listenerName: "Dr. Sarah Johnson",
-      type: "Video Session",
-      duration: "45 min",
-      status: "completed",
-      feedbackGiven: true,
-      rating: 5,
-      notes: "Breakthrough session on anxiety management",
-    },
-  ])
-
-  const [notifications] = useState([
-    {
-      id: 1,
-      type: "appointment",
-      title: "Session Reminder",
-      message: "Your session with Dr. Sarah Johnson starts in 2 hours",
-      time: "2 hours",
-      unread: true,
-    },
-    {
-      id: 2,
-      type: "payment",
-      title: "Payment Confirmed",
-      message: "Your payment of $75 has been processed",
-      time: "1 day",
-      unread: false,
-    },
-    {
-      id: 3,
-      type: "forum",
-      title: "New Forum Reply",
-      message: "Someone replied to your post in Anxiety Support",
-      time: "2 days",
-      unread: true,
-    },
-    {
-      id: 4,
-      type: "listener",
-      title: "Listener Available",
-      message: "Dr. Sarah Johnson is now available for immediate chat",
-      time: "3 hours",
-      unread: true,
-    },
-  ])
-
-  const [accountStats] = useState({
-    totalSessions: 24,
-    moodImprovement: 78,
-    totalTimeSpent: "48 hours",
-    satisfactionScore: 4.8,
-  })
-
-  const [aiRecommendations] = useState([
-    {
-      type: "professional",
-      title: "Dr. Maria Santos",
-      description: "Specializes in anxiety and depression. 95% match based on your profile.",
-      rating: 4.9,
-      availability: "Available now",
-      image: "/placeholder.svg?height=60&width=60",
-    },
-    {
-      type: "resource",
-      title: "Breathing Exercises for Anxiety",
-      description: "Based on your recent mood patterns, these exercises might help.",
-      duration: "10 min",
-      category: "Self-help",
-    },
-    {
-      type: "forum",
-      title: "Anxiety Support Group",
-      description: "Active discussion: 'Managing work stress during busy periods'",
-      members: 1247,
-      activity: "12 new posts today",
-    },
-  ])
+  const [upcomingAppointments, setUpcomingAppointments] = useState<any[]>([])
+  const [loadingAppointments, setLoadingAppointments] = useState(true)
+  const [listeners, setListeners] = useState<any[]>([])
+  const [loadingListeners, setLoadingListeners] = useState(true)
+  const [moodData, setMoodData] = useState<any[]>([])
+  const [loadingMood, setLoadingMood] = useState(true)
+  const [hasFetched, setHasFetched] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000)
-    return () => clearInterval(timer)
-  }, [])
+    if (!isLoading && !user) {
+      navigate('/auth')
+      return
+    }
+    if (user && (user.type === 'professional' || user.type === 'listener')) {
+      navigate('/professionals')
+    }
+  }, [user, navigate, isLoading])
 
-  const getGreeting = () => {
-    const hour = currentTime.getHours()
-    if (hour < 12) return "Good morning"
-    if (hour < 17) return "Good afternoon"
-    return "Good evening"
-  }
 
-  const getMoodTrend = () => {
-    const recent = moodData.slice(-3).map((d) => d.mood)
-    const avg = recent.reduce((a, b) => a + b, 0) / recent.length
-    if (avg <= 2.5)
-      return {
-        trend: "concerning",
-        icon: MdTrendingDown,
-        color: "text-red-500",
-        message: "You've been feeling low for 3 days. Want to talk now?",
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/appointments/')
+        if (response.ok) {
+          const data = await response.json()
+          // Filter for upcoming/pending and sort by date
+          const upcoming = data.filter((app: any) => app.status === 'upcoming' || app.status === 'pending')
+          upcoming.sort((a: any, b: any) => new Date(`${a.date}T${a.time}`).getTime() - new Date(`${b.date}T${b.time}`).getTime())
+          setUpcomingAppointments(upcoming)
+        }
+      } catch (error) {
+        console.error("Error fetching appointments:", error)
+      } finally {
+        setLoadingAppointments(false)
       }
-    if (avg >= 4)
-      return {
-        trend: "positive",
-        icon: MdTrendingUp,
-        color: "text-green-500",
-        message: "Great job maintaining positive mood!",
+    }
+
+    const fetchProfessionals = async () => {
+      try {
+        const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/professionals/')
+        if (response.ok) {
+          const data = await response.json()
+          const formatted = data.map((user: any) => ({
+            id: user.id,
+            name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.username,
+            role: 'Mental Wellness Expert',
+            rating: user.rating || 5.0,
+            image: user.profile_photo
+              ? (user.profile_photo.startsWith('http') ? user.profile_photo : `http://127.0.0.1:8000${user.profile_photo}`)
+              : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=random`,
+            tags: user.specialization ? [user.specialization] : ["Wellness Support"]
+          }))
+          setListeners(formatted)
+        }
+      } catch (error) {
+        console.error("Error fetching professionals:", error)
+      } finally {
+        setLoadingListeners(false)
       }
-    return { trend: "stable", icon: FaHeart, color: "text-blue-500", message: "Your mood has been stable. Keep it up!" }
-  }
+    }
 
-  const moodTrend = getMoodTrend()
+    const fetchMoodData = async () => {
+      try {
+        const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/mood-updates/')
+        if (response.ok) {
+          const data = await response.json()
+          // Format for the last 7 days
+          const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+          const last7Days = Array.from({ length: 7 }, (_, i) => {
+            const d = new Date()
+            d.setDate(d.getDate() - (6 - i))
+            const dayName = days[d.getDay()]
+            const record = data.find((r: any) => new Date(r.created_at).toDateString() === d.toDateString())
+            return { date: dayName, mood: record ? record.mood_score : 0 }
+          })
+          setMoodData(last7Days)
+        }
+      } catch (error) {
+        console.error("Error fetching mood data:", error)
+      } finally {
+        setLoadingMood(false)
+      }
+    }
 
-  const getAISuggestion = () => {
-    if (currentMood <= 2)
-      return "Based on your current mood, we recommend talking to Dr. Sarah Johnson who specializes in mood support."
-    if (currentMood >= 4) return "You're feeling great! Consider sharing your positive energy in our community forums."
-    return "Your mood seems neutral. A quick check-in with one of our AI assistants might help."
-  }
+    if (!isLoading && user && !hasFetched) {
+      fetchAppointments()
+      fetchProfessionals()
+      fetchMoodData()
+      setHasFetched(true)
+    }
+  }, [fetchWithAuth, user, isLoading, hasFetched])
+
+
+
+
+
+
 
   return (
-    <div
-      className={`min-h-screen transition-all duration-500 ${
-        theme === "dark"
-          ? "bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900"
-          : "bg-gradient-to-br from-teal-50 via-white to-blue-50"
-      }`}
-    >
+    <div className={`min-h-screen transition-all duration-500 ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
       <DashboardHeader />
-
       <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Welcome Section */}
-        <div
-          className={`rounded-3xl p-8 mb-8 shadow-xl relative overflow-hidden transition-all duration-500 ${
-            theme === "dark"
-              ? "bg-gradient-to-r from-gray-800 to-slate-800 text-white"
-              : "bg-gradient-to-r from-teal-500 to-cyan-500 text-white"
-          }`}
-        >
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32"></div>
-          <div className="relative z-10">
-            <h1 className="text-4xl font-bold mb-4 flex items-center space-x-3">
-              <span>
-                {getGreeting()}, {user?.name || "Zube"} 👋
-              </span>
-            </h1>
+        {/* Hero Section with Daily Quote */}
+        <div className={`rounded-3xl p-8 mb-8 relative overflow-hidden transition-all duration-500 ${theme === "dark" ? "bg-gray-800 text-white" : "bg-teal-600 text-white shadow-2xl shadow-teal-900/20"}`}>
+          <div className="relative z-10 flex flex-col items-center">
+            <div className="w-full max-w-4xl">
+              <DailyQuote />
+            </div>
+          </div>
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-20 -mt-20 blur-3xl"></div>
+        </div>
 
-            {/* Current Mood Input */}
-            <div className="grid md:grid-cols-1 gap-8 mb-6">
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
-                <MoodTracker onMoodSelect={setCurrentMood} currentMood={currentMood} />
+        {/* Quick Action Grid - Unified Color */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {[
+            { to: "/ai-chat", icon: FaRobot, title: "AI Companion", desc: "Supportive AI" },
+            { to: "/diagnosis", icon: FaFileMedical, title: "Diagnosis", desc: "Assessments" },
+            { to: "/schedule", icon: FaCalendarAlt, title: "Timeline", desc: "Manage sessions" },
+            { to: "/booking", icon: FaCalendarPlus, title: "Book Session", desc: "Find professional" },
+          ].map((item, idx) => (
+            <Link
+              key={idx}
+              to={item.to}
+              className={`group p-5 rounded-[2rem] border transition-all duration-300 hover:shadow-lg ${theme === 'dark' ? 'bg-gray-800 border-gray-700 hover:border-teal-500' : 'bg-white border-gray-100 hover:border-teal-400'}`}
+            >
+              <div className="flex flex-col items-center text-center">
+                <div className={`p-4 mb-3 rounded-2xl transition-transform group-hover:scale-110 duration-500 bg-teal-50 dark:bg-teal-900/20`}>
+                  <item.icon className={`w-6 h-6 text-teal-600`} />
+                </div>
+                <h3 className="text-sm font-black mb-0.5">{item.title}</h3>
+                <p className={`text-[10px] opacity-50`}>{item.desc}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* Instant Support Banner - Simplified */}
+        <div className={`relative p-8 rounded-[2.5rem] border mb-8 overflow-hidden transition-all ${theme === 'dark' ? 'bg-gray-800 shadow-2xl border-teal-900/50' : 'bg-teal-600 text-white shadow-xl shadow-teal-900/10'}`}>
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-6">
+              <div className="relative">
+                <div className={`p-4 rounded-2xl ${theme === 'dark' ? 'bg-teal-900/30' : 'bg-white/20'}`}>
+                  <FaVideo className={`w-8 h-8 ${theme === 'dark' ? 'text-teal-400' : 'text-white'}`} />
+                </div>
+              </div>
+              <div>
+                <h3 className={`text-2xl font-black`}>Get support right now</h3>
+                <p className={`text-lg opacity-80`}>Verified listeners are online and ready to help.</p>
               </div>
             </div>
+            <Link to="/instant-support" className={`px-10 py-5 font-black rounded-[2rem] shadow-xl transition-all hover:scale-105 active:scale-95 text-lg ${theme === 'dark' ? 'bg-teal-600 text-white shadow-teal-900/40' : 'bg-white text-teal-600'}`}>
+              Connect Now
+            </Link>
           </div>
         </div>
 
-        {/* Quick Actions */}
+
+
+        {/* Discovery Section - Compact */}
         <div className="mb-8">
-          <h2 className={`text-2xl font-bold mb-6 ${theme === "dark" ? "text-white" : "text-gray-800"}`}>
-            Quick Actions
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Link to="/ai-chat" className="group">
-              <div className="bg-gradient-to-br from-purple-500 to-indigo-500 p-6 rounded-2xl text-white shadow-lg transition-all duration-300 transform group-hover:scale-105">
-                <div className="flex items-center space-x-4 mb-4">
-                  <div className="p-3 bg-white/20 rounded-xl">
-                    <FaRobot className="w-8 h-8" />
-                  </div>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-black">Top Support Specialists</h3>
+            <Link to="/find-listener" className="text-teal-600 text-xs font-black uppercase tracking-widest hover:underline">View All</Link>
+          </div>
+          <div className="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
+            {loadingListeners ? (
+              <div className="flex items-center justify-center w-full py-10"><div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div></div>
+            ) : listeners.map((listener) => (
+              <div key={listener.id} className={`flex-shrink-0 w-64 p-5 rounded-[2rem] border transition-all duration-300 group ${theme === "dark" ? "bg-gray-800 border-gray-700 hover:border-teal-500" : "bg-white border-gray-100 hover:border-teal-400 shadow-sm"}`}>
+                <div className="flex items-center gap-4 mb-4">
+                  <img src={listener.image} alt={listener.name} className="w-12 h-12 rounded-full object-cover border-2 border-teal-500/20" />
                   <div>
-                    <h3 className="font-bold text-xl">Start AI Chat Support</h3>
-                    <p className="text-white/80">24/7 intelligent assistance</p>
+                    <h4 className="font-black text-sm">{listener.name}</h4>
+                    <div className="flex items-center gap-1 text-[10px] font-black text-yellow-600">
+                      <FaStar className="w-2.5 h-2.5" /> <span>{listener.rating.toFixed(1)}</span>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm opacity-80">Available now</span>
-                  <FaPlay className="w-4 h-4" />
-                </div>
+                <p className={`text-[11px] opacity-60 line-clamp-2 mb-4 h-8`}>{listener.role}</p>
+                <Link to={`/booking`} className="block text-center w-full py-2.5 rounded-xl bg-teal-600/10 hover:bg-teal-600 text-teal-600 hover:text-white font-black text-xs transition-all">
+                  Book Session
+                </Link>
               </div>
-            </Link>
-
-            <Link to="/booking" className="group">
-              <div className="bg-gradient-to-br from-teal-500 to-cyan-500 p-6 rounded-2xl text-white shadow-lg transition-all duration-300 transform group-hover:scale-105">
-                <div className="flex items-center space-x-4 mb-4">
-                  <div className="p-3 bg-white/20 rounded-xl">
-                    <FaCalendarAlt className="w-8 h-8" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-xl">Book a Session</h3>
-                    <p className="text-white/80">Schedule with professionals</p>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm opacity-80">Next available: 2pm</span>
-                  <FaCalendarCheck className="w-4 h-4" />
-                </div>
-              </div>
-            </Link>
-
-            <Link to="/find-listener" className="group">
-              <div className="bg-gradient-to-br from-green-500 to-emerald-500 p-6 rounded-2xl text-white shadow-lg transition-all duration-300 transform group-hover:scale-105">
-                <div className="flex items-center space-x-4 mb-4">
-                  <div className="p-3 bg-white/20 rounded-xl">
-                    <FaUserMd className="w-8 h-8" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-xl">Find a Listener</h3>
-                    <p className="text-white/80">Connect with specialists</p>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm opacity-80">47 online now</span>
-                  <FaUserFriends className="w-4 h-4" />
-                </div>
-              </div>
-            </Link>
+            ))}
           </div>
         </div>
 
         {/* Main Content Grid */}
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Left Column */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Upcoming Appointments */}
-            <div
-              className={`rounded-2xl p-6 shadow-xl transition-all duration-300 ${
-                theme === "dark" ? "bg-gray-800 text-white" : "bg-white"
-              }`}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-teal-100 dark:bg-teal-900/30 rounded-xl">
-                    <FaCalendarAlt className="w-6 h-6 text-teal-600" />
-                  </div>
-                  <h3 className="text-2xl font-bold">Upcoming Appointments</h3>
-                </div>
-                <Link to="/appointments" className="text-teal-600 hover:text-teal-700 text-sm font-medium">
-                  View All
-                </Link>
+            <div className={`rounded-[2rem] p-8 transition-all duration-300 border ${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100 shadow-sm"}`}>
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="text-xl font-black flex items-center gap-3">
+                  <FaCalendarAlt className="text-teal-600" /> Upcoming Sessions
+                </h3>
+                <Link to="/schedule" className="text-teal-600 text-xs font-black uppercase tracking-widest hover:underline">Schedule</Link>
               </div>
-
               <div className="space-y-4">
-                {upcomingAppointments.map((appointment) => (
-                  <div
-                    key={appointment.id}
-                    className={`p-4 rounded-xl border transition-all duration-300 hover:shadow-md ${
-                      theme === "dark"
-                        ? "bg-gray-700 border-gray-600 hover:border-teal-400"
-                        : "bg-teal-50 border-teal-200 hover:border-teal-400"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center space-x-4">
-                        <img
-                          src={appointment.listenerImage || "/placeholder.svg"}
-                          alt={appointment.listenerName}
-                          className="w-12 h-12 rounded-full border-2 border-teal-400"
-                        />
-                        <div>
-                          <h4 className="font-semibold text-lg">{appointment.listenerName}</h4>
-                          <p className={`text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
-                            {appointment.specialty}
-                          </p>
-                          <div className="flex items-center space-x-1 mt-1">
-                            <FaStar className="w-3 h-3 text-yellow-400" />
-                            <span className="text-xs text-yellow-600">{appointment.rating}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <CountdownTimer targetTime={appointment.date} />
-                    </div>
-
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center space-x-4 text-sm">
-                        <div className="flex items-center space-x-1">
-                          <FaClock className="w-4 h-4 text-teal-500" />
-                          <span>{appointment.date.toLocaleString()}</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <FaVideo className="w-4 h-4 text-teal-500" />
-                          <span>{appointment.type}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex space-x-3">
-                      <button className="flex-1 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white px-4 py-2 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2">
-                        <FaVideo className="w-4 h-4" />
-                        <span>Join</span>
-                      </button>
-                      <button
-                        className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
-                          theme === "dark"
-                            ? "bg-gray-600 hover:bg-gray-500 text-white"
-                            : "bg-gray-200 hover:bg-gray-300 text-gray-700"
-                        }`}
-                      >
-                        <FaRedoAlt className="w-4 h-4" />
-                      </button>
-                      <button
-                        className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
-                          theme === "dark"
-                            ? "bg-red-600 hover:bg-red-500 text-white"
-                            : "bg-red-100 hover:bg-red-200 text-red-600"
-                        }`}
-                      >
-                        <FaTimes className="w-4 h-4" />
-                      </button>
-                    </div>
+                {loadingAppointments ? (
+                  <div className="py-12 flex justify-center"><div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div></div>
+                ) : upcomingAppointments.length === 0 ? (
+                  <div className="py-12 text-center border-2 border-dashed rounded-2xl border-gray-100 dark:border-gray-700 text-gray-400">
+                    <p className="text-sm font-bold">No sessions scheduled.</p>
                   </div>
-                ))}
-              </div>
-            </div>
-
-
-
-            {/* AI Suggestions / Recommendations */}
-            <div
-              className={`rounded-2xl p-6 shadow-xl transition-all duration-300 ${
-                theme === "dark" ? "bg-gray-800 text-white" : "bg-white"
-              }`}
-            >
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-xl">
-                  <FaRobot className="w-6 h-6 text-purple-600" />
-                </div>
-                <h3 className="text-2xl font-bold">AI Recommendations</h3>
-              </div>
-
-              <div className="space-y-4">
-                {aiRecommendations.map((rec, index) => (
-                  <div
-                    key={index}
-                    className={`p-4 rounded-xl border transition-all duration-300 hover:shadow-md ${
-                      theme === "dark" ? "bg-gray-700 border-gray-600" : "bg-purple-50 border-purple-200"
-                    }`}
-                  >
-                    {rec.type === "professional" && (
-                      <div className="flex items-center space-x-4">
-                        <img
-                          src={rec.image || "/placeholder.svg"}
-                          alt={rec.title}
-                          className="w-12 h-12 rounded-full border-2 border-purple-400"
-                        />
-                        <div className="flex-1">
-                          <h4 className="font-semibold text-lg">{rec.title}</h4>
-                          <p className={`text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
-                            {rec.description}
-                          </p>
-                          <div className="flex items-center space-x-4 mt-2">
-                            <div className="flex items-center space-x-1">
-                              <FaStar className="w-3 h-3 text-yellow-400" />
-                              <span className="text-xs">{rec.rating}</span>
-                            </div>
-                            <span className="text-xs text-green-600">{rec.availability}</span>
-                          </div>
-                        </div>
-                        <button className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                          Connect
-                        </button>
-                      </div>
-                    )}
-
-                    {rec.type === "resource" && (
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                            <FaBrain className="w-5 h-5 text-blue-600" />
-                          </div>
+                ) : (
+                  upcomingAppointments.map((app) => (
+                    <div key={app.id} className={`p-4 rounded-2xl border transition-all duration-300 ${theme === "dark" ? "bg-gray-700/20 border-gray-700 hover:border-teal-500/50" : "bg-gray-50/50 border-gray-100 hover:border-teal-400/30"}`}>
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                          <img
+                            src={app.professional_image ? (app.professional_image.startsWith('http') ? app.professional_image : `http://127.0.0.1:8000${app.professional_image}`) : `https://ui-avatars.com/api/?name=${app.professional_name}&background=random`}
+                            className="w-12 h-12 rounded-xl object-cover"
+                            alt=""
+                          />
                           <div>
-                            <h4 className="font-semibold">{rec.title}</h4>
-                            <p className={`text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
-                              {rec.description}
-                            </p>
-                            <span className="text-xs text-blue-600">
-                              {rec.duration} • {rec.category}
-                            </span>
+                            <h4 className="font-black text-sm">{app.professional_name}</h4>
+                            <p className="text-[10px] font-bold opacity-50 uppercase tracking-tighter">{new Date(app.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} • {app.time.substring(0, 5)}</p>
                           </div>
                         </div>
-                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                          Start
-                        </button>
-                      </div>
-                    )}
-
-                    {rec.type === "forum" && (
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                            <FaUsers className="w-5 h-5 text-green-600" />
-                          </div>
-                          <div>
-                            <h4 className="font-semibold">{rec.title}</h4>
-                            <p className={`text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
-                              {rec.description}
-                            </p>
-                            <span className="text-xs text-green-600">
-                              {rec.members} members • {rec.activity}
-                            </span>
-                          </div>
+                        <div className="flex items-center gap-4">
+                          <CountdownTimer targetTime={new Date(`${app.date}T${app.time}`)} />
+                          <button
+                            disabled={new Date(`${app.date}T${app.time}`).getTime() - new Date().getTime() > 600000}
+                            onClick={() => navigate(`/live/${app.id}`)}
+                            className="disabled:opacity-20 px-4 py-2 bg-teal-600 text-white text-[10px] font-black rounded-lg transition-all active:scale-95"
+                          >
+                            Enter
+                          </button>
                         </div>
-                        <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                          Join
-                        </button>
                       </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column */}
-          <div className="space-y-8">
-            {/* Mood Tracker */}
-            <div
-              className={`rounded-2xl p-6 shadow-xl transition-all duration-300 ${
-                theme === "dark" ? "bg-gray-800 text-white" : "bg-white"
-              }`}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-teal-100 dark:bg-teal-900/30 rounded-xl">
-                    <FaChartLine className="w-5 h-5 text-teal-600" />
-                  </div>
-                  <h3 className="text-lg font-bold">Mood Tracker</h3>
-                </div>
-                <button className="bg-teal-500 hover:bg-teal-600 text-white px-3 py-1 rounded-lg text-sm font-medium transition-colors flex items-center space-x-1">
-                  <FaPlus className="w-3 h-3" />
-                  <span>Add</span>
-                </button>
-              </div>
-
-              <MoodChart moodData={moodData} />
-
-              <div
-                className={`mt-4 p-3 rounded-lg ${
-                  moodTrend.trend === "concerning"
-                    ? "bg-red-50 dark:bg-red-900/20"
-                    : moodTrend.trend === "positive"
-                      ? "bg-green-50 dark:bg-green-900/20"
-                      : "bg-blue-50 dark:bg-blue-900/20"
-                }`}
-              >
-                <div className="flex items-center space-x-2 mb-2">
-                  <moodTrend.icon className={`w-4 h-4 ${moodTrend.color}`} />
-                  <span className="text-sm font-medium">Mood Insight</span>
-                </div>
-                <p className="text-sm text-gray-600 dark:text-gray-300">{moodTrend.message}</p>
-                {moodTrend.trend === "concerning" && (
-                  <button className="mt-2 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm font-medium transition-colors">
-                    Talk Now
-                  </button>
+                    </div>
+                  ))
                 )}
               </div>
             </div>
+          </div>
 
-
-
-            {/* Account Snapshot / Stats */}
-            <div
-              className={`rounded-2xl p-6 shadow-xl transition-all duration-300 ${
-                theme === "dark" ? "bg-gray-800 text-white" : "bg-white"
-              }`}
-            >
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-xl">
-                  <FaChartLine className="w-5 h-5 text-green-600" />
+          <div className="space-y-8">
+            <div className={`rounded-[2rem] p-6 border transition-all duration-300 ${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100 shadow-sm"}`}>
+              {loadingMood ? (
+                <div className="h-48 flex items-center justify-center">
+                  <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
                 </div>
-                <h3 className="text-lg font-bold">Your Progress</h3>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <BiMessageSquareDetail className="w-4 h-4 text-blue-500" />
-                    <span className="text-sm">Total Sessions</span>
-                  </div>
-                  <span className="font-bold text-blue-500">{accountStats.totalSessions}</span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <HiOutlineEmojiHappy className="w-4 h-4 text-green-500" />
-                    <span className="text-sm">Mood Improvement</span>
-                  </div>
-                  <span className="font-bold text-green-500">{accountStats.moodImprovement}%</span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <FaClock className="w-4 h-4 text-purple-500" />
-                    <span className="text-sm">Time Spent</span>
-                  </div>
-                  <span className="font-bold text-purple-500">{accountStats.totalTimeSpent}</span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <FaStar className="w-4 h-4 text-yellow-500" />
-                    <span className="text-sm">Satisfaction</span>
-                  </div>
-                  <span className="font-bold text-yellow-500">{accountStats.satisfactionScore}/5</span>
-                </div>
-              </div>
-
-              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-teal-500">{accountStats.totalSessions}</div>
-                    <div className="text-xs text-gray-500">Sessions</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-500">{accountStats.moodImprovement}%</div>
-                    <div className="text-xs text-gray-500">Improvement</div>
-                  </div>
-                </div>
-              </div>
+              ) : (
+                <MoodChart moodData={moodData} />
+              )}
             </div>
-
-
+            <CrisisCorner />
           </div>
         </div>
       </div>
-    </div>
+      <AICompanion />
+    </div >
   )
 }
 

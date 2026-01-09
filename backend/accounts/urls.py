@@ -1,0 +1,48 @@
+from django.urls import path
+from .views import (
+    RegisterView, UserDetailView, AIChatView, 
+    ChatSessionListView, ChatSessionDetailView, 
+    UserListView, ProfessionalListView, ClientListView,
+    AppointmentListCreateView, AppointmentDetailView, NotificationListView, NotificationMarkReadView,
+    MoodUpdateListCreateView, ConnectionListCreateView, ConnectionDetailView, UpdateOnlineStatusView, DirectMessageView,
+    PublicUserDetailView, InitiateLiveSessionView, InitializePaymentView, VerifyPaymentView,
+    PaymentListView, PaymentCallbackView, JournalEntryListCreateView, JournalEntryDetailView,
+    ProfessionalEarningsView, BankListView, WithdrawalRequestView
+)
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
+urlpatterns = [
+    path('register/', RegisterView.as_view(), name='register'),
+    path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('me/', UserDetailView.as_view(), name='me'),
+    path('ai-chat/', AIChatView.as_view(), name='ai_chat'),
+    path('chat-sessions/', ChatSessionListView.as_view(), name='chat_session_list'),
+    path('chat-sessions/<int:pk>/', ChatSessionDetailView.as_view(), name='chat_session_detail'),
+    path('users/', UserListView.as_view(), name='user_list'),
+    path('professionals/', ProfessionalListView.as_view(), name='professional_list'),
+    path('clients/', ClientListView.as_view(), name='client_list'),
+    path('appointments/', AppointmentListCreateView.as_view(), name='appointment_list_create'),
+    path('appointments/<int:pk>/', AppointmentDetailView.as_view(), name='appointment_detail'),
+    path('notifications/', NotificationListView.as_view(), name='notification_list'),
+    path('notifications/<int:pk>/read/', NotificationMarkReadView.as_view(), name='notification_mark_read'),
+    path('mood-updates/', MoodUpdateListCreateView.as_view(), name='mood_update_list_create'),
+    path('connections/', ConnectionListCreateView.as_view(), name='connection_list_create'),
+    path('connections/<int:pk>/', ConnectionDetailView.as_view(), name='connection_detail'),
+    path('professional/status/', UpdateOnlineStatusView.as_view(), name='update_online_status'),
+    path('messages/', DirectMessageView.as_view(), name='direct_messages'),
+    path('users/detail/<int:pk>/', PublicUserDetailView.as_view(), name='public_user_detail'),
+    path('live/initiate/', InitiateLiveSessionView.as_view(), name='initiate_live_session'),
+    path('payment/initialize/', InitializePaymentView.as_view(), name='payment_initialize'),
+    path('payment/verify/<str:tx_ref>/', VerifyPaymentView.as_view(), name='payment_verify'),
+    path('payment/history/', PaymentListView.as_view(), name='payment_history'),
+    path('payment/callback/<str:tx_ref>/', PaymentCallbackView.as_view(), name='payment_callback'),
+    path('journal-entries/', JournalEntryListCreateView.as_view(), name='journal_entry_list_create'),
+    path('journal-entries/<int:pk>/', JournalEntryDetailView.as_view(), name='journal_entry_detail'),
+    path('payout/earnings/', ProfessionalEarningsView.as_view(), name='payout_earnings'),
+    path('payout/banks/', BankListView.as_view(), name='payout_banks'),
+    path('payout/withdraw/', WithdrawalRequestView.as_view(), name='payout_withdraw'),
+]

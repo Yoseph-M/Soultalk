@@ -81,7 +81,7 @@ const Chat: React.FC = () => {
 
   return (
     <div className="flex h-[calc(100vh-80px)]">
-      {/* Sidebar - Chat List */}
+      {}
       <div className="w-80 bg-white border-r flex flex-col">
         <div className="p-4 border-b">
           <h2 className="text-xl font-semibold text-gray-900">Messages</h2>
@@ -119,9 +119,9 @@ const Chat: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Chat Area */}
+      {}
       <div className="flex-1 flex flex-col">
-        {/* Chat Header */}
+        {}
         <div className="p-4 border-b bg-white flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-[#25A8A0] rounded-full flex items-center justify-center">
@@ -147,7 +147,7 @@ const Chat: React.FC = () => {
           </div>
         </div>
 
-        {/* Messages */}
+        {}
         <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
           {messages.map((msg) => (
             <div key={msg.id} className={`flex items-start space-x-3 ${msg.sender === 'user' ? 'justify-end' : ''}`}>
@@ -178,7 +178,7 @@ const Chat: React.FC = () => {
             </div>
           ))}
 
-          {/* Typing Indicator */}
+          {}
           <div className="flex items-start space-x-3">
             <div className="w-8 h-8 bg-[#25A8A0] rounded-full flex items-center justify-center flex-shrink-0">
               <span className="text-white text-sm font-semibold">SJ</span>
@@ -193,7 +193,7 @@ const Chat: React.FC = () => {
           </div>
         </div>
 
-        {/* Message Input */}
+        {}
         <div className="p-4 bg-white border-t">
           <form onSubmit={handleSendMessage} className="flex items-center space-x-2">
             <button type="button" className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">

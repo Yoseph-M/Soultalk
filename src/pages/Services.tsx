@@ -1,15 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  MessageCircle, Video, Phone, Users, Heart, 
-  Shield, Clock, Award, CheckCircle, Brain 
-} from 'lucide-react';
+import {CheckCircle } from 'lucide-react';
 import Header from './Header';
 
 const Services: React.FC = () => {
   const services = [
     {
-      icon: MessageCircle,
       title: 'Individual Therapy',
       description: 'One-on-one sessions with licensed mental health professionals',
       features: [
@@ -21,7 +17,6 @@ const Services: React.FC = () => {
       color: 'from-blue-500 to-blue-600'
     },
     {
-      icon: Users,
       title: 'Group Support',
       description: 'Connect with others in moderated group therapy sessions',
       features: [
@@ -33,7 +28,6 @@ const Services: React.FC = () => {
       color: 'from-green-500 to-green-600'
     },
     {
-      icon: Brain,
       title: 'Specialized Care',
       description: 'Expert support for specific mental health conditions',
       features: [
@@ -45,7 +39,6 @@ const Services: React.FC = () => {
       color: 'from-purple-500 to-purple-600'
     },
     {
-      icon: Heart,
       title: 'Crisis Support',
       description: '24/7 emergency mental health assistance',
       features: [
@@ -79,7 +72,7 @@ const Services: React.FC = () => {
       <Header />
 
       <div className="container mx-auto px-4 py-12">
-        {/* Hero Section */}
+        {}
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
             Comprehensive Mental Health Services
@@ -90,13 +83,11 @@ const Services: React.FC = () => {
           </p>
         </div>
 
-        {/* Main Services */}
+        {}
         <div className="grid md:grid-cols-2 gap-8 mb-20">
           {services.map((service, index) => (
             <div key={index} className="border-0 shadow-xl hover:shadow-2xl transition-all duration-300 bg-white rounded-lg p-8">
-              <div className={`w-16 h-16 bg-gradient-to-br ${service.color} rounded-2xl flex items-center justify-center mb-6`}>
-                <service.icon className="h-8 w-8 text-white" />
-              </div>
+              {}
               <h3 className="text-2xl font-bold mb-4">{service.title}</h3>
               <p className="text-gray-600 mb-6 leading-relaxed">{service.description}</p>
               <ul className="space-y-3">
@@ -111,7 +102,7 @@ const Services: React.FC = () => {
           ))}
         </div>
 
-        {/* Specializations */}
+        {}
         <div className="mb-20">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Areas of Specialization</h2>
@@ -129,43 +120,7 @@ const Services: React.FC = () => {
           </div>
         </div>
 
-        {/* Quality Assurance */}
-        <div className="bg-white rounded-2xl p-8 shadow-lg mb-20">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Quality & Safety First</h2>
-            <p className="text-lg text-gray-600">
-              Your safety and privacy are our top priorities
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Award className="h-8 w-8 text-blue-600" />
-              </div>
-              <h3 className="font-bold mb-2">Licensed Professionals</h3>
-              <p className="text-gray-600 text-sm">All therapists are licensed, verified, and background-checked</p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-green-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Shield className="h-8 w-8 text-green-600" />
-              </div>
-              <h3 className="font-bold mb-2">HIPAA Compliant</h3>
-              <p className="text-gray-600 text-sm">End-to-end encryption and secure, confidential sessions</p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Clock className="h-8 w-8 text-purple-600" />
-              </div>
-              <h3 className="font-bold mb-2">24/7 Support</h3>
-              <p className="text-gray-600 text-sm">Crisis support and emergency resources available anytime</p>
-            </div>
-          </div>
-        </div>
-
-        {/* CTA Section */}
+        {}
         <div className="text-center bg-gradient-to-r from-[#25A8A0] to-green-600 rounded-2xl p-12 text-white">
           <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
           <p className="text-xl mb-8 opacity-90">

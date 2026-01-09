@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import Logo from '../assets/images/stlogo.svg';
-import { FaUserCircle, FaCalendarAlt, FaBell, FaListAlt } from 'react-icons/fa';
+
 
 const Header: React.FC = () => {
   const { user, logout } = useAuth();
@@ -13,7 +13,7 @@ const Header: React.FC = () => {
 
   React.useEffect(() => {
     const onScroll = () => {
-      // When scrolling down more than 50px, switch to compact header
+
       setIsScrolled(window.scrollY > 50);
     };
     onScroll();
@@ -40,21 +40,21 @@ const Header: React.FC = () => {
       style={{ transformOrigin: 'top center', zIndex: 50 }}
     >
       <div className="container mx-auto px-4 py-0 flex items-center justify-between h-full">
-        {/* Logo */}
+        { }
         <Link to="/" className="flex items-center hover:opacity-80 transition-opacity" style={{ gap: '0px' }}>
           <img src={Logo} alt="SoulTalk Logo" className="h-16 md:h-12 -mr-2" />
           <span className="text-2xl font-extrabold text-white">SoulTalk</span>
         </Link>
 
-  {/* Desktop Navigation */}
-  <nav className={(isScrolled ? 'hidden md:flex items-center flex-1 justify-center h-full' : 'hidden md:flex items-center flex-1 justify-center h-full')}>
+        { }
+        <nav className={(isScrolled ? 'hidden md:flex items-center flex-1 justify-center gap-8 h-full' : 'hidden md:flex items-center flex-1 justify-center gap-8 h-full')}>
           {navItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
               className={
                 (isActive(item.path) ? 'active-nav-link' : 'nav-link') +
-                ' text-base px-4 flex items-center justify-center h-full'
+                ' text-base px-4 flex items-center justify-center'
               }
             >
               {item.label}
@@ -62,55 +62,32 @@ const Header: React.FC = () => {
           ))}
         </nav>
 
-        {/* User Actions */}
-        <div className={(isScrolled ? 'hidden md:flex items-center space-x-2' : 'hidden md:flex items-center space-x-3')}>
-          {!user ? (
+        { }
+        <div className="hidden md:flex items-center gap-4">
+          {user && (user.type !== 'professional' || user.verified) ? (
             <>
-              <Link to="/auth?mode=signup">
-                <button className="bg-white text-[#25A8A0] hover:bg-gray-100 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center text-base h-12">
-                  Get Started
+              <Link to={user.type === 'professional' || user.type === 'listener' ? '/professionals' : '/dashboard'}>
+                <button className="text-white font-semibold px-4 hover:underline transition-all">
+                  Dashboard
                 </button>
               </Link>
+              <button
+                onClick={logout}
+                className="bg-white text-[#25A8A0] hover:bg-gray-100 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center text-base h-12"
+              >
+                Logout
+              </button>
             </>
           ) : (
-            <>
-              {/* My Sessions */}
-              <Link to="/sessions">
-                <button className="flex items-center gap-2 text-white hover:bg-white/10 px-4 py-2 rounded-lg transition-colors" title="My Sessions">
-                  <FaListAlt className="w-5 h-5" />
-                  <span className="hidden lg:inline">My Sessions</span>
-                </button>
-              </Link>
-              {/* Schedule */}
-              <Link to="/schedule">
-                <button className="flex items-center gap-2 text-white hover:bg-white/10 px-4 py-2 rounded-lg transition-colors" title="Schedule">
-                  <FaCalendarAlt className="w-5 h-5" />
-                  <span className="hidden lg:inline">Schedule</span>
-                </button>
-              </Link>
-              {/* Notifications */}
-              <Link to="/notifications">
-                <button className="flex items-center gap-2 text-white hover:bg-white/10 px-4 py-2 rounded-lg transition-colors" title="Notifications">
-                  <FaBell className="w-5 h-5" />
-                  <span className="hidden lg:inline">Notifications</span>
-                </button>
-              </Link>
-              {/* My Profile Dropdown */}
-              <div className="relative group">
-                <button className="flex items-center gap-2 text-white hover:bg-white/10 px-4 py-2 rounded-lg transition-colors" title="My Profile" aria-haspopup="true" aria-expanded="false">
-                  <FaUserCircle className="w-6 h-6" />
-                  <span className="hidden lg:inline">My Profile</span>
-                </button>
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition-opacity">
-                  <Link to="/profile" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">View Profile</Link>
-                  <button onClick={logout} className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">Logout</button>
-                </div>
-              </div>
-            </>
+            <Link to="/auth?mode=signup">
+              <button className="bg-white text-[#25A8A0] hover:bg-gray-100 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center text-base h-12">
+                Get Started
+              </button>
+            </Link>
           )}
         </div>
 
-        {/* Mobile Menu Button */}
+        { }
         <button
           className="md:hidden text-white p-2"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -119,7 +96,7 @@ const Header: React.FC = () => {
         </button>
       </div>
 
-      {/* Mobile Menu */}
+      { }
       {isMobileMenuOpen && (
         <div className="md:hidden mt-4 pb-4 border-t border-white/20">
           <nav className="flex flex-col space-y-2 mt-4">
@@ -136,7 +113,7 @@ const Header: React.FC = () => {
                 {item.label}
               </Link>
             ))}
-            {user ? (
+            {user && (user.type !== 'professional' || user.verified) ? (
               <button
                 onClick={() => {
                   logout();

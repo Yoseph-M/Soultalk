@@ -105,7 +105,7 @@ const HowItWorks: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
       <Header />
       <div className="container mx-auto px-4 py-12">
-        {/* Hero Section */}
+        {}
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
             How SoulTalk Works
@@ -116,7 +116,7 @@ const HowItWorks: React.FC = () => {
           </p>
         </div>
 
-        {/* Steps Section */}
+        {}
         <div className="mb-20">
           <div className="space-y-16">
             {steps.map((step, index) => (
@@ -155,7 +155,7 @@ const HowItWorks: React.FC = () => {
           </div>
         </div>
 
-        {/* Features Section */}
+        {}
         <div className="mb-20">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Choose SoulTalk?</h2>
@@ -177,7 +177,7 @@ const HowItWorks: React.FC = () => {
           </div>
         </div>
 
-        {/* FAQ Section */}
+        {}
         <div className="mb-20">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
@@ -196,7 +196,7 @@ const HowItWorks: React.FC = () => {
           </div>
         </div>
 
-        {/* CTA Section */}
+        {}
         <div className="text-center bg-gradient-to-r from-[#25A8A0] to-green-600 rounded-2xl p-12 text-white">
           <h2 className="text-3xl font-bold mb-4">Ready to Start Your Mental Health Journey?</h2>
           <p className="text-xl mb-8 opacity-90">

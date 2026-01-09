@@ -101,7 +101,7 @@ const Blog: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
       <Header />
       <div className="container mx-auto px-4 py-12">
-        {/* Hero Section */}
+        {}
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
             Mental Health Insights & Resources
@@ -111,7 +111,7 @@ const Blog: React.FC = () => {
           </p>
         </div>
 
-        {/* Featured Post */}
+        {}
         <div className="mb-16">
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
             <div className="md:flex">
@@ -162,7 +162,7 @@ const Blog: React.FC = () => {
           </div>
         </div>
 
-        {/* Category Filter */}
+        {}
         <div className="mb-12">
           <div className="flex flex-wrap gap-3 justify-center">
             {categories.map((category) => (
@@ -181,7 +181,7 @@ const Blog: React.FC = () => {
           </div>
         </div>
 
-        {/* Blog Posts Grid */}
+        {}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {filteredPosts.map((post) => (
             <article key={post.id} className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow overflow-hidden">
@@ -232,7 +232,7 @@ const Blog: React.FC = () => {
           ))}
         </div>
 
-        {/* Newsletter Subscription */}
+        {}
         <div className="bg-gradient-to-r from-[#25A8A0] to-green-600 rounded-2xl p-8 text-center text-white">
           <BookOpen className="h-12 w-12 mx-auto mb-4" />
           <h2 className="text-2xl font-bold mb-4">Stay Updated with Mental Health Insights</h2>

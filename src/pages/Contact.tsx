@@ -11,7 +11,7 @@ const Contact: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
-    // Here you would handle sending the form data
+    
   };
 
   return (
