@@ -1,4 +1,5 @@
 "use client"
+import { API_BASE_URL } from "../config";
 
 import React, { useState } from "react"
 import { FaHistory, FaDownload } from "react-icons/fa"
@@ -19,7 +20,7 @@ const ClientBilling: React.FC = () => {
     React.useEffect(() => {
         const fetchHistory = async () => {
             try {
-                const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/payment/history/')
+                const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/payment/history/')
                 if (response.ok) {
                     const data = await response.json()
                     setBillingHistory(data)
@@ -47,7 +48,7 @@ const ClientBilling: React.FC = () => {
     const handlePayment = async (amount: number) => {
         setIsProcessing(true);
         try {
-            const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/payment/initialize/', {
+            const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/payment/initialize/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -89,7 +90,7 @@ const ClientBilling: React.FC = () => {
     const handleDownloadReceipt = async (transaction: any) => {
         try {
             // Fetch fresh data from Chapa verification to ensure "real" receipt data
-            const response = await fetchWithAuth(`http://127.0.0.1:8000/api/auth/payment/verify/${transaction.tx_ref}/`);
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/auth/payment/verify/${transaction.tx_ref}/`);
             if (!response.ok) {
                 alert("Could not verify transaction details for receipt.");
                 return;

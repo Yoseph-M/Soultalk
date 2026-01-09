@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config";
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Send, ArrowLeft, Phone, Video } from 'lucide-react';
@@ -47,7 +48,7 @@ const TextChat: React.FC = () => {
         if (!chatPartnerId) return;
         const fetchPartnerInfo = async () => {
             try {
-                const res = await fetchWithAuth(`http://127.0.0.1:8000/api/auth/users/detail/${chatPartnerId}/`);
+                const res = await fetchWithAuth(`${API_BASE_URL}/api/auth/users/detail/${chatPartnerId}/`);
                 if (res.ok) {
                     const data = await res.json();
                     setOtherUser(data);
@@ -65,7 +66,7 @@ const TextChat: React.FC = () => {
 
         const loadMessages = async () => {
             try {
-                const res = await fetchWithAuth(`http://127.0.0.1:8000/api/auth/messages/?user_id=${chatPartnerId}`);
+                const res = await fetchWithAuth(`${API_BASE_URL}/api/auth/messages/?user_id=${chatPartnerId}`);
                 if (res.ok) {
                     const data = await res.json();
                     setMessages(data);
@@ -85,7 +86,7 @@ const TextChat: React.FC = () => {
         if (!newMessage.trim() || !chatPartnerId) return;
 
         try {
-            const res = await fetchWithAuth('http://127.0.0.1:8000/api/auth/messages/', {
+            const res = await fetchWithAuth(' + API_BASE_URL + '/api/auth/messages/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

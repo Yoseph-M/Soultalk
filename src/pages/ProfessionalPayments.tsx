@@ -1,4 +1,5 @@
 "use client"
+import { API_BASE_URL } from "../config";
 
 import React, { useState, useEffect } from "react"
 import {
@@ -132,7 +133,7 @@ const ProfessionalPayments: React.FC = () => {
 
     const fetchData = async () => {
         try {
-            const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/payout/earnings/')
+            const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/payout/earnings/')
             if (response.ok) {
                 const data = await response.json()
                 setEarnings({
@@ -152,7 +153,7 @@ const ProfessionalPayments: React.FC = () => {
     const fetchBanks = async () => {
         setFetchingBanks(true)
         try {
-            const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/payout/banks/')
+            const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/payout/banks/')
             let apiBanks: Bank[] = []
 
             if (response.ok) {
@@ -213,7 +214,7 @@ const ProfessionalPayments: React.FC = () => {
         setError(null)
 
         try {
-            const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/payout/withdraw/', {
+            const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/payout/withdraw/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)

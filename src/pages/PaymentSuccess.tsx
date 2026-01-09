@@ -1,4 +1,5 @@
 "use client"
+import { API_BASE_URL } from "../config";
 
 import React, { useEffect, useState } from "react"
 import { useSearchParams, useNavigate } from "react-router-dom"
@@ -26,7 +27,7 @@ const PaymentSuccess: React.FC = () => {
             }
 
             try {
-                const response = await fetchWithAuth(`http://127.0.0.1:8000/api/auth/payment/verify/${txRef}/`)
+                const response = await fetchWithAuth(`${API_BASE_URL}/api/auth/payment/verify/${txRef}/`)
                 const data = await response.json()
 
                 if (response.ok && data.status === 'success') {

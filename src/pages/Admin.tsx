@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config";
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -56,7 +57,7 @@ const Admin: React.FC = () => {
 
     const fetchUsers = async () => {
         try {
-            const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/users/');
+            const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/users/');
             if (response.ok) {
                 const data = await response.json();
                 setUsers(data);
@@ -74,7 +75,7 @@ const Admin: React.FC = () => {
 
     const handleVerifyUser = async (userId: number) => {
         try {
-            const response = await fetchWithAuth(`http://127.0.0.1:8000/api/auth/users/`, {
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/auth/users/`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -253,7 +254,7 @@ const Admin: React.FC = () => {
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center bg-[#25A8A0]/10 border border-[#25A8A0]/20 shadow-sm">
                                                         {u.profile_photo ? (
-                                                            <img src={`http://127.0.0.1:8000${u.profile_photo}`} alt="" className="w-full h-full object-cover" />
+                                                            <img src={`${API_BASE_URL}${u.profile_photo}`} alt="" className="w-full h-full object-cover" />
                                                         ) : (
                                                             <span className="font-bold text-lg text-[#25A8A0]">
                                                                 {u.first_name ? u.first_name[0] : (u.username ? u.username[0].toUpperCase() : 'U')}
@@ -338,7 +339,7 @@ const Admin: React.FC = () => {
                                 <div className="relative -mt-20 mb-8 flex flex-col md:flex-row md:items-end gap-6 text-center md:text-left">
                                     <div className="w-40 h-40 rounded-[2rem] overflow-hidden border-8 border-white dark:border-gray-800 shadow-2xl bg-gray-100 mx-auto md:mx-0">
                                         {selectedUser.profile_photo ? (
-                                            <img src={`http://127.0.0.1:8000${selectedUser.profile_photo}`} alt="" className="w-full h-full object-cover" />
+                                            <img src={`${API_BASE_URL}${selectedUser.profile_photo}`} alt="" className="w-full h-full object-cover" />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center bg-[#25A8A0] text-white text-5xl font-black">
                                                 {selectedUser.first_name?.[0] || selectedUser.username?.[0].toUpperCase()}
@@ -391,7 +392,7 @@ const Admin: React.FC = () => {
                                                     <div className="space-y-3">
                                                         {selectedUser.id_image && (
                                                             <a
-                                                                href={`http://127.0.0.1:8000${selectedUser.id_image}`}
+                                                                href={`${API_BASE_URL}${selectedUser.id_image}`}
                                                                 target="_blank"
                                                                 rel="noreferrer"
                                                                 className={`flex items-center justify-between p-3 rounded-2xl border-2 transition-all hover:bg-[#25A8A0]/5 hover:border-[#25A8A0]/50 ${theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`}
@@ -408,7 +409,7 @@ const Admin: React.FC = () => {
                                                         )}
                                                         {selectedUser.certificates && (
                                                             <a
-                                                                href={`http://127.0.0.1:8000${selectedUser.certificates}`}
+                                                                href={`${API_BASE_URL}${selectedUser.certificates}`}
                                                                 target="_blank"
                                                                 rel="noreferrer"
                                                                 className={`flex items-center justify-between p-3 rounded-2xl border-2 transition-all hover:bg-[#25A8A0]/5 hover:border-[#25A8A0]/50 ${theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`}

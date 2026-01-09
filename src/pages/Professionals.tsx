@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config";
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
@@ -26,21 +27,21 @@ const ProfessionalDashboard: React.FC = () => {
         try {
             console.log("Fetching professional data for user:", user.id);
             // Fetch Status (via User Details)
-            const meResponse = await fetchWithAuth('http://127.0.0.1:8000/api/auth/me/');
+            const meResponse = await fetchWithAuth(' + API_BASE_URL + '/api/auth/me/');
             if (meResponse.ok) {
                 const meData = await meResponse.json();
                 setIsOnline(meData.is_online);
             }
 
             // Fetch Appointments
-            const appResponse = await fetchWithAuth('http://127.0.0.1:8000/api/auth/appointments/');
+            const appResponse = await fetchWithAuth(' + API_BASE_URL + '/api/auth/appointments/');
             if (appResponse.ok) {
                 const data = await appResponse.json();
                 setUpcomingSessions(data.filter((a: any) => a.status === 'upcoming'));
             }
 
             // Fetch Connection Requests
-            const connResponse = await fetchWithAuth('http://127.0.0.1:8000/api/auth/connections/');
+            const connResponse = await fetchWithAuth(' + API_BASE_URL + '/api/auth/connections/');
             if (connResponse.ok) {
                 const data = await connResponse.json();
                 console.log("Received connections data:", data);
@@ -57,7 +58,7 @@ const ProfessionalDashboard: React.FC = () => {
             }
 
             // Fetch Notifications
-            const notifResponse = await fetchWithAuth('http://127.0.0.1:8000/api/auth/notifications/');
+            const notifResponse = await fetchWithAuth(' + API_BASE_URL + '/api/auth/notifications/');
             if (notifResponse.ok) {
                 const data = await notifResponse.json();
                 setNotifications(data);
@@ -86,7 +87,7 @@ const ProfessionalDashboard: React.FC = () => {
 
     const handleConnectionUpdate = async (id: number, status: 'accepted' | 'rejected') => {
         try {
-            const response = await fetchWithAuth(`http://127.0.0.1:8000/api/auth/connections/${id}/`, {
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/auth/connections/${id}/`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status })
@@ -133,7 +134,7 @@ const ProfessionalDashboard: React.FC = () => {
                                 onClick={async () => {
                                     try {
                                         const newStatus = !isOnline;
-                                        const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/professional/status/', {
+                                        const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/professional/status/', {
                                             method: 'POST',
                                             headers: { 'Content-Type': 'application/json' },
                                             body: JSON.stringify({ is_online: newStatus })
@@ -226,7 +227,7 @@ const ProfessionalDashboard: React.FC = () => {
                                         <div className="flex items-center gap-3 w-full md:w-auto">
                                             <button
                                                 onClick={async () => {
-                                                    await fetchWithAuth(`http://127.0.0.1:8000/api/auth/notifications/${notif.id}/mark-read/`, { method: 'POST' });
+                                                    await fetchWithAuth(`${API_BASE_URL}/api/auth/notifications/${notif.id}/mark-read/`, { method: 'POST' });
                                                     fetchProfessionalData();
                                                 }}
                                                 className={`flex-1 md:flex-none px-6 py-3 font-bold rounded-2xl transition-all border ${theme === 'dark' ? 'bg-transparent border-teal-500/30 text-teal-400 hover:bg-teal-500/10' : 'bg-white border-teal-200 text-teal-600 hover:bg-teal-50'}`}
@@ -236,7 +237,7 @@ const ProfessionalDashboard: React.FC = () => {
                                             <Link
                                                 to={notif.link}
                                                 onClick={async () => {
-                                                    await fetchWithAuth(`http://127.0.0.1:8000/api/auth/notifications/${notif.id}/mark-read/`, { method: 'POST' });
+                                                    await fetchWithAuth(`${API_BASE_URL}/api/auth/notifications/${notif.id}/mark-read/`, { method: 'POST' });
                                                 }}
                                                 className="flex-1 md:flex-none px-8 py-3 bg-[#25A8A0] text-white font-black rounded-2xl hover:bg-teal-600 shadow-xl shadow-teal-500/20 transition-all flex items-center justify-center gap-2"
                                             >

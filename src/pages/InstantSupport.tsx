@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config";
 import React, { useState, useEffect } from 'react';
 import DashboardHeader from './DashboardHeader';
 import { useAuth } from '../contexts/AuthContext';
@@ -49,12 +50,12 @@ const InstantSupport: React.FC = () => {
                 const getImageUrl = (path: string | null, name: string) => {
                     if (!path) return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`;
                     if (path.startsWith('http')) return path;
-                    return `http://127.0.0.1:8000${path}`;
+                    return `${API_BASE_URL}${path}`;
                 };
 
 
                 // Fetch all professionals (in a real app, optimize this to only fetch online)
-                const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/professionals/');
+                const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/professionals/');
                 if (response.ok) {
                     const data = await response.json();
                     const formatted: Professional[] = data.map((user: any) => ({
@@ -99,7 +100,7 @@ const InstantSupport: React.FC = () => {
         const sessionId = `conn-${professionalId}-${user.id}-${Date.now()}`; // Unique session
 
         try {
-            await fetchWithAuth('http://127.0.0.1:8000/api/auth/live/initiate/', {
+            await fetchWithAuth(' + API_BASE_URL + '/api/auth/live/initiate/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

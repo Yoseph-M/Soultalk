@@ -1,4 +1,5 @@
 "use client"
+import { API_BASE_URL } from "../config";
 
 import React, { useState, useEffect } from "react"
 import { FaCommentDots, FaSearch, FaHistory, FaVideo, FaChevronRight } from "react-icons/fa"
@@ -19,7 +20,7 @@ const ProfessionalHistory: React.FC = () => {
         const fetchHistory = async () => {
             setLoading(true)
             try {
-                const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/appointments/')
+                const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/appointments/')
                 if (response.ok) {
                     const appointments = await response.json()
                     const pastAppointments = appointments.map((appt: any) => ({

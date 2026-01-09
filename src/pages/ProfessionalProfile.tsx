@@ -1,4 +1,5 @@
 "use client"
+import { API_BASE_URL } from "../config";
 
 import React, { useState, useEffect } from "react"
 import {
@@ -63,7 +64,7 @@ const ProfessionalProfile: React.FC = () => {
         if (!path) return null;
         if (path.startsWith('http')) return path;
         if (path.startsWith('data:')) return path; // Handle base64 preview
-        return `http://127.0.0.1:8000${path}`;
+        return `${API_BASE_URL}${path}`;
     };
 
 
@@ -72,7 +73,7 @@ const ProfessionalProfile: React.FC = () => {
             if (!user) return
 
             try {
-                const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/me/')
+                const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/me/')
                 if (response.ok) {
                     const data = await response.json()
                     setProfile({
@@ -132,7 +133,7 @@ const ProfessionalProfile: React.FC = () => {
                 formData.append('certificates', certificateFile)
             }
 
-            const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/me/', {
+            const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/me/', {
                 method: 'PATCH',
                 body: formData
             })

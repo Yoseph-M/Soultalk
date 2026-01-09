@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config";
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { Link } from 'react-router-dom';
@@ -55,7 +56,7 @@ const Journal: React.FC = () => {
     const fetchClients = useCallback(async () => {
         if (!isProfessional) return;
         try {
-            const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/connections/');
+            const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/connections/');
             if (response.ok) {
                 const data = await response.json();
                 const accepted = data.filter((c: any) => c.status === 'accepted');
@@ -69,7 +70,7 @@ const Journal: React.FC = () => {
     const fetchHistory = useCallback(async () => {
         setLoadingHistory(true);
         try {
-            let url = 'http://127.0.0.1:8000/api/auth/journal-entries/';
+            let url = ' + API_BASE_URL + '/api/auth/journal-entries/';
             if (selectedClient) {
                 url += `?client_id=${selectedClient}`;
             } else {
@@ -120,7 +121,7 @@ const Journal: React.FC = () => {
                 }
             }
 
-            const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/journal-entries/', {
+            const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/journal-entries/', {
                 method: 'POST',
                 body: formData,
             });
@@ -148,7 +149,7 @@ const Journal: React.FC = () => {
     const handleDelete = async (id: number) => {
         if (!confirm("Are you sure you want to delete this journal entry?")) return;
         try {
-            const response = await fetchWithAuth(`http://127.0.0.1:8000/api/auth/journal-entries/${id}/`, {
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/auth/journal-entries/${id}/`, {
                 method: 'DELETE',
             });
             if (response.ok) {
@@ -163,7 +164,7 @@ const Journal: React.FC = () => {
     const handleRename = async (id: number) => {
         if (!renameValue.trim()) return;
         try {
-            const response = await fetchWithAuth(`http://127.0.0.1:8000/api/auth/journal-entries/${id}/`, {
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/auth/journal-entries/${id}/`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ title: renameValue }),
@@ -352,7 +353,7 @@ const Journal: React.FC = () => {
                 // Handle different URL formats from backend
                 const url = item.media_file.startsWith('http')
                     ? item.media_file
-                    : `http://127.0.0.1:8000${item.media_file}`;
+                    : `${API_BASE_URL}${item.media_file}`;
                 setSelectedMediaUrl(url);
             } else {
                 setSelectedMediaUrl(null);

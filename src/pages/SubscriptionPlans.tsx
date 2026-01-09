@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config";
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Check, Shield } from 'lucide-react';
@@ -17,7 +18,7 @@ const SubscriptionPlans: React.FC = () => {
 
         setIsProcessing(planName);
         try {
-            const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/payment/initialize/', {
+            const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/payment/initialize/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

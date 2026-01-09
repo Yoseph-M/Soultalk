@@ -1,4 +1,5 @@
 "use client"
+import { API_BASE_URL } from "../config";
 
 import type React from "react"
 import { useState, useEffect } from "react"
@@ -280,7 +281,7 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/appointments/')
+        const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/appointments/')
         if (response.ok) {
           const data = await response.json()
           // Filter for upcoming/pending and sort by date
@@ -297,7 +298,7 @@ const Dashboard: React.FC = () => {
 
     const fetchProfessionals = async () => {
       try {
-        const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/professionals/')
+        const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/professionals/')
         if (response.ok) {
           const data = await response.json()
           const formatted = data.map((user: any) => ({
@@ -306,7 +307,7 @@ const Dashboard: React.FC = () => {
             role: 'Mental Wellness Expert',
             rating: user.rating || 5.0,
             image: user.profile_photo
-              ? (user.profile_photo.startsWith('http') ? user.profile_photo : `http://127.0.0.1:8000${user.profile_photo}`)
+              ? (user.profile_photo.startsWith('http') ? user.profile_photo : `${API_BASE_URL}${user.profile_photo}`)
               : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=random`,
             tags: user.specialization ? [user.specialization] : ["Wellness Support"]
           }))
@@ -321,7 +322,7 @@ const Dashboard: React.FC = () => {
 
     const fetchMoodData = async () => {
       try {
-        const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/mood-updates/')
+        const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/mood-updates/')
         if (response.ok) {
           const data = await response.json()
           // Format for the last 7 days
@@ -468,7 +469,7 @@ const Dashboard: React.FC = () => {
                       <div className="flex items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
                           <img
-                            src={app.professional_image ? (app.professional_image.startsWith('http') ? app.professional_image : `http://127.0.0.1:8000${app.professional_image}`) : `https://ui-avatars.com/api/?name=${app.professional_name}&background=random`}
+                            src={app.professional_image ? (app.professional_image.startsWith('http') ? app.professional_image : `${API_BASE_URL}${app.professional_image}`) : `https://ui-avatars.com/api/?name=${app.professional_name}&background=random`}
                             className="w-12 h-12 rounded-xl object-cover"
                             alt=""
                           />

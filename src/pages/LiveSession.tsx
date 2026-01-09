@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config";
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ZegoUIKitPrebuilt } from '@zegocloud/zego-uikit-prebuilt';
@@ -23,7 +24,7 @@ const LiveSession: React.FC = () => {
             const partnerId = (user.id.toString() === parts[1]) ? parts[2] : parts[1];
             const fetchPartner = async () => {
                 try {
-                    const res = await fetchWithAuth(`http://127.0.0.1:8000/api/auth/users/detail/${partnerId}/`);
+                    const res = await fetchWithAuth(`${API_BASE_URL}/api/auth/users/detail/${partnerId}/`);
                     if (res.ok) {
                         const data = await res.json();
                         setOtherUser(data);

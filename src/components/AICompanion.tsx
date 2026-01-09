@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config";
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Bot, X, SendHorizontal } from 'lucide-react';
@@ -45,7 +46,7 @@ const AICompanion: React.FC = () => {
         setIsTyping(true);
 
         try {
-            const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/ai-chat/', {
+            const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/ai-chat/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: userMsgContent })

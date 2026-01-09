@@ -1,4 +1,5 @@
 "use client"
+import { API_BASE_URL } from "../config";
 
 import React, { useState, useEffect } from "react"
 import {
@@ -64,7 +65,7 @@ const ClientProfile: React.FC = () => {
             if (!user) return
 
             try {
-                const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/me/')
+                const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/me/')
                 if (response.ok) {
                     const data = await response.json()
                     setProfile(prev => ({
@@ -109,7 +110,7 @@ const ClientProfile: React.FC = () => {
                 // Add other fields that UserSerializer expects
             }
 
-            const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/me/', {
+            const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/me/', {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updateData)

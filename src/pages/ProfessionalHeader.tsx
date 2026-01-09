@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config";
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -69,7 +70,7 @@ const ProfessionalHeader: React.FC = () => {
 
     const fetchNotifications = async () => {
         try {
-            const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/notifications/');
+            const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/notifications/');
             if (response.ok) {
                 const data = await response.json();
                 setNotifications(data);
@@ -85,7 +86,7 @@ const ProfessionalHeader: React.FC = () => {
 
     const markAsRead = async (id: number) => {
         try {
-            const response = await fetchWithAuth(`http://127.0.0.1:8000/api/auth/notifications/${id}/read/`, {
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/auth/notifications/${id}/read/`, {
                 method: 'POST'
             });
             if (response.ok) {
@@ -255,7 +256,7 @@ const ProfessionalHeader: React.FC = () => {
                                         title="Profile"
                                     >
                                         {user?.avatar ? (
-                                            <img src={user.avatar.startsWith('http') ? user.avatar : `http://127.0.0.1:8000${user.avatar}`} alt="" className="w-full h-full rounded-full object-cover" />
+                                            <img src={user.avatar.startsWith('http') ? user.avatar : `${API_BASE_URL}${user.avatar}`} alt="" className="w-full h-full rounded-full object-cover" />
                                         ) : (
                                             user?.name?.charAt(0).toUpperCase() || 'P'
                                         )}
@@ -270,7 +271,7 @@ const ProfessionalHeader: React.FC = () => {
                                                 <div className="flex flex-col items-center mb-6 pt-2">
                                                     <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-3 shadow-lg ring-4 overflow-hidden ${theme === 'dark' ? 'bg-[#25A8A0] ring-gray-700/50' : 'bg-teal-50 ring-teal-50'}`}>
                                                         {user?.avatar ? (
-                                                            <img src={user.avatar.startsWith('http') ? user.avatar : `http://127.0.0.1:8000${user.avatar}`} alt="" className="w-full h-full object-cover" />
+                                                            <img src={user.avatar.startsWith('http') ? user.avatar : `${API_BASE_URL}${user.avatar}`} alt="" className="w-full h-full object-cover" />
                                                         ) : (
                                                             <span className={`text-4xl font-bold ${theme === 'dark' ? 'text-white' : 'text-[#25A8A0]'}`}>{user?.name?.charAt(0).toUpperCase() || 'P'}</span>
                                                         )}

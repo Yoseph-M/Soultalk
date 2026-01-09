@@ -1,4 +1,5 @@
 "use client"
+import { API_BASE_URL } from "../config";
 
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
@@ -109,7 +110,7 @@ const DashboardHeader: React.FC = () => {
 
   const fetchNotifications = async () => {
     try {
-      const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/notifications/')
+      const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/notifications/')
       if (response.ok) {
         const data = await response.json()
         setNotifications(data)
@@ -130,7 +131,7 @@ const DashboardHeader: React.FC = () => {
 
   const markAsRead = async (id: number) => {
     try {
-      const response = await fetchWithAuth(`http://127.0.0.1:8000/api/auth/notifications/${id}/read/`, {
+      const response = await fetchWithAuth(`${API_BASE_URL}/api/auth/notifications/${id}/read/`, {
         method: 'POST'
       })
       if (response.ok) {

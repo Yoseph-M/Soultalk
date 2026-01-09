@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config";
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -42,7 +43,7 @@ const Clients: React.FC = () => {
         const fetchClients = async () => {
             if (!user) return;
             try {
-                const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/clients/');
+                const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/clients/');
                 if (response.ok) {
                     const data = await response.json();
                     const formattedClients = data.map((user: any) => ({

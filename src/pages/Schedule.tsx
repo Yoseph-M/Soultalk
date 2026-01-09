@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config";
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
@@ -35,7 +36,7 @@ const Schedule: React.FC = () => {
     const fetchAppointments = async () => {
         if (!user) return;
         try {
-            const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/appointments/');
+            const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/appointments/');
             if (response.ok) {
                 const data = await response.json();
                 setAppointments(data);
@@ -57,7 +58,7 @@ const Schedule: React.FC = () => {
         if (!confirm("Are you sure you want to cancel this appointment?")) return;
 
         try {
-            const response = await fetchWithAuth(`http://127.0.0.1:8000/api/auth/appointments/${id}/`, {
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/auth/appointments/${id}/`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'

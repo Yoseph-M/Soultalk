@@ -1,4 +1,5 @@
 "use client"
+import { API_BASE_URL } from "../config";
 
 import React, { useState, useEffect } from "react"
 import { useNavigate, Link } from "react-router-dom"
@@ -44,7 +45,7 @@ const MoodHistory: React.FC = () => {
 
     const fetchHistory = async () => {
         try {
-            const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/mood-updates/')
+            const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/mood-updates/')
             if (response.ok) {
                 const data = await response.json()
                 setHistory(data)
@@ -69,7 +70,7 @@ const MoodHistory: React.FC = () => {
         const mood = moodOptions.find(m => m.label === selectedMood)
 
         try {
-            const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/mood-updates/', {
+            const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/mood-updates/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

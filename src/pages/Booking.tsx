@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config";
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Video, MessageCircle, Phone, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Calendar, Check, Filter, Star, Clock, ShieldCheck, AlertCircle } from 'lucide-react';
@@ -83,14 +84,14 @@ const Booking: React.FC = () => {
     const getImageUrl = (path: string | null, name: string) => {
       if (!path) return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`;
       if (path.startsWith('http')) return path;
-      return `http://127.0.0.1:8000${path}`;
+      return `${API_BASE_URL}${path}`;
     };
 
 
     const fetchProfessionals = async () => {
       if (!user) return;
       try {
-        const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/professionals/');
+        const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/professionals/');
         if (response.ok) {
           const data = await response.json();
           const formatted = data.map((p: any) => ({
@@ -115,7 +116,7 @@ const Booking: React.FC = () => {
     const fetchConnections = async () => {
       if (!user) return;
       try {
-        const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/connections/');
+        const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/connections/');
         if (response.ok) {
           const data = await response.json();
           setUserConnections(data);
@@ -578,7 +579,7 @@ const Booking: React.FC = () => {
                                         };
 
                                         // 1. Create Appointment
-                                        const apptResponse = await fetchWithAuth('http://127.0.0.1:8000/api/auth/appointments/', {
+                                        const apptResponse = await fetchWithAuth(' + API_BASE_URL + '/api/auth/appointments/', {
                                           method: 'POST',
                                           headers: { 'Content-Type': 'application/json' },
                                           body: JSON.stringify({

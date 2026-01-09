@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config";
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, ArrowLeft, MoreHorizontal, Plus, Menu, X, Trash2, Edit2, Share2, Pin, Check, Bot } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -84,7 +85,7 @@ const AIChat: React.FC = () => {
 
     const fetchSessions = async () => {
         try {
-            const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/chat-sessions/');
+            const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/chat-sessions/');
             if (response.status === 401) {
                 navigate('/auth');
                 return;
@@ -114,7 +115,7 @@ const AIChat: React.FC = () => {
         if (window.innerWidth < 768) setSidebarOpen(false);
 
         try {
-            const response = await fetchWithAuth(`http://127.0.0.1:8000/api/auth/chat-sessions/${sessionId}/`);
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/auth/chat-sessions/${sessionId}/`);
             if (response.ok) {
                 const data = await response.json();
                 if (activeSessionRef.current === sessionId) {
@@ -166,7 +167,7 @@ const AIChat: React.FC = () => {
         setIsTyping(true);
 
         try {
-            const response = await fetchWithAuth('http://127.0.0.1:8000/api/auth/ai-chat/', {
+            const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/ai-chat/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -221,7 +222,7 @@ const AIChat: React.FC = () => {
     const handleRename = async (sessionId: number) => {
         if (!renameTitle.trim()) return;
         try {
-            await fetchWithAuth(`http://127.0.0.1:8000/api/auth/chat-sessions/${sessionId}/`, {
+            await fetchWithAuth(`${API_BASE_URL}/api/auth/chat-sessions/${sessionId}/`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ title: renameTitle })
@@ -236,7 +237,7 @@ const AIChat: React.FC = () => {
     const handlePin = async (session: ChatSession) => {
         try {
             const currentPinned = session.is_pinned || false;
-            await fetchWithAuth(`http://127.0.0.1:8000/api/auth/chat-sessions/${session.id}/`, {
+            await fetchWithAuth(`${API_BASE_URL}/api/auth/chat-sessions/${session.id}/`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ is_pinned: !currentPinned })
@@ -251,7 +252,7 @@ const AIChat: React.FC = () => {
     const handleDelete = async (sessionId: number) => {
         if (!confirm("Are you sure you want to delete this chat?")) return;
         try {
-            await fetchWithAuth(`http://127.0.0.1:8000/api/auth/chat-sessions/${sessionId}/`, {
+            await fetchWithAuth(`${API_BASE_URL}/api/auth/chat-sessions/${sessionId}/`, {
                 method: 'DELETE',
             });
             if (currentSessionId === sessionId) {
