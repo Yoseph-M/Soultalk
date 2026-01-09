@@ -67,14 +67,10 @@ const getBankLogoUrl = (name: string) => {
         'global_bank_ethiopia': 'global_bank_ethiopia', // Fallback
         'yaya_wallet': 'yaya_wallet', // Fallback
 
-        // Aliases for partial matches
         'commercial': 'commercial_bank_of_ethiopia',
         'dashen': 'dashen_bank',
         'awash': 'awash_international_bank',
         'abyssinia': 'bank_of_abyssinia',
-        'hibret': 'hibret_bank',
-        'nib': 'nib_international_bank',
-        'cooperative': 'cooperative_bank_of_oromia',
         'zemen': 'zemen_bank',
         'amhara': 'amhara_bank',
         'wegagen': 'wegagen_bank',

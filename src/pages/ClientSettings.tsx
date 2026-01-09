@@ -18,9 +18,6 @@ const ClientSettings: React.FC = () => {
         emailNotifications: true,
         pushNotifications: false,
         marketingEmails: false,
-        emailNotifications: true,
-        pushNotifications: false,
-        marketingEmails: false,
         timezone: "UTC-5 (Eastern Time)",
         twoFactor: false,
         profileVisibility: "Private"
