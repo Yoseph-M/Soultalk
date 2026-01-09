@@ -70,7 +70,7 @@ const ProfessionalHeader: React.FC = () => {
 
     const fetchNotifications = async () => {
         try {
-            const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/notifications/');
+            const response = await fetchWithAuth(API_BASE_URL + '/api/auth/notifications/');
             if (response.ok) {
                 const data = await response.json();
                 setNotifications(data);

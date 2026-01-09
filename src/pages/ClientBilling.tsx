@@ -20,7 +20,7 @@ const ClientBilling: React.FC = () => {
     React.useEffect(() => {
         const fetchHistory = async () => {
             try {
-                const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/payment/history/')
+                const response = await fetchWithAuth(API_BASE_URL + '/api/auth/payment/history/')
                 if (response.ok) {
                     const data = await response.json()
                     setBillingHistory(data)
@@ -48,7 +48,7 @@ const ClientBilling: React.FC = () => {
     const handlePayment = async (amount: number) => {
         setIsProcessing(true);
         try {
-            const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/payment/initialize/', {
+            const response = await fetchWithAuth(API_BASE_URL + '/api/auth/payment/initialize/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

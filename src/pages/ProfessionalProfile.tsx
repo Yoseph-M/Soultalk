@@ -73,7 +73,7 @@ const ProfessionalProfile: React.FC = () => {
             if (!user) return
 
             try {
-                const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/me/')
+                const response = await fetchWithAuth(API_BASE_URL + '/api/auth/me/')
                 if (response.ok) {
                     const data = await response.json()
                     setProfile({
@@ -133,7 +133,7 @@ const ProfessionalProfile: React.FC = () => {
                 formData.append('certificates', certificateFile)
             }
 
-            const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/me/', {
+            const response = await fetchWithAuth(API_BASE_URL + '/api/auth/me/', {
                 method: 'PATCH',
                 body: formData
             })

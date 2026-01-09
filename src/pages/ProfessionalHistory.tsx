@@ -20,7 +20,7 @@ const ProfessionalHistory: React.FC = () => {
         const fetchHistory = async () => {
             setLoading(true)
             try {
-                const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/appointments/')
+                const response = await fetchWithAuth(API_BASE_URL + '/api/auth/appointments/')
                 if (response.ok) {
                     const appointments = await response.json()
                     const pastAppointments = appointments.map((appt: any) => ({

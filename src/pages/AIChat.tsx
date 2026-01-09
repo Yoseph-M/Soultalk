@@ -85,7 +85,7 @@ const AIChat: React.FC = () => {
 
     const fetchSessions = async () => {
         try {
-            const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/chat-sessions/');
+            const response = await fetchWithAuth(API_BASE_URL + '/api/auth/chat-sessions/');
             if (response.status === 401) {
                 navigate('/auth');
                 return;
@@ -167,7 +167,7 @@ const AIChat: React.FC = () => {
         setIsTyping(true);
 
         try {
-            const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/ai-chat/', {
+            const response = await fetchWithAuth(API_BASE_URL + '/api/auth/ai-chat/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -39,7 +39,7 @@ const ProfessionalSchedule: React.FC = () => {
         const fetchSessions = async () => {
             if (!user) return;
             try {
-                const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/appointments/');
+                const response = await fetchWithAuth(API_BASE_URL + '/api/auth/appointments/');
                 if (response.ok) {
                     const data = await response.json();
                     setSessions(data);

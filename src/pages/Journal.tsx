@@ -56,7 +56,7 @@ const Journal: React.FC = () => {
     const fetchClients = useCallback(async () => {
         if (!isProfessional) return;
         try {
-            const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/connections/');
+            const response = await fetchWithAuth(API_BASE_URL + '/api/auth/connections/');
             if (response.ok) {
                 const data = await response.json();
                 const accepted = data.filter((c: any) => c.status === 'accepted');
@@ -70,7 +70,7 @@ const Journal: React.FC = () => {
     const fetchHistory = useCallback(async () => {
         setLoadingHistory(true);
         try {
-            let url = ' + API_BASE_URL + '/api/auth/journal-entries/';
+            let url = API_BASE_URL + '/api/auth/journal-entries/';
             if (selectedClient) {
                 url += `?client_id=${selectedClient}`;
             } else {
@@ -121,7 +121,7 @@ const Journal: React.FC = () => {
                 }
             }
 
-            const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/journal-entries/', {
+            const response = await fetchWithAuth(API_BASE_URL + '/api/auth/journal-entries/', {
                 method: 'POST',
                 body: formData,
             });

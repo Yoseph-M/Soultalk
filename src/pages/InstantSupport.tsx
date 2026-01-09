@@ -55,7 +55,7 @@ const InstantSupport: React.FC = () => {
 
 
                 // Fetch all professionals (in a real app, optimize this to only fetch online)
-                const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/professionals/');
+                const response = await fetchWithAuth(API_BASE_URL + '/api/auth/professionals/');
                 if (response.ok) {
                     const data = await response.json();
                     const formatted: Professional[] = data.map((user: any) => ({
@@ -100,7 +100,7 @@ const InstantSupport: React.FC = () => {
         const sessionId = `conn-${professionalId}-${user.id}-${Date.now()}`; // Unique session
 
         try {
-            await fetchWithAuth(' + API_BASE_URL + '/api/auth/live/initiate/', {
+            await fetchWithAuth(API_BASE_URL + '/api/auth/live/initiate/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

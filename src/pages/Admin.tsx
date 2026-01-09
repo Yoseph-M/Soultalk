@@ -57,7 +57,7 @@ const Admin: React.FC = () => {
 
     const fetchUsers = async () => {
         try {
-            const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/users/');
+            const response = await fetchWithAuth(API_BASE_URL + '/api/auth/users/');
             if (response.ok) {
                 const data = await response.json();
                 setUsers(data);

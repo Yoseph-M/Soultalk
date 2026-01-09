@@ -27,21 +27,21 @@ const ProfessionalDashboard: React.FC = () => {
         try {
             console.log("Fetching professional data for user:", user.id);
             // Fetch Status (via User Details)
-            const meResponse = await fetchWithAuth(' + API_BASE_URL + '/api/auth/me/');
+            const meResponse = await fetchWithAuth(API_BASE_URL + '/api/auth/me/');
             if (meResponse.ok) {
                 const meData = await meResponse.json();
                 setIsOnline(meData.is_online);
             }
 
             // Fetch Appointments
-            const appResponse = await fetchWithAuth(' + API_BASE_URL + '/api/auth/appointments/');
+            const appResponse = await fetchWithAuth(API_BASE_URL + '/api/auth/appointments/');
             if (appResponse.ok) {
                 const data = await appResponse.json();
                 setUpcomingSessions(data.filter((a: any) => a.status === 'upcoming'));
             }
 
             // Fetch Connection Requests
-            const connResponse = await fetchWithAuth(' + API_BASE_URL + '/api/auth/connections/');
+            const connResponse = await fetchWithAuth(API_BASE_URL + '/api/auth/connections/');
             if (connResponse.ok) {
                 const data = await connResponse.json();
                 console.log("Received connections data:", data);
@@ -58,7 +58,7 @@ const ProfessionalDashboard: React.FC = () => {
             }
 
             // Fetch Notifications
-            const notifResponse = await fetchWithAuth(' + API_BASE_URL + '/api/auth/notifications/');
+            const notifResponse = await fetchWithAuth(API_BASE_URL + '/api/auth/notifications/');
             if (notifResponse.ok) {
                 const data = await notifResponse.json();
                 setNotifications(data);
@@ -134,7 +134,7 @@ const ProfessionalDashboard: React.FC = () => {
                                 onClick={async () => {
                                     try {
                                         const newStatus = !isOnline;
-                                        const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/professional/status/', {
+                                        const response = await fetchWithAuth(API_BASE_URL + '/api/auth/professional/status/', {
                                             method: 'POST',
                                             headers: { 'Content-Type': 'application/json' },
                                             body: JSON.stringify({ is_online: newStatus })

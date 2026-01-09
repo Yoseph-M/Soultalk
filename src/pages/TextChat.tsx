@@ -86,7 +86,7 @@ const TextChat: React.FC = () => {
         if (!newMessage.trim() || !chatPartnerId) return;
 
         try {
-            const res = await fetchWithAuth(' + API_BASE_URL + '/api/auth/messages/', {
+            const res = await fetchWithAuth(API_BASE_URL + '/api/auth/messages/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

@@ -65,7 +65,7 @@ const ClientProfile: React.FC = () => {
             if (!user) return
 
             try {
-                const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/me/')
+                const response = await fetchWithAuth(API_BASE_URL + '/api/auth/me/')
                 if (response.ok) {
                     const data = await response.json()
                     setProfile(prev => ({
@@ -110,7 +110,7 @@ const ClientProfile: React.FC = () => {
                 // Add other fields that UserSerializer expects
             }
 
-            const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/me/', {
+            const response = await fetchWithAuth(API_BASE_URL + '/api/auth/me/', {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updateData)

@@ -281,7 +281,7 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/appointments/')
+        const response = await fetchWithAuth(API_BASE_URL + '/api/auth/appointments/')
         if (response.ok) {
           const data = await response.json()
           // Filter for upcoming/pending and sort by date
@@ -298,7 +298,7 @@ const Dashboard: React.FC = () => {
 
     const fetchProfessionals = async () => {
       try {
-        const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/professionals/')
+        const response = await fetchWithAuth(API_BASE_URL + '/api/auth/professionals/')
         if (response.ok) {
           const data = await response.json()
           const formatted = data.map((user: any) => ({
@@ -322,7 +322,7 @@ const Dashboard: React.FC = () => {
 
     const fetchMoodData = async () => {
       try {
-        const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/mood-updates/')
+        const response = await fetchWithAuth(API_BASE_URL + '/api/auth/mood-updates/')
         if (response.ok) {
           const data = await response.json()
           // Format for the last 7 days

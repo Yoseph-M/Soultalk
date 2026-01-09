@@ -91,7 +91,7 @@ const Booking: React.FC = () => {
     const fetchProfessionals = async () => {
       if (!user) return;
       try {
-        const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/professionals/');
+        const response = await fetchWithAuth(API_BASE_URL + '/api/auth/professionals/');
         if (response.ok) {
           const data = await response.json();
           const formatted = data.map((p: any) => ({
@@ -116,7 +116,7 @@ const Booking: React.FC = () => {
     const fetchConnections = async () => {
       if (!user) return;
       try {
-        const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/connections/');
+        const response = await fetchWithAuth(API_BASE_URL + '/api/auth/connections/');
         if (response.ok) {
           const data = await response.json();
           setUserConnections(data);
@@ -579,7 +579,7 @@ const Booking: React.FC = () => {
                                         };
 
                                         // 1. Create Appointment
-                                        const apptResponse = await fetchWithAuth(' + API_BASE_URL + '/api/auth/appointments/', {
+                                        const apptResponse = await fetchWithAuth(API_BASE_URL + '/api/auth/appointments/', {
                                           method: 'POST',
                                           headers: { 'Content-Type': 'application/json' },
                                           body: JSON.stringify({

@@ -43,7 +43,7 @@ const Clients: React.FC = () => {
         const fetchClients = async () => {
             if (!user) return;
             try {
-                const response = await fetchWithAuth(' + API_BASE_URL + '/api/auth/clients/');
+                const response = await fetchWithAuth(API_BASE_URL + '/api/auth/clients/');
                 if (response.ok) {
                     const data = await response.json();
                     const formattedClients = data.map((user: any) => ({
