@@ -189,7 +189,6 @@ JAZZMIN_SETTINGS = {
     "user_avatar": "profile_photo",
     "topmenu_links": [
         {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
-        {"name": "Verification Queue", "url": "admin:accounts_professional_changelist", "permissions": ["auth.view_user"]},
         {"model": "accounts.User"},
     ],
     "show_sidebar": True,
@@ -205,11 +204,8 @@ JAZZMIN_SETTINGS = {
         "accounts.Client": "fas fa-user-friends",
         "accounts.ProfessionalProfile": "fas fa-id-card",
         "accounts.ClientProfile": "fas fa-address-book",
-        "accounts.ChatSession": "fas fa-comments",
-        "accounts.ChatMessage": "fas fa-comment",
-        "accounts.Appointment": "fas fa-calendar-check",
     },
-    "order_with_respect_to": ["accounts", "accounts.Professional", "accounts.Client", "auth"],
+    "order_with_respect_to": ["accounts", "auth"],
     "colorscheme": "theme-teal",
     "show_ui_builder": False,
 }

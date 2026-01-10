@@ -11,6 +11,7 @@ interface User {
   verified?: boolean;
   verificationStatus?: 'pending' | 'verified' | 'rejected';
   rejectionReason?: string;
+  notSignedIn?: boolean;
 }
 
 interface AuthContextType {
@@ -58,6 +59,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           if (response.ok) {
             const userData = await response.json();
+
+            // Security: If professional/listener is not verified, don't sign them in
+            if ((userData.role === 'professional' || userData.role === 'listener') && !userData.verified) {
+              logout();
+              setIsLoading(false);
+              return;
+            }
+
             setUser({
               id: userData.id,
               name: userData.first_name ? `${userData.first_name} ${userData.last_name}` : userData.username,
@@ -100,8 +109,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const data = await response.json();
       console.log('Login successful, tokens received');
-      localStorage.setItem('accessToken', data.access);
-      localStorage.setItem('refreshToken', data.refresh);
 
       const userResponse = await fetch(`${API_BASE_URL}/api/auth/me/`, {
         headers: { 'Authorization': `Bearer ${data.access}` }
@@ -120,6 +127,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           verificationStatus: userData.verification_status,
           rejectionReason: userData.rejection_reason
         };
+
+        // Security: If professional/listener is not verified, do NOT sign them in
+        if ((userData.role === 'professional' || userData.role === 'listener') && !userData.verified) {
+          // Ensure no tokens/user state is saved
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          localStorage.removeItem('user');
+          setUser(null);
+          // Return user object with a flag so Auth.tsx knows to redirect but not treat as logged in
+          return { ...userObj, notSignedIn: true };
+        }
+
+        // Only persist tokens and user state if verified or not a professional
+        localStorage.setItem('accessToken', data.access);
+        localStorage.setItem('refreshToken', data.refresh);
         setUser(userObj);
         localStorage.setItem('user', JSON.stringify(userObj));
         return userObj;

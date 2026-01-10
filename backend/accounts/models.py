@@ -56,14 +56,6 @@ class ProfessionalProfile(models.Model):
     review_count = models.IntegerField(default=0)
     sessions_completed = models.IntegerField(default=0)
     location = models.CharField(max_length=100, default='Global')
-    REJECTION_REASON_CHOICES = (
-        ('blurry_id', 'ID Image is blurry or unreadable'),
-        ('expired_id', 'Provided ID has expired'),
-        ('mismatch_cert', 'Certificate does not match specialization'),
-        ('missing_photo', 'Professional profile photo is missing'),
-        ('incomplete_info', 'Incomplete professional information'),
-        ('other', 'Other (specify below)'),
-    )
     VERIFICATION_CHOICES = (
         ('pending', 'Pending'),
         ('verified', 'Verified'),

@@ -211,8 +211,20 @@ const Auth: React.FC = () => {
       if (isLogin) {
         const loggedInUser = await login(formData.email, formData.password);
         if (loggedInUser) {
-          console.log('Login successful, redirecting based on role:', loggedInUser.role);
-          // Redirect immediately based on user role and verification status
+          console.log('Login result:', loggedInUser);
+
+          // If the user wasn't fully signed in (unverified pro), pass details via state
+          if (loggedInUser.notSignedIn) {
+            navigate('/verification-pending', {
+              state: {
+                status: loggedInUser.verificationStatus,
+                reason: loggedInUser.rejectionReason,
+                email: loggedInUser.email
+              }
+            });
+            return;
+          }
+
           if (loggedInUser.role === 'professional' || loggedInUser.role === 'listener') {
             if (loggedInUser.verified) {
               navigate('/professionals');

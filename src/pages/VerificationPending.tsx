@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Clock, ArrowLeft, XCircle, AlertCircle, RefreshCw } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const VerificationPending: React.FC = () => {
     const navigate = useNavigate();
-    const { user, logout, refreshUser, isLoading: authLoading } = useAuth();
+    const location = useLocation();
+    const { user, refreshUser, isLoading: authLoading } = useAuth();
     const [isRefreshing, setIsRefreshing] = useState(false);
 
-    const isRejected = user?.verificationStatus === 'rejected';
+    // Get info from either AuthContext (if they were already logged in) or location state (if just logged in)
+    const verificationStatus = user?.verificationStatus || location.state?.status;
+    const rejectionReason = user?.rejectionReason || location.state?.reason;
     const isVerified = user?.verified;
+    const isRejected = verificationStatus === 'rejected';
 
     // Auto redirect if verified
     useEffect(() => {
@@ -20,11 +24,15 @@ const VerificationPending: React.FC = () => {
 
     // Manual refresh handler
     const handleRefresh = async () => {
+        if (!user) {
+            // If they aren't "properly" signed in, refresh means go back to login to check again
+            navigate('/auth');
+            return;
+        }
         setIsRefreshing(true);
         try {
             await refreshUser();
         } finally {
-            // Add a small delay for better feel
             setTimeout(() => setIsRefreshing(false), 500);
         }
     };
@@ -33,17 +41,7 @@ const VerificationPending: React.FC = () => {
         <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6">
             <div className="max-w-md w-full bg-white rounded-3xl shadow-sm border border-slate-200 p-8 md:p-12 text-center relative overflow-hidden">
 
-                {/* Refresh Button at the top right */}
-                {!isRejected && (
-                    <button
-                        onClick={handleRefresh}
-                        disabled={isRefreshing || authLoading}
-                        className={`absolute top-6 right-6 p-2 rounded-full hover:bg-slate-100 transition-all ${isRefreshing ? 'animate-spin text-[#25A8A0]' : 'text-slate-400'}`}
-                        title="Check status"
-                    >
-                        <RefreshCw className="w-5 h-5" />
-                    </button>
-                )}
+
 
                 {isRejected ? (
                     <>
@@ -59,27 +57,20 @@ const VerificationPending: React.FC = () => {
                             Unfortunately, your professional application could not be verified at this time.
                         </p>
 
-                        {user?.rejectionReason && (
+                        {rejectionReason && (
                             <div className="p-4 bg-red-50 border border-red-100 rounded-2xl mb-10 text-left">
                                 <div className="flex items-center gap-2 text-red-700 font-semibold mb-1 text-sm">
                                     <AlertCircle className="w-4 h-4" />
                                     Reason for rejection:
                                 </div>
                                 <p className="text-sm text-red-600">
-                                    {user.rejectionReason}
+                                    {rejectionReason}
                                 </p>
                                 <p className="mt-4 text-xs text-red-500 italic">
-                                    Please update your profile information and re-submit your documents.
+                                    Please contact support or try again later.
                                 </p>
                             </div>
                         )}
-
-                        <button
-                            onClick={() => navigate('/professional/settings')}
-                            className="w-full bg-[#25A8A0] hover:bg-[#1e8a82] text-white py-4 rounded-xl transition-colors font-bold flex items-center justify-center gap-2 group mb-4"
-                        >
-                            Update Profile
-                        </button>
                     </>
                 ) : (
                     <>
@@ -112,14 +103,7 @@ const VerificationPending: React.FC = () => {
                             </div>
                         </div>
 
-                        <button
-                            onClick={handleRefresh}
-                            disabled={isRefreshing}
-                            className={`w-full mb-6 flex items-center justify-center gap-2 text-sm font-bold tracking-wide uppercase transition-all ${isRefreshing ? 'text-[#25A8A0]' : 'text-slate-400 hover:text-slate-600'}`}
-                        >
-                            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-                            {isRefreshing ? 'Checking for updates...' : 'Check Status Now'}
-                        </button>
+
                     </>
                 )}
 
@@ -131,18 +115,6 @@ const VerificationPending: React.FC = () => {
                         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                         Back to Home
                     </button>
-
-                    {user && (
-                        <button
-                            onClick={() => {
-                                logout();
-                                navigate('/');
-                            }}
-                            className="text-red-500 hover:text-red-700 transition-colors text-sm font-medium"
-                        >
-                            Sign out of {user.email}
-                        </button>
-                    )}
                 </div>
 
                 <p className="mt-10 text-xs text-slate-400">
