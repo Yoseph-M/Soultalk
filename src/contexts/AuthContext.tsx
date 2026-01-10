@@ -11,6 +11,7 @@ interface User {
   verified?: boolean;
   verificationStatus?: 'pending' | 'verified' | 'rejected';
   rejectionReason?: string;
+  rejectionReasonType?: string;
   notSignedIn?: boolean;
 }
 
@@ -76,7 +77,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               avatar: userData.profile_photo ? `${API_BASE_URL}${userData.profile_photo}` : '',
               verified: userData.verified,
               verificationStatus: userData.verification_status,
-              rejectionReason: userData.rejection_reason
+              rejectionReason: userData.rejection_reason,
+              rejectionReasonType: userData.rejection_reason_type
             });
           } else {
             console.warn('Init auth failed, logging out');
@@ -125,7 +127,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           avatar: userData.profile_photo ? `${API_BASE_URL}${userData.profile_photo}` : '',
           verified: userData.verified,
           verificationStatus: userData.verification_status,
-          rejectionReason: userData.rejection_reason
+          rejectionReason: userData.rejection_reason,
+          rejectionReasonType: userData.rejection_reason_type
         };
 
         // Security: If professional/listener is not verified, do NOT sign them in
@@ -177,7 +180,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           avatar: userData.profile_photo ? `${API_BASE_URL}${userData.profile_photo}` : '',
           verified: userData.verified,
           verificationStatus: userData.verification_status,
-          rejectionReason: userData.rejection_reason
+          rejectionReason: userData.rejection_reason,
+          rejectionReasonType: userData.rejection_reason_type
         };
         setUser(userObj);
         localStorage.setItem('user', JSON.stringify(userObj));

@@ -219,6 +219,7 @@ const Auth: React.FC = () => {
               state: {
                 status: loggedInUser.verificationStatus,
                 reason: loggedInUser.rejectionReason,
+                reasonType: loggedInUser.rejectionReasonType,
                 email: loggedInUser.email
               }
             });

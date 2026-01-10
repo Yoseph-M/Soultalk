@@ -15,7 +15,7 @@ class ProfessionalProfileInline(admin.StackedInline):
     can_delete = False
     verbose_name_plural = 'Professional Profile'
     fieldsets = (
-        ('Verification & Approval', {'fields': ('verification_status', 'rejection_reason_type', 'rejection_reason')}),
+        ('Verification & Approval', {'fields': ('verification_status', 'rejection_reason_type')}),
         ('Essential Documents', {'fields': ('profile_photo', 'id_type', 'id_image', 'certificates')}),
     )
 

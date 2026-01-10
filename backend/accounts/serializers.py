@@ -37,6 +37,7 @@ class UserSerializer(serializers.ModelSerializer):
     is_online = serializers.SerializerMethodField()
     verification_status = serializers.SerializerMethodField()
     rejection_reason = serializers.SerializerMethodField()
+    rejection_reason_type = serializers.SerializerMethodField()
     id_number = serializers.SerializerMethodField()
     issuing_authority = serializers.SerializerMethodField()
 
@@ -46,7 +47,7 @@ class UserSerializer(serializers.ModelSerializer):
                   'phone', 'dob', 'specialization', 'bio', 'location', 'id_type',
                   'profile_photo', 'id_image', 'certificates',
                   'rating', 'review_count', 'sessions_completed', 'verified', 'languages', 'is_online',
-                  'verification_status', 'rejection_reason', 'id_number', 'issuing_authority',
+                  'verification_status', 'rejection_reason', 'rejection_reason_type', 'id_number', 'issuing_authority',
                   'id_number_input', 'issuing_authority_input')
 
     def get_rating(self, obj):
@@ -88,6 +89,12 @@ class UserSerializer(serializers.ModelSerializer):
     def get_rejection_reason(self, obj):
         try:
             return obj.professional_profile.rejection_reason
+        except:
+            return None
+
+    def get_rejection_reason_type(self, obj):
+        try:
+            return obj.professional_profile.get_rejection_reason_type_display()
         except:
             return None
 
@@ -230,6 +237,7 @@ class UserSerializer(serializers.ModelSerializer):
                 data['id_image'] = profile.id_image.url if profile.id_image else None
                 data['certificates'] = profile.certificates.url if profile.certificates else None
                 data['verified'] = profile.verified
+                data['rejection_reason_type'] = profile.get_rejection_reason_type_display() if profile.rejection_reason_type else None
         except Exception as e:
                 print(f"Error in to_representation: {e}")
                 data['verified'] = False

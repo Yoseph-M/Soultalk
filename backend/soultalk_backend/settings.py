@@ -336,5 +336,24 @@ JAZZMIN_UI_CONFIG = {
         
         /* Hide boilerplate Clear labels */
         .file-upload br, .file-upload span.clearable-file-input { display: none !important; }
+    """,
+    "custom_js": """
+        document.addEventListener('DOMContentLoaded', function() {
+            const statusField = document.querySelector('#id_professional_profile-0-verification_status');
+            const reasonTypeRow = document.querySelector('.field-rejection_reason_type');
+
+            if (statusField && reasonTypeRow) {
+                function toggleRejectionFields() {
+                    if (statusField.value === 'rejected') {
+                        reasonTypeRow.style.display = 'block';
+                    } else {
+                        reasonTypeRow.style.display = 'none';
+                    }
+                }
+
+                statusField.addEventListener('change', toggleRejectionFields);
+                toggleRejectionFields();
+            }
+        });
     """
 }

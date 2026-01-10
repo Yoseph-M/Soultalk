@@ -10,7 +10,7 @@ const VerificationPending: React.FC = () => {
 
     // Get info from either AuthContext (if they were already logged in) or location state (if just logged in)
     const verificationStatus = user?.verificationStatus || location.state?.status;
-    const rejectionReason = user?.rejectionReason || location.state?.reason;
+    const rejectionReasonType = user?.rejectionReasonType || location.state?.reasonType;
     const isVerified = user?.verified;
     const isRejected = verificationStatus === 'rejected';
 
@@ -39,17 +39,20 @@ const VerificationPending: React.FC = () => {
                             Unfortunately, your professional application could not be verified at this time.
                         </p>
 
-                        {rejectionReason && (
+                        {rejectionReasonType && (
                             <div className="p-4 bg-red-50 border border-red-100 rounded-2xl mb-10 text-left">
-                                <div className="flex items-center gap-2 text-red-700 font-semibold mb-1 text-sm">
+                                <div className="flex items-center gap-2 text-red-700 font-semibold mb-3 text-sm">
                                     <AlertCircle className="w-4 h-4" />
-                                    Reason for rejection:
+                                    Rejection Details
                                 </div>
-                                <p className="text-sm text-red-600">
-                                    {rejectionReason}
-                                </p>
-                                <p className="mt-4 text-xs text-red-500 italic">
-                                    Please contact support or try again later.
+                                <div>
+                                    <p className="text-[10px] uppercase tracking-widest text-red-400 font-bold mb-0.5">Reason Category</p>
+                                    <p className="text-sm text-red-700 font-medium">
+                                        {rejectionReasonType}
+                                    </p>
+                                </div>
+                                <p className="mt-4 pt-4 border-t border-red-100 text-xs text-red-500 italic">
+                                    Please review this category and contact support to appeal or update your documents.
                                 </p>
                             </div>
                         )}
