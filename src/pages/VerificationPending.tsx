@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Clock, ArrowLeft, XCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { ShieldCheck, Clock, ArrowLeft, XCircle, AlertCircle } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const VerificationPending: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { user, refreshUser, isLoading: authLoading } = useAuth();
-    const [isRefreshing, setIsRefreshing] = useState(false);
+    const { user } = useAuth();
 
     // Get info from either AuthContext (if they were already logged in) or location state (if just logged in)
     const verificationStatus = user?.verificationStatus || location.state?.status;
@@ -22,26 +21,9 @@ const VerificationPending: React.FC = () => {
         }
     }, [isVerified, navigate]);
 
-    // Manual refresh handler
-    const handleRefresh = async () => {
-        if (!user) {
-            // If they aren't "properly" signed in, refresh means go back to login to check again
-            navigate('/auth');
-            return;
-        }
-        setIsRefreshing(true);
-        try {
-            await refreshUser();
-        } finally {
-            setTimeout(() => setIsRefreshing(false), 500);
-        }
-    };
-
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6">
             <div className="max-w-md w-full bg-white rounded-3xl shadow-sm border border-slate-200 p-8 md:p-12 text-center relative overflow-hidden">
-
-
 
                 {isRejected ? (
                     <>
@@ -79,7 +61,7 @@ const VerificationPending: React.FC = () => {
                         </div>
 
                         <h1 className="text-2xl font-bold text-slate-900 mb-4">
-                            Verification Pending
+                            Account Under Review
                         </h1>
 
                         <p className="text-slate-600 mb-10 leading-relaxed">
@@ -102,8 +84,6 @@ const VerificationPending: React.FC = () => {
                                 </div>
                             </div>
                         </div>
-
-
                     </>
                 )}
 
