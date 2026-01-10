@@ -142,6 +142,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (userData.dob) formData.append('dob', userData.dob);
       if (userData.specialization) formData.append('specialization', userData.specialization);
       if (userData.idType) formData.append('id_type', userData.idType);
+      if (userData.idNumber) formData.append('id_number', userData.idNumber);
+      if (userData.issuingAuthority) formData.append('issuing_authority', userData.issuingAuthority);
 
       if (userData.profilePhotoFile) {
         formData.append('profile_photo', userData.profilePhotoFile);

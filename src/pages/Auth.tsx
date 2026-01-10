@@ -232,6 +232,8 @@ const Auth: React.FC = () => {
               phone: `${formData.countryCode} ${formData.phone}`,
               dob: formData.dob,
               idType: formData.idType,
+              idNumber: formData.idNumber,
+              issuingAuthority: formData.issuingAuthority,
               specialization: formData.specialization,
               profilePhotoFile: profilePhoto,
               singleDocFile: certificates,

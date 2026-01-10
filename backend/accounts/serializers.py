@@ -72,16 +72,21 @@ class UserSerializer(serializers.ModelSerializer):
             return False
 
     def create(self, validated_data):
+        from django.db import transaction
         print(f"Debug: Starting user creation for {validated_data.get('email')}")
         role = validated_data.pop('role', 'client')
         password = validated_data.pop('password')
         
         # Extract profile fields
-        profile_fields = ['phone', 'dob', 'specialization', 'bio', 'location', 'id_type', 'profile_photo', 'id_image', 'certificates', 'verified']
+        profile_fields = [
+            'phone', 'dob', 'specialization', 'bio', 'location', 
+            'id_type', 'profile_photo', 'id_image', 'certificates', 
+            'verified', 'id_number', 'issuing_authority'
+        ]
         profile_data = {field: validated_data.pop(field, None) for field in profile_fields}
         
         try:
-            # Create user
+            # Create user (this happens in the main transaction)
             user = User.objects.create_user(
                 password=password,
                 role=role,
@@ -89,52 +94,58 @@ class UserSerializer(serializers.ModelSerializer):
             )
             print(f"Debug: User created successfully with ID {user.id}")
             
-            # Profile creation is handled by post_save signals, 
-            # but we need to update with the extra fields provided during signup
+            # Profile updates are wrapped in their own atomic block (savepoint)
+            # so that if they fail (e.g. due to file storage issues on Vercel),
+            # we can catch the exception and still perform DB queries to retry.
             try:
-                if role == 'client':
-                    profile, _ = ClientProfile.objects.get_or_create(user=user)
-                    if profile_data.get('phone'): profile.phone = profile_data['phone']
-                    if profile_data.get('dob'): profile.dob = profile_data['dob']
-                    profile.save()
-                    print("Debug: Client profile saved")
-                elif role == 'professional':
-                    profile, _ = ProfessionalProfile.objects.get_or_create(user=user)
-                    for attr, value in profile_data.items():
-                        if value is not None:
-                            setattr(profile, attr, value)
-                    profile.save()
-                    print("Debug: Professional profile saved with files")
-                elif role == 'admin':
-                    AdminProfile.objects.get_or_create(user=user)
-                    print("Debug: Admin profile created")
+                with transaction.atomic():
+                    if role == 'client':
+                        profile, _ = ClientProfile.objects.get_or_create(user=user)
+                        if profile_data.get('phone'): profile.phone = profile_data['phone']
+                        if profile_data.get('dob'): profile.dob = profile_data['dob']
+                        profile.save()
+                        print("Debug: Client profile saved")
+                    elif role == 'professional':
+                        profile, _ = ProfessionalProfile.objects.get_or_create(user=user)
+                        for attr, value in profile_data.items():
+                            if value is not None:
+                                setattr(profile, attr, value)
+                        profile.save()
+                        print("Debug: Professional profile saved with files")
+                    elif role == 'admin':
+                        AdminProfile.objects.get_or_create(user=user)
+                        print("Debug: Admin profile created")
             except Exception as e:
-                print(f"Error saving profile details (likely file storage issue): {str(e)}")
-                # Retry without files if professional
+                print(f"Error saving profile details (likely file storage or length issue): {str(e)}")
+                # If it's a professional and it failed, retry without the file fields
                 if role == 'professional':
+                    print("Attempting to save professional profile WITHOUT files...")
                     try:
-                         # Refresh to get clean state
-                         profile = ProfessionalProfile.objects.get(user=user)
-                         file_fields = ['profile_photo', 'id_image', 'certificates']
-                         for attr, value in profile_data.items():
-                             if value is not None and attr not in file_fields:
-                                 setattr(profile, attr, value)
-                         profile.save()
-                         print("Recovered: Saved professional profile without files.")
+                        # This works now because the previous failure was rolled back to a savepoint
+                        profile = ProfessionalProfile.objects.get(user=user)
+                        file_fields = ['profile_photo', 'id_image', 'certificates']
+                        for attr, value in profile_data.items():
+                            if value is not None and attr not in file_fields:
+                                setattr(profile, attr, value)
+                        profile.save()
+                        print("Recovered: Saved professional profile without files.")
                     except Exception as e2:
-                         print(f"Critical error saving profile retry: {str(e2)}")
-                         # If we can't even save basic info, we should probably delete the user 
-                         # to allow another attempt, but for now just raise
-                         raise e2
+                        print(f"Critical error during recovery: {str(e2)}")
+                        raise e2
                 else:
                     raise e
                 
             return user
         except Exception as e:
-            print(f"FATAL Signup Error: {str(e)}")
+            # Check if this is the "poisoned transaction" error and try to provide context
+            error_msg = str(e)
+            if "atomic" in error_msg.lower():
+                print("Detected transaction poisoning. The original error was likely lost.")
+            
+            print(f"FATAL Signup Error: {error_msg}")
             import traceback
             traceback.print_exc()
-            raise serializers.ValidationError({"detail": str(e)})
+            raise serializers.ValidationError({"detail": error_msg})
 
     def update(self, instance, validated_data):
         # Extract profile fields
