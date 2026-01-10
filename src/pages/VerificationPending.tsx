@@ -1,17 +1,49 @@
-import React from 'react';
-import { ShieldCheck, Clock, ArrowLeft, XCircle, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ShieldCheck, Clock, ArrowLeft, XCircle, AlertCircle, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const VerificationPending: React.FC = () => {
     const navigate = useNavigate();
-    const { user, logout } = useAuth();
+    const { user, logout, refreshUser, isLoading: authLoading } = useAuth();
+    const [isRefreshing, setIsRefreshing] = useState(false);
 
     const isRejected = user?.verificationStatus === 'rejected';
+    const isVerified = user?.verified;
+
+    // Auto redirect if verified
+    useEffect(() => {
+        if (isVerified) {
+            navigate('/professionals');
+        }
+    }, [isVerified, navigate]);
+
+    // Manual refresh handler
+    const handleRefresh = async () => {
+        setIsRefreshing(true);
+        try {
+            await refreshUser();
+        } finally {
+            // Add a small delay for better feel
+            setTimeout(() => setIsRefreshing(false), 500);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6">
-            <div className="max-w-md w-full bg-white rounded-3xl shadow-sm border border-slate-200 p-8 md:p-12 text-center">
+            <div className="max-w-md w-full bg-white rounded-3xl shadow-sm border border-slate-200 p-8 md:p-12 text-center relative overflow-hidden">
+
+                {/* Refresh Button at the top right */}
+                {!isRejected && (
+                    <button
+                        onClick={handleRefresh}
+                        disabled={isRefreshing || authLoading}
+                        className={`absolute top-6 right-6 p-2 rounded-full hover:bg-slate-100 transition-all ${isRefreshing ? 'animate-spin text-[#25A8A0]' : 'text-slate-400'}`}
+                        title="Check status"
+                    >
+                        <RefreshCw className="w-5 h-5" />
+                    </button>
+                )}
 
                 {isRejected ? (
                     <>
@@ -79,10 +111,19 @@ const VerificationPending: React.FC = () => {
                                 </div>
                             </div>
                         </div>
+
+                        <button
+                            onClick={handleRefresh}
+                            disabled={isRefreshing}
+                            className={`w-full mb-6 flex items-center justify-center gap-2 text-sm font-bold tracking-wide uppercase transition-all ${isRefreshing ? 'text-[#25A8A0]' : 'text-slate-400 hover:text-slate-600'}`}
+                        >
+                            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                            {isRefreshing ? 'Checking for updates...' : 'Check Status Now'}
+                        </button>
                     </>
                 )}
 
-                <div className="flex flex-col items-center gap-4">
+                <div className="flex flex-col items-center gap-4 border-t border-slate-100 pt-8">
                     <button
                         onClick={() => navigate('/')}
                         className="text-slate-500 hover:text-slate-900 transition-colors text-sm font-medium flex items-center justify-center gap-2 group"
