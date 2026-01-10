@@ -183,18 +183,17 @@ JAZZMIN_SETTINGS = {
     "site_header": "SoulTalk",
     "site_brand": "SoulTalk Management",
     "site_logo": None,
-    "welcome_sign": "Welcome to SoulTalk Admin Dashboard",
-    "copyright": "SoulTalk Ltd",
-    "search_model": ["accounts.User", "accounts.ProfessionalProfile"],
+    "welcome_sign": "Welcome back to SoulTalk Panel",
+    "copyright": "SoulTalk Ltd 2026",
+    "search_model": ["accounts.User"],
     "user_avatar": "profile_photo",
     "topmenu_links": [
         {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
-        {"model": "accounts.User"},
     ],
     "show_sidebar": True,
     "navigation_expanded": True,
     "hide_apps": [],
-    "hide_models": [],
+    "hide_models": ["accounts.AdminUser"],
     "icons": {
         "auth": "fas fa-users-cog",
         "auth.user": "fas fa-user",
@@ -208,6 +207,7 @@ JAZZMIN_SETTINGS = {
     "order_with_respect_to": ["accounts", "auth"],
     "colorscheme": "theme-teal",
     "show_ui_builder": False,
+    "changeform_format": "horizontal_tabs",
 }
 
 JAZZMIN_UI_CONFIG = {
@@ -219,28 +219,122 @@ JAZZMIN_UI_CONFIG = {
     "accent": "accent-teal",
     "navbar": "navbar-teal navbar-dark",
     "no_navbar_border": False,
-    "navbar_fixed": False,
+    "navbar_fixed": True,
     "layout_boxed": False,
     "footer_fixed": False,
-    "sidebar_fixed": False,
+    "sidebar_fixed": True,
     "sidebar": "sidebar-dark-teal",
     "sidebar_nav_small_text": False,
     "sidebar_disable_expand": False,
-    "sidebar_nav_child_indent": False,
+    "sidebar_nav_child_indent": True,
     "sidebar_nav_compact_style": False,
     "sidebar_remove_offset": False,
     "sidebar_link_nav_small_text": False,
     "footer_link_nav_small_text": False,
     "sidebar_nav_legacy_style": False,
     "sidebar_nav_flat_style": False,
-    "theme": "default",
-    "dark_mode_theme": None,
+    "theme": "flatly",
+    "dark_mode_theme": "darkly",
     "button_classes": {
         "primary": "btn-teal",
-        "secondary": "btn-secondary",
-        "info": "btn-info",
+        "secondary": "btn-outline-secondary",
+        "info": "btn-secondary text-white",
         "warning": "btn-warning",
         "danger": "btn-danger",
         "success": "btn-success"
-    }
+    },
+    "custom_css": """
+        /* Force Hide Add and Change buttons on Dashboard */
+        .card-body td .btn-success, 
+        .card-body td .btn-info,
+        .card-body td .btn-primary,
+        .addlink, .changelink, .add-link, .change-link { 
+            display: none !important; 
+        }
+
+        /* Change Circle Logo 'A' to 'ST' */
+        .brand-link .brand-image { display: none !important; }
+        .brand-link::before {
+            content: "ST";
+            background: #25A8A0;
+            color: white;
+            padding: 5px 8px;
+            border-radius: 50%;
+            font-weight: 900;
+            font-size: 14px;
+            margin-right: 10px;
+            margin-left: 5px;
+            display: inline-block;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        /* Remove Red Stars (Required Fields) */
+        .required label::after, label.required::after { content: "" !important; display: none !important; }
+        
+        /* Centralized & Widened Search Bar */
+        .navbar-nav.ml-auto { width: 100% !important; display: flex !important; justify-content: center !important; }
+        #search-form { width: 60% !important; margin: 0 auto !important; }
+        #search-form .input-group { width: 100% !important; }
+        #search-form input { 
+            border-radius: 25px !important; 
+            padding: 12px 25px !important; 
+            background: rgba(255,255,255,0.1) !important;
+            border: 1px solid rgba(255,255,255,0.2) !important;
+            color: white !important;
+            font-size: 15px !important;
+        }
+        
+        /* Premium Dashboard Card Headers */
+        .card-header { background-color: rgba(37, 168, 160, 0.05) !important; border-bottom: none !important; }
+        .card-title { font-weight: 800 !important; color: #1e8a82; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Unified & Attractive File/Image Upload UI */
+        .file-upload { 
+            border: 2px dashed #25A8A0 !important; 
+            background: #fafafa !important;
+            border-radius: 12px !important;
+            padding: 25px !important;
+            text-align: center !important;
+            position: relative;
+            display: block;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        .file-upload:hover { 
+            background: #f0fdfc !important;
+            border-color: #1e8a82 !important;
+        }
+        /* Hide complex 'Currently/Change' text */
+        .file-upload { color: transparent !important; font-size: 0 !important; }
+        .file-upload::before {
+            content: "Click to upload or drag & drop";
+            color: #666;
+            font-size: 14px;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .file-upload a { 
+            color: #25A8A0 !important; 
+            font-size: 13px !important; 
+            font-weight: 700 !important;
+            text-decoration: none !important;
+            display: inline-block !important;
+            margin-bottom: 15px !important;
+            background: white;
+            padding: 5px 12px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .file-upload a::before { content: "📄 View Current: "; color: #999; font-weight: 400; }
+        .file-upload input[type="file"] { 
+            color: #333 !important; 
+            font-size: 13px !important;
+            margin: 0 auto !important;
+            display: block !important;
+        }
+        
+        /* Hide boilerplate Clear labels */
+        .file-upload br, .file-upload span.clearable-file-input { display: none !important; }
+    """
 }

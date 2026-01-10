@@ -26,7 +26,6 @@ import Journal from './pages/Journal';
 import Diagnosis from './pages/Diagnosis';
 import Clients from './pages/Clients';
 import AIChat from './pages/AIChat';
-import Admin from './pages/Admin';
 import LiveSession from './pages/LiveSession';
 import TextChat from './pages/TextChat';
 import ClientProfile from './pages/ClientProfile';
@@ -95,7 +94,6 @@ function App() {
                 <Route path="/diagnosis" element={<Diagnosis />} />
                 <Route path="/clients" element={<Clients />} />
                 <Route path="/ai-chat" element={<AIChat />} />
-                <Route path="/admin" element={<Admin />} />
                 <Route path="/live/:sessionId" element={<LiveSession />} />
                 <Route path="/chat/:connId" element={<TextChat />} />
                 <Route path="/profile" element={<ClientProfile />} />

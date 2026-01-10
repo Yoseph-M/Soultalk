@@ -10,6 +10,8 @@ class User(AbstractUser):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='client')
 
     def __str__(self):
+        if self.first_name or self.last_name:
+            return f"{self.first_name} {self.last_name}".strip()
         return self.username
 
 from django.db.models.signals import post_save
@@ -48,8 +50,14 @@ class ProfessionalProfile(models.Model):
     dob = models.DateField(blank=True, null=True)
     specialization = models.CharField(max_length=100, blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
+    ID_TYPE_CHOICES = (
+        ('passport', 'International Passport'),
+        ('national_id', 'National ID Card'),
+        ('driver_license', 'Driver\'s License'),
+        ('professional_id', 'Professional ID / License'),
+    )
     profile_photo = models.ImageField(upload_to='profiles/', blank=True, null=True)
-    id_type = models.CharField(max_length=50, blank=True, null=True)
+    id_type = models.CharField(max_length=50, choices=ID_TYPE_CHOICES, blank=True, null=True)
     id_image = models.ImageField(upload_to='ids/', blank=True, null=True)
     certificates = models.FileField(upload_to='certificates/', blank=True, null=True)
     rating = models.DecimalField(max_digits=3, decimal_places=2, default=5.00)
@@ -61,8 +69,16 @@ class ProfessionalProfile(models.Model):
         ('verified', 'Verified'),
         ('rejected', 'Rejected'),
     )
+    REJECTION_REASON_CHOICES = (
+        ('invalid_id', 'Invalid or Expired ID'),
+        ('unclear_certificates', 'Unclear or Missing Certificates'),
+        ('fake_profile', 'Potential Fake Profile / Identity Issue'),
+        ('insufficient_bio', 'Incomplete or Low Quality Bio'),
+        ('other', 'Other (View/Edit Below)'),
+    )
     verification_status = models.CharField(max_length=20, choices=VERIFICATION_CHOICES, default='pending')
-    rejection_reason = models.TextField(blank=True, null=True)
+    rejection_reason_type = models.CharField(max_length=50, choices=REJECTION_REASON_CHOICES, blank=True, null=True, verbose_name="Reason Category")
+    rejection_reason = models.TextField(blank=True, null=True, verbose_name="Detailed Feedback")
     verified = models.BooleanField(default=False)
     languages = models.CharField(max_length=255, default='English') # Comma separated
     is_online = models.BooleanField(default=False)
