@@ -5,7 +5,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import Logo from '../assets/images/stlogo.svg';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
-import { FaApple } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
 import { countries } from '../data/countries';
 import { Metadata, type CountryCode } from 'libphonenumber-js';
@@ -381,98 +380,55 @@ const Auth: React.FC = () => {
 
       <div className="w-full max-w-6xl relative z-10">
         <div className="grid md:grid-cols-2 gap-6 items-center">
-          {/* Left Side - Enhanced Branding */}
-          <div className="hidden md:block text-white space-y-5">
-            <div className="flex items-center gap-3 mb-6">
-              <img src={Logo} alt="SoulTalk" className="h-12 w-12" />
-              <h1 className="text-2xl font-bold">SoulTalk</h1>
-            </div>
+          {/* Left Side - Clean Branding */}
+          <div className="hidden md:flex flex-col text-white space-y-12 pr-8">
 
-            <div className="space-y-3">
-              <h2 className="text-3xl font-bold leading-tight">
+
+            <div className="space-y-6">
+              <h2 className="text-5xl font-extrabold leading-[1.1] tracking-tight">
                 Your Journey to<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-green-200">
-                  Mental Wellness Starts Here
-                </span>
+                <span className="text-white/60">Mental Wellness</span><br />
+                Starts Here
               </h2>
-              <p className="text-base text-white/90 leading-relaxed">
+              <p className="text-xl text-white/80 leading-relaxed max-w-md font-medium">
                 Connect with licensed professionals in a safe, confidential environment.
                 Experience compassionate care tailored to your unique needs.
               </p>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 gap-3 mt-6">
-              <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
-                <div className="text-2xl font-bold mb-1">25,000+</div>
-                <div className="text-white/80 text-xs">Lives Transformed</div>
+            {/* Premium Trust Indicators */}
+            <div className="grid gap-4 max-w-md">
+              <div className="group flex items-center gap-5 p-5 bg-white/5 backdrop-blur-lg rounded-3xl border border-white/10 hover:bg-white/10 transition-all duration-500">
+                <div className="w-12 h-12 rounded-2xl bg-[#25A8A0] flex items-center justify-center flex-shrink-0 shadow-lg shadow-[#25A8A0]/20 group-hover:scale-110 transition-transform">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="font-bold text-lg text-white">100% Confidential</div>
+                  <div className="text-white/50 text-sm">Your privacy is our top priority</div>
+                </div>
               </div>
-              <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
-                <div className="text-2xl font-bold mb-1">500+</div>
-                <div className="text-white/80 text-xs">Licensed Professionals</div>
-              </div>
-            </div>
 
-            {/* Features */}
-            <div className="space-y-2.5 mt-6">
-              <div className="flex items-start gap-2.5">
-                <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <div className="group flex items-center gap-5 p-5 bg-white/5 backdrop-blur-lg rounded-3xl border border-white/10 hover:bg-white/10 transition-all duration-500">
+                <div className="w-12 h-12 rounded-2xl bg-[#25A8A0] flex items-center justify-center flex-shrink-0 shadow-lg shadow-[#25A8A0]/20 group-hover:scale-110 transition-transform">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                   </svg>
                 </div>
                 <div>
-                  <div className="font-semibold text-white text-sm">100% Confidential</div>
-                  <div className="text-white/70 text-xs">Your privacy is our top priority</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <div>
-                  <div className="font-semibold text-white text-sm">Flexible Scheduling</div>
-                  <div className="text-white/70 text-xs">Book sessions at your convenience</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <div>
-                  <div className="font-semibold text-white text-sm">Expert Care</div>
-                  <div className="text-white/70 text-xs">Verified and experienced therapists</div>
+                  <div className="font-bold text-lg text-white">Expert Care</div>
+                  <div className="text-white/50 text-sm">Verified and licensed therapists</div>
                 </div>
               </div>
             </div>
 
-            {/* Testimonial */}
-            <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20 mt-6">
-              <div className="flex gap-0.5 mb-2">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
-              </div>
-              <p className="text-white/90 text-xs italic mb-2">
-                "SoulTalk has been a game-changer for my mental health journey."
-              </p>
-              <div className="text-white/70 text-xs">— Sarah M.</div>
-            </div>
+
           </div>
 
           {/* Right Side - Auth Form */}
           <div className="bg-white rounded-3xl shadow-2xl p-5 md:p-6">
-            {/* Mobile Logo */}
-            <div className="md:hidden flex items-center justify-center gap-3 mb-4">
-              <img src={Logo} alt="SoulTalk" className="h-10 w-10" />
-              <h1 className="text-xl font-bold">SoulTalk</h1>
-            </div>
+
 
             {/* Form Header */}
             <div className="text-center mb-4">
@@ -512,10 +468,6 @@ const Auth: React.FC = () => {
                 <button className="w-full flex items-center justify-center gap-3 px-4 py-3.5 border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-bold text-gray-700 bg-white shadow-sm">
                   <FcGoogle className="w-5 h-5" />
                   Continue with Google
-                </button>
-                <button className="w-full flex items-center justify-center gap-3 px-4 py-3.5 border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-bold text-gray-700 bg-white shadow-sm">
-                  <FaApple className="w-5 h-5" />
-                  Continue with Apple
                 </button>
                 <div className="relative my-3">
                   <div className="absolute inset-0 flex items-center">
