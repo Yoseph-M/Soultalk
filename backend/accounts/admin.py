@@ -14,7 +14,8 @@ class ProfessionalProfileInline(admin.StackedInline):
     can_delete = False
     verbose_name_plural = 'Professional Profile'
     fieldsets = (
-        (None, {'fields': ('specialization', 'bio', 'location', 'languages', 'is_online', 'verified')}),
+        (None, {'fields': ('specialization', 'bio', 'location', 'languages', 'is_online')}),
+        ('Verification Status', {'fields': ('verification_status', 'rejection_reason', 'verified')}),
         ('Documents', {'fields': ('profile_photo', 'id_type', 'id_number', 'id_image', 'certificates')}),
         ('Stats', {'fields': ('rating', 'review_count', 'sessions_completed')}),
     )
@@ -60,13 +61,20 @@ class ProfessionalAdmin(BaseUserAdmin):
         return obj.professional_profile.specialization if hasattr(obj, 'professional_profile') else "-"
     specialization_view.short_description = 'Specialization'
 
-    def verification_status(self, obj):
-        if hasattr(obj, 'professional_profile') and obj.professional_profile.verified:
-            return format_html('<span style="color: green; font-weight: bold;">{}</span>', "Verified")
-        return format_html('<span style="color: red;">{}</span>', "Unverified")
-    verification_status.short_description = 'Status'
+    def verification_status_view(self, obj):
+        if not hasattr(obj, 'professional_profile'):
+            return "-"
+        status = obj.professional_profile.verification_status
+        colors = {
+            'verified': 'green',
+            'pending': 'orange',
+            'rejected': 'red'
+        }
+        color = colors.get(status, 'black')
+        return format_html('<span style="color: {}; font-weight: bold;">{}</span>', color, status.capitalize())
+    verification_status_view.short_description = 'Status'
 
-    list_display = ('profile_photo_preview', 'get_full_name', 'email', 'verification_status', 'manage_button')
+    list_display = ('profile_photo_preview', 'get_full_name', 'email', 'verification_status_view', 'manage_button')
 
 # Client-specific admin
 class ClientAdmin(BaseUserAdmin):

@@ -39,7 +39,8 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('id', 'username', 'email', 'password', 'role', 'first_name', 'last_name', 
                   'phone', 'dob', 'specialization', 'bio', 'location', 'id_type',
                   'profile_photo', 'id_image', 'certificates',
-                  'rating', 'review_count', 'sessions_completed', 'verified', 'languages', 'is_online')
+                  'rating', 'review_count', 'sessions_completed', 'verified', 'languages', 'is_online',
+                  'verification_status', 'rejection_reason')
 
     def get_rating(self, obj):
         try:
@@ -194,8 +195,13 @@ class UserSerializer(serializers.ModelSerializer):
                 data['id_image'] = profile.id_image.url if profile.id_image else None
                 data['certificates'] = profile.certificates.url if profile.certificates else None
                 data['verified'] = profile.verified
-        except:
-            data['verified'] = False
+                data['verification_status'] = profile.verification_status
+                data['rejection_reason'] = profile.rejection_reason
+        except Exception as e:
+                print(f"Error in to_representation: {e}")
+                data['verified'] = False
+                data['verification_status'] = 'pending'
+                data['rejection_reason'] = None
         return data
 
 class PublicUserSerializer(serializers.ModelSerializer):

@@ -56,6 +56,13 @@ class ProfessionalProfile(models.Model):
     review_count = models.IntegerField(default=0)
     sessions_completed = models.IntegerField(default=0)
     location = models.CharField(max_length=100, default='Global')
+    VERIFICATION_CHOICES = (
+        ('pending', 'Pending'),
+        ('verified', 'Verified'),
+        ('rejected', 'Rejected'),
+    )
+    verification_status = models.CharField(max_length=20, choices=VERIFICATION_CHOICES, default='pending')
+    rejection_reason = models.TextField(blank=True, null=True)
     verified = models.BooleanField(default=False)
     languages = models.CharField(max_length=255, default='English') # Comma separated
     is_online = models.BooleanField(default=False)
@@ -67,6 +74,11 @@ class ProfessionalProfile(models.Model):
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     total_earnings = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     
+    def save(self, *args, **kwargs):
+        # Sync verified boolean with status
+        self.verified = (self.verification_status == 'verified')
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"Professional: {self.user.username}"
 

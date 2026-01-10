@@ -9,6 +9,8 @@ interface User {
   role: 'seeker' | 'listener' | 'professional' | 'client' | 'admin';
   avatar?: string;
   verified?: boolean;
+  verificationStatus?: 'pending' | 'verified' | 'rejected';
+  rejectionReason?: string;
 }
 
 interface AuthContextType {
@@ -62,7 +64,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               type: userData.role,
               role: userData.role,
               avatar: userData.profile_photo ? `${API_BASE_URL}${userData.profile_photo}` : '',
-              verified: userData.verified
+              verified: userData.verified,
+              verificationStatus: userData.verification_status,
+              rejectionReason: userData.rejection_reason
             });
           } else {
             console.warn('Init auth failed, logging out');
@@ -111,7 +115,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           type: userData.role,
           role: userData.role,
           avatar: userData.profile_photo ? `${API_BASE_URL}${userData.profile_photo}` : '',
-          verified: userData.verified
+          verified: userData.verified,
+          verificationStatus: userData.verification_status,
+          rejectionReason: userData.rejection_reason
         };
         setUser(userObj);
         localStorage.setItem('user', JSON.stringify(userObj));
