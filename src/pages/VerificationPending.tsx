@@ -60,9 +60,10 @@ const VerificationPending: React.FC = () => {
                             <ShieldCheck className="w-8 h-8 text-[#25A8A0]" />
                         </div>
 
-                        <h1 className="text-2xl font-bold text-slate-900 mb-4">
+                        <h1 className="text-2xl font-bold text-slate-900 mb-4 uppercase tracking-tight">
                             Account Under Review
                         </h1>
+                        {/* Deployment Check: v2 - Removal of buttons confirmed */}
 
                         <p className="text-slate-600 mb-10 leading-relaxed">
                             Your professional profile is currently being reviewed. To maintain our community standards, we verify all credentials before granting full access.
