@@ -46,7 +46,8 @@ class UserSerializer(serializers.ModelSerializer):
                   'phone', 'dob', 'specialization', 'bio', 'location', 'id_type',
                   'profile_photo', 'id_image', 'certificates',
                   'rating', 'review_count', 'sessions_completed', 'verified', 'languages', 'is_online',
-                  'verification_status', 'rejection_reason', 'id_number', 'issuing_authority')
+                  'verification_status', 'rejection_reason', 'id_number', 'issuing_authority',
+                  'id_number_input', 'issuing_authority_input')
 
     def get_rating(self, obj):
         try:
@@ -212,12 +213,12 @@ class UserSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        # Populate profile fields in response if they were not already populated
         try:
-            if instance.role == 'client':
-                data['phone'] = instance.client_profile.phone
-                data['dob'] = instance.client_profile.dob
-            elif instance.role == 'professional':
+            if instance.role == 'client' and hasattr(instance, 'client_profile'):
+                profile = instance.client_profile
+                data['phone'] = profile.phone
+                data['dob'] = profile.dob
+            elif instance.role == 'professional' and hasattr(instance, 'professional_profile'):
                 profile = instance.professional_profile
                 data['phone'] = profile.phone
                 data['dob'] = profile.dob
@@ -229,10 +230,6 @@ class UserSerializer(serializers.ModelSerializer):
                 data['id_image'] = profile.id_image.url if profile.id_image else None
                 data['certificates'] = profile.certificates.url if profile.certificates else None
                 data['verified'] = profile.verified
-                data['id_number'] = profile.id_number
-                data['issuing_authority'] = profile.issuing_authority
-                data['verification_status'] = profile.verification_status
-                data['rejection_reason'] = profile.rejection_reason
         except Exception as e:
                 print(f"Error in to_representation: {e}")
                 data['verified'] = False
