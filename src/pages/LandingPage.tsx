@@ -628,6 +628,7 @@ const LandingPage: React.FC = () => {
           </div>
           <div className="text-center text-gray-400 mt-12 pt-8 border-t border-gray-700 text-xs md:text-sm">
             <p>&copy; 2025 SoulTalk. All rights reserved. Professional mental health support for everyone.</p>
+            <p className="mt-2 text-[10px] opacity-20">Deployment Version: 1.0.5</p>
             <p className="mt-2">Licensed professionals available 24/7 for your mental wellness journey.</p>
           </div>
         </div>
