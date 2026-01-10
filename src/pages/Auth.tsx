@@ -61,11 +61,13 @@ const Auth: React.FC = () => {
   // Redirect if already logged in
   React.useEffect(() => {
     if (!isAuthLoading && user) {
-      if (user.type === 'professional' || user.type === 'listener') {
+      console.log('User already logged in, checking redirect:', { role: user.role, verified: user.verified });
+      if (user.role === 'professional' || user.role === 'listener') {
         if (user.verified) {
           navigate('/professionals');
+        } else {
+          navigate('/verification-pending');
         }
-        // If unverified, we stay on the auth page to allow them to login again or switch accounts
       } else {
         navigate('/dashboard');
       }
@@ -209,7 +211,9 @@ const Auth: React.FC = () => {
       if (isLogin) {
         const loggedInUser = await login(formData.email, formData.password);
         if (loggedInUser) {
-          if (loggedInUser.type === 'professional' || loggedInUser.type === 'listener') {
+          console.log('Login successful, redirecting based on role:', loggedInUser.role);
+          // Redirect immediately based on user role and verification status
+          if (loggedInUser.role === 'professional' || loggedInUser.role === 'listener') {
             if (loggedInUser.verified) {
               navigate('/professionals');
             } else {

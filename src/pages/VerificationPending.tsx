@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 const VerificationPending: React.FC = () => {
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
 
     const isRejected = user?.verificationStatus === 'rejected';
 
@@ -82,13 +82,27 @@ const VerificationPending: React.FC = () => {
                     </>
                 )}
 
-                <button
-                    onClick={() => navigate('/')}
-                    className="w-full text-slate-500 hover:text-slate-900 py-2 transition-colors text-sm font-medium flex items-center justify-center gap-2 group"
-                >
-                    <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                    Back to Home
-                </button>
+                <div className="flex flex-col items-center gap-4">
+                    <button
+                        onClick={() => navigate('/')}
+                        className="text-slate-500 hover:text-slate-900 transition-colors text-sm font-medium flex items-center justify-center gap-2 group"
+                    >
+                        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                        Back to Home
+                    </button>
+
+                    {user && (
+                        <button
+                            onClick={() => {
+                                logout();
+                                navigate('/');
+                            }}
+                            className="text-red-500 hover:text-red-700 transition-colors text-sm font-medium"
+                        >
+                            Sign out of {user.email}
+                        </button>
+                    )}
+                </div>
 
                 <p className="mt-10 text-xs text-slate-400">
                     Questions? Contact <a href="mailto:support@soultalk.com" className="text-[#25A8A0] font-medium hover:underline">Support</a>
