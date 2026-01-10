@@ -20,6 +20,8 @@ class UserSerializer(serializers.ModelSerializer):
     bio = serializers.CharField(required=False, allow_blank=True, allow_null=True, write_only=True)
     location = serializers.CharField(required=False, allow_blank=True, allow_null=True, write_only=True)
     id_type = serializers.CharField(required=False, allow_blank=True, allow_null=True, write_only=True)
+    id_number_input = serializers.CharField(required=False, allow_blank=True, allow_null=True, write_only=True)
+    issuing_authority_input = serializers.CharField(required=False, allow_blank=True, allow_null=True, write_only=True)
     
     # Files
     profile_photo = serializers.ImageField(required=False, allow_null=True, write_only=True)
@@ -33,6 +35,10 @@ class UserSerializer(serializers.ModelSerializer):
     verified = serializers.BooleanField(required=False, write_only=True)
     languages = serializers.SerializerMethodField()
     is_online = serializers.SerializerMethodField()
+    verification_status = serializers.SerializerMethodField()
+    rejection_reason = serializers.SerializerMethodField()
+    id_number = serializers.SerializerMethodField()
+    issuing_authority = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -72,6 +78,30 @@ class UserSerializer(serializers.ModelSerializer):
         except:
             return False
 
+    def get_verification_status(self, obj):
+        try:
+            return obj.professional_profile.verification_status
+        except:
+            return 'pending'
+
+    def get_rejection_reason(self, obj):
+        try:
+            return obj.professional_profile.rejection_reason
+        except:
+            return None
+
+    def get_id_number(self, obj):
+        try:
+            return obj.professional_profile.id_number
+        except:
+            return None
+
+    def get_issuing_authority(self, obj):
+        try:
+            return obj.professional_profile.issuing_authority
+        except:
+            return None
+
     def create(self, validated_data):
         from django.db import transaction
         print(f"Debug: Starting user creation for {validated_data.get('email')}")
@@ -82,9 +112,13 @@ class UserSerializer(serializers.ModelSerializer):
         profile_fields = [
             'phone', 'dob', 'specialization', 'bio', 'location', 
             'id_type', 'profile_photo', 'id_image', 'certificates', 
-            'verified', 'id_number', 'issuing_authority'
+            'verified'
         ]
         profile_data = {field: validated_data.pop(field, None) for field in profile_fields}
+        
+        # Handle renamed input fields
+        profile_data['id_number'] = validated_data.pop('id_number_input', None)
+        profile_data['issuing_authority'] = validated_data.pop('issuing_authority_input', None)
         
         try:
             # Create user (this happens in the main transaction)
@@ -195,15 +229,13 @@ class UserSerializer(serializers.ModelSerializer):
                 data['id_image'] = profile.id_image.url if profile.id_image else None
                 data['certificates'] = profile.certificates.url if profile.certificates else None
                 data['verified'] = profile.verified
-                data['verification_status'] = profile.verification_status
-                data['rejection_reason'] = profile.rejection_reason
                 data['id_number'] = profile.id_number
                 data['issuing_authority'] = profile.issuing_authority
+                data['verification_status'] = profile.verification_status
+                data['rejection_reason'] = profile.rejection_reason
         except Exception as e:
                 print(f"Error in to_representation: {e}")
                 data['verified'] = False
-                data['verification_status'] = 'pending'
-                data['rejection_reason'] = None
         return data
 
 class PublicUserSerializer(serializers.ModelSerializer):
