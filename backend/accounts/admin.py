@@ -3,6 +3,24 @@ from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
 from .models import User, ClientProfile, ProfessionalProfile, AdminProfile
 
+from django import forms
+
+# Forms for the Admin
+class ProfessionalProfileForm(forms.ModelForm):
+    rejection_template = forms.ChoiceField(
+        choices=[('', '--- Select a common reason ---')] + list(ProfessionalProfile.REJECTION_REASON_CHOICES),
+        required=False,
+        label="Common Rejection Reasons",
+        help_text="Selecting a reason will automatically fill the text field below."
+    )
+
+    class Meta:
+        model = ProfessionalProfile
+        fields = '__all__'
+        widgets = {
+            'rejection_reason': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Type or select a reason above...'}),
+        }
+
 # Inlines for Profiles
 class ClientProfileInline(admin.StackedInline):
     model = ClientProfile
@@ -11,14 +29,28 @@ class ClientProfileInline(admin.StackedInline):
 
 class ProfessionalProfileInline(admin.StackedInline):
     model = ProfessionalProfile
+    form = ProfessionalProfileForm
     can_delete = False
-    verbose_name_plural = 'Professional Profile'
+    verbose_name_plural = 'Professional Profile/Verification'
     fieldsets = (
-        (None, {'fields': ('specialization', 'bio', 'location', 'languages', 'is_online')}),
-        ('Verification Status', {'fields': ('verification_status', 'rejection_reason', 'verified')}),
-        ('Documents', {'fields': ('profile_photo', 'id_type', 'id_number', 'id_image', 'certificates')}),
-        ('Stats', {'fields': ('rating', 'review_count', 'sessions_completed')}),
+        ('Account Status', {
+            'fields': (('verification_status', 'verified'),),
+            'classes': ('tab-verification',),
+        }),
+        ('Verification Feedback', {
+            'fields': ('rejection_template', 'rejection_reason'),
+            'description': 'Provide feedback if rejected.',
+        }),
+        ('Primary Info', {'fields': ('specialization', 'bio', 'location', 'languages', 'is_online')}),
+        ('Verification Documents', {'fields': ('profile_photo', 'id_type', 'id_number', 'id_image', 'certificates')}),
+        ('Platform Stats', {'fields': (('rating', 'review_count', 'sessions_completed'),)}),
     )
+
+    class Media:
+        js = ('admin/js/professional_rejection.js',)
+        css = {
+            'all': ('admin/css/professional_admin.css',)
+        }
 
 # Base admin class with common configurations
 class BaseUserAdmin(UserAdmin):
@@ -74,7 +106,8 @@ class ProfessionalAdmin(BaseUserAdmin):
         return format_html('<span style="color: {}; font-weight: bold;">{}</span>', color, status.capitalize())
     verification_status_view.short_description = 'Status'
 
-    list_display = ('profile_photo_preview', 'get_full_name', 'email', 'verification_status_view', 'manage_button')
+    list_filter = BaseUserAdmin.list_filter + ('professional_profile__verification_status',)
+    list_display = ('profile_photo_preview', 'get_full_name', 'email', 'specialization_view', 'verification_status_view', 'manage_button')
 
 # Client-specific admin
 class ClientAdmin(BaseUserAdmin):
