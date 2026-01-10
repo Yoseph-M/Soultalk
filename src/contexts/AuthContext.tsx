@@ -161,7 +161,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
+        let errorData;
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          errorData = await response.json();
+        } else {
+          const textError = await response.text();
+          console.error('Signup error (non-JSON):', textError);
+          errorData = { detail: 'Server error. Please try again later.' };
+        }
         console.error('Signup error details:', errorData);
         throw new Error(JSON.stringify(errorData));
       }

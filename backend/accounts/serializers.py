@@ -72,6 +72,7 @@ class UserSerializer(serializers.ModelSerializer):
             return False
 
     def create(self, validated_data):
+        print(f"Debug: Starting user creation for {validated_data.get('email')}")
         role = validated_data.pop('role', 'client')
         password = validated_data.pop('password')
         
@@ -79,48 +80,61 @@ class UserSerializer(serializers.ModelSerializer):
         profile_fields = ['phone', 'dob', 'specialization', 'bio', 'location', 'id_type', 'profile_photo', 'id_image', 'certificates', 'verified']
         profile_data = {field: validated_data.pop(field, None) for field in profile_fields}
         
-        # Create user
-        user = User.objects.create_user(
-            password=password,
-            role=role,
-            **validated_data
-        )
-        
-        # Profile creation is handled by post_save signals, 
-        # but we need to update with the extra fields provided during signup
         try:
-            if role == 'client':
-                profile, _ = ClientProfile.objects.get_or_create(user=user)
-                if profile_data.get('phone'): profile.phone = profile_data['phone']
-                if profile_data.get('dob'): profile.dob = profile_data['dob']
-                profile.save()
-            elif role == 'professional':
-                profile, _ = ProfessionalProfile.objects.get_or_create(user=user)
-                for attr, value in profile_data.items():
-                    if value is not None:
-                        setattr(profile, attr, value)
-                profile.save()
-            elif role == 'admin':
-                AdminProfile.objects.get_or_create(user=user)
-        except Exception as e:
-            print(f"Error saving profile (likely file storage issue): {e}")
-            # Retry without files if professional
-            if role == 'professional':
-                try:
-                     profile.refresh_from_db()
-                     file_fields = ['profile_photo', 'id_image', 'certificates']
-                     for attr, value in profile_data.items():
-                         if value is not None and attr not in file_fields:
-                             setattr(profile, attr, value)
-                     profile.save()
-                     print("Recovered: Saved profile without files.")
-                except Exception as e2:
-                     print(f"Critical error saving profile retry: {e2}")
-                     raise e2
-            else:
-                raise e
+            # Create user
+            user = User.objects.create_user(
+                password=password,
+                role=role,
+                **validated_data
+            )
+            print(f"Debug: User created successfully with ID {user.id}")
             
-        return user
+            # Profile creation is handled by post_save signals, 
+            # but we need to update with the extra fields provided during signup
+            try:
+                if role == 'client':
+                    profile, _ = ClientProfile.objects.get_or_create(user=user)
+                    if profile_data.get('phone'): profile.phone = profile_data['phone']
+                    if profile_data.get('dob'): profile.dob = profile_data['dob']
+                    profile.save()
+                    print("Debug: Client profile saved")
+                elif role == 'professional':
+                    profile, _ = ProfessionalProfile.objects.get_or_create(user=user)
+                    for attr, value in profile_data.items():
+                        if value is not None:
+                            setattr(profile, attr, value)
+                    profile.save()
+                    print("Debug: Professional profile saved with files")
+                elif role == 'admin':
+                    AdminProfile.objects.get_or_create(user=user)
+                    print("Debug: Admin profile created")
+            except Exception as e:
+                print(f"Error saving profile details (likely file storage issue): {str(e)}")
+                # Retry without files if professional
+                if role == 'professional':
+                    try:
+                         # Refresh to get clean state
+                         profile = ProfessionalProfile.objects.get(user=user)
+                         file_fields = ['profile_photo', 'id_image', 'certificates']
+                         for attr, value in profile_data.items():
+                             if value is not None and attr not in file_fields:
+                                 setattr(profile, attr, value)
+                         profile.save()
+                         print("Recovered: Saved professional profile without files.")
+                    except Exception as e2:
+                         print(f"Critical error saving profile retry: {str(e2)}")
+                         # If we can't even save basic info, we should probably delete the user 
+                         # to allow another attempt, but for now just raise
+                         raise e2
+                else:
+                    raise e
+                
+            return user
+        except Exception as e:
+            print(f"FATAL Signup Error: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            raise serializers.ValidationError({"detail": str(e)})
 
     def update(self, instance, validated_data):
         # Extract profile fields

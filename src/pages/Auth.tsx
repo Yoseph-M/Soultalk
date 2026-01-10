@@ -222,6 +222,7 @@ const Auth: React.FC = () => {
       } else {
         if (isProfessional) {
           if (proStep === totalProSteps) {
+            console.log('Starting signup process...');
             await signup({
               email: formData.email,
               password: formData.password,
@@ -237,6 +238,7 @@ const Auth: React.FC = () => {
               idImageFile: idImage,
               skipLogin: true
             });
+            console.log('Signup successful, navigating to verification-pending...');
             // Manual navigation since we skipped auto-login
             navigate('/verification-pending');
           }
@@ -1150,7 +1152,9 @@ const Auth: React.FC = () => {
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     ) : (
                       <>
-                        {proStep === totalProSteps ? 'Complete Registration' : 'Continue'}
+                        {proStep === totalProSteps
+                          ? (isAuthLoading ? 'Uploading documents...' : 'Complete Registration')
+                          : 'Continue'}
                         <ArrowRight className="w-5 h-5" />
                       </>
                     )}
