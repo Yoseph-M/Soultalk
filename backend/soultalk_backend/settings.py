@@ -91,12 +91,15 @@ WSGI_APPLICATION = 'soultalk_backend.wsgi.application'
 
 import dj_database_url
 
+default_db = dj_database_url.config(
+    default=os.getenv('DATABASE_URL', 'postgresql://zube@localhost:5432/soultalk_db'),
+    conn_max_age=600,
+    conn_health_checks=True,
+)
+default_db['ATOMIC_REQUESTS'] = True
+
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL', 'postgresql://zube@localhost:5432/soultalk_db'),
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
+    'default': default_db
 }
 
 

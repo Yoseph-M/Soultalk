@@ -88,19 +88,37 @@ class UserSerializer(serializers.ModelSerializer):
         
         # Profile creation is handled by post_save signals, 
         # but we need to update with the extra fields provided during signup
-        if role == 'client':
-            profile, _ = ClientProfile.objects.get_or_create(user=user)
-            if profile_data['phone']: profile.phone = profile_data['phone']
-            if profile_data['dob']: profile.dob = profile_data['dob']
-            profile.save()
-        elif role == 'professional':
-            profile, _ = ProfessionalProfile.objects.get_or_create(user=user)
-            for attr, value in profile_data.items():
-                if value is not None:
-                    setattr(profile, attr, value)
-            profile.save()
-        elif role == 'admin':
-            AdminProfile.objects.get_or_create(user=user)
+        try:
+            if role == 'client':
+                profile, _ = ClientProfile.objects.get_or_create(user=user)
+                if profile_data.get('phone'): profile.phone = profile_data['phone']
+                if profile_data.get('dob'): profile.dob = profile_data['dob']
+                profile.save()
+            elif role == 'professional':
+                profile, _ = ProfessionalProfile.objects.get_or_create(user=user)
+                for attr, value in profile_data.items():
+                    if value is not None:
+                        setattr(profile, attr, value)
+                profile.save()
+            elif role == 'admin':
+                AdminProfile.objects.get_or_create(user=user)
+        except Exception as e:
+            print(f"Error saving profile (likely file storage issue): {e}")
+            # Retry without files if professional
+            if role == 'professional':
+                try:
+                     profile.refresh_from_db()
+                     file_fields = ['profile_photo', 'id_image', 'certificates']
+                     for attr, value in profile_data.items():
+                         if value is not None and attr not in file_fields:
+                             setattr(profile, attr, value)
+                     profile.save()
+                     print("Recovered: Saved profile without files.")
+                except Exception as e2:
+                     print(f"Critical error saving profile retry: {e2}")
+                     raise e2
+            else:
+                raise e
             
         return user
 
