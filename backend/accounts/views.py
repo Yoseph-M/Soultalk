@@ -93,11 +93,23 @@ class AIChatView(views.APIView):
 
             print(f"Debug: History length: {len(history)}")
 
-            chat = client.chats.create(model='gemini-1.5-flash', history=history)
+            # Strict prompt to keep the AI on topic
+            prompt_context = (
+                "You are SoulTalk AI, a compassionate mental wellness companion. "
+                "Your purpose is strictly limited to providing emotional support and mental health guidance. "
+                "STRICT RULE: You must ONLY answer questions directly related to mental health, wellness, and emotional well-being. "
+                "If the user asks about ANY unrelated topic (e.g., coding, math, general knowledge, recipes, technology, etc.), "
+                "you must politely refuse to answer. State that you are specifically designed to support their mental health "
+                "and ask if they would like to share how they are feeling or discuss a wellness topic instead. "
+                "Maintain a supportive, professional, and empathetic tone at all times.\n\n"
+                "User says: "
+            )
+            full_prompt = prompt_context + message_content
             
-            prompt = f"""You are SoulTalk AI, a compassionate mental wellness companion.
-User says: {message_content}"""
-            response = chat.send_message(prompt)
+            response = client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=history + [{'role': 'user', 'parts': [{'text': full_prompt}]}]
+            )
             ai_reply = response.text
             
             print(f"Debug: AI Reply received: {ai_reply[:20]}...")
