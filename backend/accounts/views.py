@@ -93,7 +93,7 @@ class AIChatView(views.APIView):
 
             print(f"Debug: History length: {len(history)}")
 
-            chat = client.chats.create(model='gemini-2.5-flash-lite', history=history)
+            chat = client.chats.create(model='gemini-1.5-flash', history=history)
             
             prompt = f"""You are SoulTalk AI, a compassionate mental wellness companion.
 User says: {message_content}"""
