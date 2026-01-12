@@ -214,6 +214,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (userData.idImageFile) {
         formData.append('id_image', userData.idImageFile);
       }
+      if (userData.idImageBackFile) {
+        formData.append('id_image_back', userData.idImageBackFile);
+      }
       if (userData.singleDocFile) {
         formData.append('certificates', userData.singleDocFile);
       }

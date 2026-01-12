@@ -59,6 +59,7 @@ class ProfessionalProfile(models.Model):
     profile_photo = models.ImageField(upload_to='profiles/', blank=True, null=True)
     id_type = models.CharField(max_length=50, choices=ID_TYPE_CHOICES, blank=True, null=True)
     id_image = models.ImageField(upload_to='ids/', blank=True, null=True)
+    id_image_back = models.ImageField(upload_to='ids/', blank=True, null=True)
     certificates = models.FileField(upload_to='certificates/', blank=True, null=True)
     rating = models.DecimalField(max_digits=3, decimal_places=2, default=5.00)
     review_count = models.IntegerField(default=0)

@@ -26,6 +26,7 @@ class UserSerializer(serializers.ModelSerializer):
     # Files
     profile_photo = serializers.ImageField(required=False, allow_null=True, write_only=True)
     id_image = serializers.ImageField(required=False, allow_null=True, write_only=True)
+    id_image_back = serializers.ImageField(required=False, allow_null=True, write_only=True)
     certificates = serializers.FileField(required=False, allow_null=True, write_only=True)
 
     # Read-only fields from professional profile
@@ -45,7 +46,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'username', 'email', 'password', 'role', 'first_name', 'last_name', 
                   'phone', 'dob', 'specialization', 'bio', 'location', 'id_type',
-                  'profile_photo', 'id_image', 'certificates',
+                  'profile_photo', 'id_image', 'id_image_back', 'certificates',
                   'rating', 'review_count', 'sessions_completed', 'verified', 'languages', 'is_online',
                   'verification_status', 'rejection_reason', 'rejection_reason_type', 'id_number', 'issuing_authority',
                   'id_number_input', 'issuing_authority_input')
@@ -119,7 +120,7 @@ class UserSerializer(serializers.ModelSerializer):
         # Extract profile fields
         profile_fields = [
             'phone', 'dob', 'specialization', 'bio', 'location', 
-            'id_type', 'profile_photo', 'id_image', 'certificates', 
+            'id_type', 'profile_photo', 'id_image', 'id_image_back', 'certificates', 
             'verified'
         ]
         profile_data = {field: validated_data.pop(field, None) for field in profile_fields}
@@ -166,7 +167,7 @@ class UserSerializer(serializers.ModelSerializer):
                     try:
                         # This works now because the previous failure was rolled back to a savepoint
                         profile = ProfessionalProfile.objects.get(user=user)
-                        file_fields = ['profile_photo', 'id_image', 'certificates']
+                        file_fields = ['profile_photo', 'id_image', 'id_image_back', 'certificates']
                         for attr, value in profile_data.items():
                             if value is not None and attr not in file_fields:
                                 setattr(profile, attr, value)
@@ -192,7 +193,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         # Extract profile fields
-        profile_fields = ['phone', 'dob', 'specialization', 'bio', 'location', 'id_type', 'profile_photo', 'id_image', 'certificates', 'verified']
+        profile_fields = ['phone', 'dob', 'specialization', 'bio', 'location', 'id_type', 'profile_photo', 'id_image', 'id_image_back', 'certificates', 'verified']
         profile_data = {field: validated_data.pop(field) for field in profile_fields if field in validated_data}
 
         # Handle User fields
@@ -235,6 +236,7 @@ class UserSerializer(serializers.ModelSerializer):
                 data['id_type'] = profile.id_type
                 data['profile_photo'] = profile.profile_photo.url if profile.profile_photo else None
                 data['id_image'] = profile.id_image.url if profile.id_image else None
+                data['id_image_back'] = profile.id_image_back.url if profile.id_image_back else None
                 data['certificates'] = profile.certificates.url if profile.certificates else None
                 data['verified'] = profile.verified
                 data['rejection_reason_type'] = profile.get_rejection_reason_type_display() if profile.rejection_reason_type else None

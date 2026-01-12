@@ -46,18 +46,18 @@ const Auth: React.FC = () => {
   };
   const [errors, setErrors] = useState<ErrorsType>({});
 
-  const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
   const [certificates, setCertificates] = useState<File | null>(null);
-  const [idImage, setIdImage] = useState<File | null>(null);
+  const [idImageFront, setIdImageFront] = useState<File | null>(null);
+  const [idImageBack, setIdImageBack] = useState<File | null>(null);
   const [showStepErrors, setShowStepErrors] = useState(false);
   const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
+  const [countrySearch, setCountrySearch] = useState('');
   const [isIdTypeDropdownOpen, setIsIdTypeDropdownOpen] = useState(false);
   const [isSpecializationDropdownOpen, setIsSpecializationDropdownOpen] = useState(false);
 
   const navigate = useNavigate();
   const { user, login, signup, isLoading: isAuthLoading } = useAuth();
 
-  // Redirect if already logged in
   React.useEffect(() => {
     if (!isAuthLoading && user) {
       console.log('User already logged in, checking redirect:', { role: user.role, verified: user.verified });
@@ -72,6 +72,31 @@ const Auth: React.FC = () => {
       }
     }
   }, [user, isAuthLoading, navigate]);
+
+  // Telegram-like feature: Automatically detect user's country
+  React.useEffect(() => {
+    const detectCountry = async () => {
+      try {
+        const response = await fetch('https://ipapi.co/json/');
+        const data = await response.json();
+        if (data && data.country_code) {
+          const detectedCountry = countries.find(c => c.code === data.country_code);
+          if (detectedCountry) {
+            setFormData(prev => ({
+              ...prev,
+              countryCode: detectedCountry.dial_code
+            }));
+          }
+        }
+      } catch (error) {
+        console.error('Error detecting country:', error);
+      }
+    };
+
+    if (!isLogin) {
+      detectCountry();
+    }
+  }, [isLogin]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -153,13 +178,13 @@ const Auth: React.FC = () => {
         ageLimit.setFullYear(ageLimit.getFullYear() - 18);
         return birthDate <= ageLimit;
       case 3: // ID Check
-        return !!(formData.idType && idImage);
+        return !!formData.idType && !!idImageFront && !!idImageBack;
       case 4: // Professional
-        return !!(formData.specialization);
+        return !!formData.specialization;
       case 5: // Documents
-        return !!(profilePhoto && certificates);
+        return !!certificates;
       default:
-        return false;
+        return true;
     }
   };
 
@@ -190,9 +215,9 @@ const Auth: React.FC = () => {
       console.log('Validating all steps...');
       console.log('Step 1 (Account):', validateStep(1), { firstName: formData.firstName, lastName: formData.lastName, email: formData.email, password: formData.password, confirmPassword: formData.confirmPassword });
       console.log('Step 2 (Personal):', validateStep(2), { phone: formData.phone, dob: formData.dob });
-      console.log('Step 3 (ID):', validateStep(3), { idType: formData.idType, idImage: idImage?.name });
+      console.log('Step 3 (ID):', validateStep(3), { idType: formData.idType, idImageFront: idImageFront?.name, idImageBack: idImageBack?.name });
       console.log('Step 4 (Professional):', validateStep(4), { specialization: formData.specialization });
-      console.log('Step 5 (Documents):', validateStep(5), { profilePhoto: profilePhoto?.name, certificates: certificates?.name });
+      console.log('Step 5 (Documents):', validateStep(5), { certificates: certificates?.name });
 
       const allStepsValid = [1, 2, 3, 4, 5].every(step => validateStep(step));
       if (!allStepsValid) {
@@ -251,9 +276,9 @@ const Auth: React.FC = () => {
               idNumber: formData.idNumber,
               issuingAuthority: formData.issuingAuthority,
               specialization: formData.specialization,
-              profilePhotoFile: profilePhoto,
               singleDocFile: certificates,
-              idImageFile: idImage,
+              idImageFile: idImageFront,
+              idImageBackFile: idImageBack,
               skipLogin: true
             });
             console.log('Signup successful, navigating to verification-pending...');
@@ -329,22 +354,21 @@ const Auth: React.FC = () => {
     if (proStep > 1) setProStep(proStep - 1);
   };
 
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setProfilePhoto(e.target.files[0]);
-    }
-  };
-
   const handleCertificateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setCertificates(e.target.files[0]);
       setShowStepErrors(false);
     }
   };
-
-  const handleIdImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleIdImageFrontChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setIdImage(e.target.files[0]);
+      setIdImageFront(e.target.files[0]);
+      setShowStepErrors(false);
+    }
+  };
+  const handleIdImageBackChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setIdImageBack(e.target.files[0]);
       setShowStepErrors(false);
     }
   };
@@ -427,7 +451,7 @@ const Auth: React.FC = () => {
           </div>
 
           {/* Right Side - Auth Form */}
-          <div className="bg-white rounded-3xl shadow-2xl p-5 md:p-6">
+          <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-10 min-h-[650px] flex flex-col justify-center">
 
 
             {/* Form Header */}
@@ -734,22 +758,45 @@ const Auth: React.FC = () => {
                                 className="fixed inset-0 z-10"
                                 onClick={() => setIsCountryDropdownOpen(false)}
                               />
-                              <div className="absolute top-full left-0 w-[300px] mt-2 bg-white border border-gray-100 rounded-xl shadow-2xl z-20 max-h-60 overflow-y-auto custom-scrollbar">
-                                {countries.map((c) => (
-                                  <button
-                                    key={c.code}
-                                    type="button"
-                                    className="w-full text-left px-4 py-3 hover:bg-gray-100 flex items-center gap-3 transition-colors border-b border-gray-50 last:border-0"
-                                    onClick={() => {
-                                      handleInputChange({ target: { name: 'countryCode', value: c.dial_code } } as any);
-                                      setIsCountryDropdownOpen(false);
-                                    }}
-                                  >
-                                    <span className="text-2xl">{c.flag}</span>
-                                    <span className="text-gray-900 font-medium truncate flex-1">{c.name}</span>
-                                    <span className="text-gray-500 text-sm font-semibold">{c.dial_code}</span>
-                                  </button>
-                                ))}
+                              <div className="absolute top-full left-0 w-[300px] mt-2 bg-white border border-gray-100 rounded-xl shadow-2xl z-20 flex flex-col overflow-hidden">
+                                <div className="p-2 border-b border-gray-100 bg-white">
+                                  <div className="relative">
+                                    <input
+                                      type="text"
+                                      placeholder="Search country..."
+                                      className="w-full pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#25A8A0] transition-all bg-white"
+                                      value={countrySearch}
+                                      onChange={(e) => setCountrySearch(e.target.value)}
+                                      autoFocus
+                                    />
+                                    <svg className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                  </div>
+                                </div>
+                                <div className="max-h-60 overflow-y-auto custom-scrollbar">
+                                  {countries
+                                    .filter(c =>
+                                      c.name.toLowerCase().includes(countrySearch.toLowerCase()) ||
+                                      c.dial_code.includes(countrySearch)
+                                    )
+                                    .map((c) => (
+                                      <button
+                                        key={c.code}
+                                        type="button"
+                                        className="w-full text-left px-4 py-3 hover:bg-gray-100 flex items-center gap-3 transition-colors border-b border-gray-50 last:border-0"
+                                        onClick={() => {
+                                          handleInputChange({ target: { name: 'countryCode', value: c.dial_code } } as any);
+                                          setIsCountryDropdownOpen(false);
+                                          setCountrySearch('');
+                                        }}
+                                      >
+                                        <span className="text-2xl">{c.flag}</span>
+                                        <span className="text-gray-900 font-medium truncate flex-1">{c.name}</span>
+                                        <span className="text-gray-500 text-sm font-semibold">{c.dial_code}</span>
+                                      </button>
+                                    ))}
+                                </div>
                               </div>
                             </>
                           )}
@@ -925,41 +972,65 @@ const Auth: React.FC = () => {
                         )}
                       </div>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Upload ID Image</label>
-                      <div className={`border-2 border-dashed ${showStepErrors && !idImage ? 'border-red-400 bg-red-50' : 'border-gray-300'} rounded-xl p-4 text-center hover:border-[#25A8A0] transition-all cursor-pointer relative overflow-hidden group`}>
-                        {idImage ? (
-                          <div className="relative aspect-video w-full rounded-lg overflow-hidden bg-gray-50">
-                            <img src={URL.createObjectURL(idImage)} alt="ID Preview" className="w-full h-full object-contain" />
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                              <span className="text-white text-sm font-medium">Change Image</span>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      {/* Front of ID */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">ID Image (Front)</label>
+                        <div className={`border-2 border-dashed ${showStepErrors && !idImageFront ? 'border-red-400 bg-red-50' : 'border-gray-300'} rounded-xl p-4 text-center hover:border-[#25A8A0] transition-all cursor-pointer relative overflow-hidden group h-32 flex flex-col items-center justify-center`}>
+                          {idImageFront ? (
+                            <div className="relative w-full h-full rounded-lg overflow-hidden bg-gray-50">
+                              <img src={URL.createObjectURL(idImageFront)} alt="Front Preview" className="w-full h-full object-contain" />
+                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <span className="text-white text-xs font-medium">Change</span>
+                              </div>
                             </div>
-                          </div>
-                        ) : (
-                          <div className="py-4">
-                            <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                              <User className="w-5 h-5 text-gray-500" />
+                          ) : (
+                            <div>
+                              <User className="w-6 h-6 text-gray-400 mx-auto mb-1" />
+                              <span className="text-[#25A8A0] text-xs font-medium">Upload Front</span>
                             </div>
-                            <span className="text-[#25A8A0] font-medium">Click to upload ID</span>
-                            <span className="text-gray-500"> or drag and drop</span>
-                          </div>
-                        )}
-                        <input
-                          type="file"
-                          onChange={handleIdImageChange}
-                          accept="image/*"
-                          className="absolute inset-0 opacity-0 cursor-pointer"
-                          id="id-upload"
-                        />
+                          )}
+                          <input
+                            type="file"
+                            onChange={handleIdImageFrontChange}
+                            accept="image/*"
+                            className="absolute inset-0 opacity-0 cursor-pointer"
+                          />
+                        </div>
                       </div>
-                      {idImage && (
-                        <div className="mt-2 text-sm text-green-600 font-medium text-center">{idImage.name}</div>
-                      )}
-                      {!idImage && showStepErrors && (
-                        <p className="text-red-500 text-xs mt-2 text-center">ID image is required</p>
-                      )}
-                      <p className="text-xs text-gray-500 mt-2 text-center">Please upload a clear image of your selected ID type.</p>
+
+                      {/* Back of ID */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">ID Image (Back)</label>
+                        <div className={`border-2 border-dashed ${showStepErrors && !idImageBack ? 'border-red-400 bg-red-50' : 'border-gray-300'} rounded-xl p-4 text-center hover:border-[#25A8A0] transition-all cursor-pointer relative overflow-hidden group h-32 flex flex-col items-center justify-center`}>
+                          {idImageBack ? (
+                            <div className="relative w-full h-full rounded-lg overflow-hidden bg-gray-50">
+                              <img src={URL.createObjectURL(idImageBack)} alt="Back Preview" className="w-full h-full object-contain" />
+                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <span className="text-white text-xs font-medium">Change</span>
+                              </div>
+                            </div>
+                          ) : (
+                            <div>
+                              <User className="w-6 h-6 text-gray-400 mx-auto mb-1" />
+                              <span className="text-[#25A8A0] text-xs font-medium">Upload Back</span>
+                            </div>
+                          )}
+                          <input
+                            type="file"
+                            onChange={handleIdImageBackChange}
+                            accept="image/*"
+                            className="absolute inset-0 opacity-0 cursor-pointer"
+                          />
+                        </div>
+                      </div>
                     </div>
+
+                    {showStepErrors && (!idImageFront || !idImageBack) && (
+                      <p className="text-red-500 text-xs text-center">Both front and back ID images are required</p>
+                    )}
+                    <p className="text-xs text-gray-500 text-center">Please upload clear images of your ID (both sides).</p>
                   </div>
                 )}
 
@@ -967,21 +1038,27 @@ const Auth: React.FC = () => {
                 {proStep === 4 && (
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Specialization</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Specializations</label>
                       <div className="relative">
                         <button
                           type="button"
                           onClick={() => setIsSpecializationDropdownOpen(!isSpecializationDropdownOpen)}
-                          className={`${inputClasses(showStepErrors && !formData.specialization)} text-left flex items-center justify-between`}
+                          className={`${inputClasses(showStepErrors && !formData.specialization)} text-left flex items-center justify-between min-h-[42px] py-1`}
                         >
-                          <span className={formData.specialization ? 'text-gray-900' : 'text-gray-400'}>
-                            {formData.specialization ?
-                              ['Anxiety', 'Depression', 'Trauma', 'Relationships', 'Addiction', 'Family Therapy', 'Child Psychology', 'PTSD', 'Stress Management', 'Grief Counseling'].find(
-                                (_, i) => ['anxiety', 'depression', 'trauma', 'relationships', 'addiction', 'family_therapy', 'child_psychology', 'ptsd', 'stress_management', 'grief_counseling'][i] === formData.specialization
-                              )
-                              : 'Select your specialization'}
-                          </span>
-                          <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isSpecializationDropdownOpen ? 'rotate-180' : ''}`} />
+                          <div className="flex flex-wrap gap-1 px-1">
+                            {formData.specialization ? (
+                              formData.specialization.split(',').map(spec => (
+                                <span key={spec} className="bg-[#25A8A0] text-white text-[10px] px-2 py-0.5 rounded-full flex items-center gap-1">
+                                  {['Anxiety', 'Depression', 'Trauma', 'Relationships', 'Addiction', 'Family Therapy', 'Child Psychology', 'PTSD', 'Stress Management', 'Grief Counseling'].find(
+                                    (_, i) => ['anxiety', 'depression', 'trauma', 'relationships', 'addiction', 'family_therapy', 'child_psychology', 'ptsd', 'stress_management', 'grief_counseling'][i] === spec
+                                  ) || spec}
+                                </span>
+                              ))
+                            ) : (
+                              <span className="text-gray-400">Select specializations</span>
+                            )}
+                          </div>
+                          <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform flex-shrink-0 mr-2 ${isSpecializationDropdownOpen ? 'rotate-180' : ''}`} />
                         </button>
 
                         {isSpecializationDropdownOpen && (
@@ -1002,26 +1079,40 @@ const Auth: React.FC = () => {
                                 { value: 'ptsd', label: 'PTSD' },
                                 { value: 'stress_management', label: 'Stress Management' },
                                 { value: 'grief_counseling', label: 'Grief Counseling' }
-                              ].map((item) => (
-                                <button
-                                  key={item.value}
-                                  type="button"
-                                  className="w-full text-left px-4 py-3 hover:bg-gray-100 flex items-center justify-between transition-colors text-sm font-medium text-gray-700"
-                                  onClick={() => {
-                                    handleInputChange({ target: { name: 'specialization', value: item.value } } as any);
-                                    setIsSpecializationDropdownOpen(false);
-                                  }}
-                                >
-                                  {item.label}
-                                  {formData.specialization === item.value && (
-                                    <div className="w-2 h-2 rounded-full bg-[#25A8A0]"></div>
-                                  )}
-                                </button>
-                              ))}
+                              ].map((item) => {
+                                const selectedSpecs = formData.specialization ? formData.specialization.split(',') : [];
+                                const isSelected = selectedSpecs.includes(item.value);
+                                return (
+                                  <button
+                                    key={item.value}
+                                    type="button"
+                                    className="w-full text-left px-4 py-3 hover:bg-gray-100 flex items-center justify-between transition-colors text-sm font-medium text-gray-700"
+                                    onClick={() => {
+                                      let newSpecs;
+                                      if (isSelected) {
+                                        newSpecs = selectedSpecs.filter(s => s !== item.value);
+                                      } else {
+                                        newSpecs = [...selectedSpecs, item.value];
+                                      }
+                                      handleInputChange({ target: { name: 'specialization', value: newSpecs.join(',') } } as any);
+                                    }}
+                                  >
+                                    {item.label}
+                                    {isSelected && (
+                                      <div className="w-4 h-4 rounded-full bg-[#25A8A0] flex items-center justify-center">
+                                        <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                      </div>
+                                    )}
+                                  </button>
+                                );
+                              })}
                             </div>
                           </>
                         )}
                       </div>
+                      <p className="text-[10px] text-gray-500 mt-2">You can select multiple specializations that apply to your practice.</p>
                     </div>
                   </div>
                 )}
@@ -1029,37 +1120,6 @@ const Auth: React.FC = () => {
                 {/* Step 5: Documents */}
                 {proStep === 5 && (
                   <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Recent Profile Photo</label>
-                      <div className={`border-2 border-dashed ${showStepErrors && !profilePhoto ? 'border-red-400 bg-red-50' : 'border-gray-300'} rounded-xl p-4 text-center hover:border-[#25A8A0] transition-all cursor-pointer relative overflow-hidden group`}>
-                        {profilePhoto ? (
-                          <div className="relative aspect-square w-24 mx-auto rounded-full overflow-hidden bg-gray-50 border-2 border-gray-100 shadow-sm">
-                            <img src={URL.createObjectURL(profilePhoto)} alt="Profile Preview" className="w-full h-full object-cover" />
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                              <span className="text-white text-[10px] font-medium">Change</span>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="py-2">
-                            <User className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                            <span className="text-[#25A8A0] font-medium">Upload Photo</span>
-                          </div>
-                        )}
-                        <input
-                          type="file"
-                          onChange={handlePhotoChange}
-                          accept="image/*"
-                          className="absolute inset-0 opacity-0 cursor-pointer"
-                          id="photo-upload"
-                        />
-                      </div>
-                      {profilePhoto && (
-                        <div className="mt-2 text-sm text-green-600 font-medium text-center">{profilePhoto.name}</div>
-                      )}
-                      {!profilePhoto && showStepErrors && (
-                        <p className="text-red-500 text-xs mt-1 text-center font-medium">Profile photo is required</p>
-                      )}
-                    </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1.5">Professional Certificates</label>
                       <div className={`border-2 border-dashed ${showStepErrors && !certificates ? 'border-red-400 bg-red-50' : 'border-gray-300'} rounded-xl p-4 text-center hover:border-[#25A8A0] transition-all cursor-pointer relative overflow-hidden group`}>
