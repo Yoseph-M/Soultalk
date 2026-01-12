@@ -291,6 +291,8 @@ const Auth: React.FC = () => {
             password: formData.password,
             firstName: formData.firstName,
             lastName: formData.lastName,
+            phone: `${formData.countryCode} ${formData.phone}`,
+            dob: formData.dob,
             userType: 'client'
           });
           // Redirection will be handled by the useEffect
