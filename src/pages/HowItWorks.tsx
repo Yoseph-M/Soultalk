@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { UserPlus, Search, MessageCircle, TrendingUp, Shield, Clock, CheckCircle, Award, Users } from 'lucide-react';
+import { UserPlus, Search, MessageCircle, Shield, Clock, CheckCircle, Award, Users, ArrowRight, ClipboardCheck, UserCheck, HeartHandshake } from 'lucide-react';
 import Header from './Header';
 
 const HowItWorks: React.FC = () => {
-  const steps = [
+  const [activeTab, setActiveTab] = useState<'seekers' | 'professionals'>('seekers');
+
+  const seekerSteps = [
     {
-      number: 1,
+      number: '01',
       icon: UserPlus,
       title: 'Create Your Profile',
       description: 'Sign up and tell us about your mental health goals, preferences, and what kind of support you\'re looking for.',
@@ -14,23 +16,25 @@ const HowItWorks: React.FC = () => {
         'Quick 5-minute signup process',
         'Share your preferences and goals',
         'Complete confidential assessment',
-        'Set your availability and preferences'
-      ]
+        'Set your availability'
+      ],
+      color: 'bg-blue-500'
     },
     {
-      number: 2,
+      number: '02',
       icon: Search,
       title: 'Get Matched',
       description: 'Our intelligent matching system connects you with licensed professionals who specialize in your specific needs.',
       details: [
         'AI-powered matching algorithm',
-        'Based on your needs and preferences',
+        'Based on your unique needs',
         'Licensed, verified professionals',
         'Multiple options to choose from'
-      ]
+      ],
+      color: 'bg-[#25A8A0]'
     },
     {
-      number: 3,
+      number: '03',
       icon: MessageCircle,
       title: 'Start Your Sessions',
       description: 'Begin your mental health journey with secure video, voice, or text sessions at times that work for you.',
@@ -38,22 +42,55 @@ const HowItWorks: React.FC = () => {
         'Flexible scheduling options',
         'Video, voice, or text sessions',
         'Secure, encrypted platform',
-        'Session notes and progress tracking'
-      ]
-    },
-    {
-      number: 4,
-      icon: TrendingUp,
-      title: 'Track Your Progress',
-      description: 'Monitor your mental health journey with personalized insights, goal tracking, and continuous support.',
-      details: [
-        'Progress tracking dashboard',
-        'Mood and wellness insights',
-        'Goal setting and achievement',
-        'Continuous care coordination'
-      ]
+        'Ongoing support and care'
+      ],
+      color: 'bg-green-500'
     }
   ];
+
+  const professionalSteps = [
+    {
+      number: '01',
+      icon: ClipboardCheck,
+      title: 'Apply and Verify',
+      description: 'Submit your credentials and undergo our rigorous verification process to ensure the highest standards of care.',
+      details: [
+        'Submit license and certifications',
+        'Background check verification',
+        'Interview and onboarding',
+        'Quality assurance review'
+      ],
+      color: 'bg-indigo-500'
+    },
+    {
+      number: '02',
+      icon: UserCheck,
+      title: 'Set Your Practice',
+      description: 'Customize your professional profile, set your availability, and define your areas of expertise.',
+      details: [
+        'Build your professional brand',
+        'Set flexible working hours',
+        'Define clinical specialties',
+        'Integrate your calendar'
+      ],
+      color: 'bg-[#25A8A0]'
+    },
+    {
+      number: '03',
+      icon: HeartHandshake,
+      title: 'Start Providing Care',
+      description: 'Begin connecting with seekers who match your expertise and start making a difference in their lives.',
+      details: [
+        'Connect with matched seekers',
+        'Manage sessions effortlessly',
+        'Secure billing and payments',
+        'Dedicated professional support'
+      ],
+      color: 'bg-orange-500'
+    }
+  ];
+
+  const currentSteps = activeTab === 'seekers' ? seekerSteps : professionalSteps;
 
   const features = [
     {
@@ -90,124 +127,153 @@ const HowItWorks: React.FC = () => {
     {
       question: 'What types of therapy sessions are available?',
       answer: 'We offer video sessions, voice-only calls, and text-based therapy. You can choose the format that makes you most comfortable and switch between them as needed.'
-    },
-    {
-      question: 'How quickly can I start therapy?',
-      answer: 'Most users are matched with a therapist within 24-48 hours of signing up. Emergency support is available immediately for crisis situations.'
-    },
-    {
-      question: 'Can I change therapists if needed?',
-      answer: 'Yes, you can request a new therapist at any time. We want to ensure you have the best possible therapeutic relationship, so switching is always an option.'
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
+    <div className="min-h-screen bg-[#F8FAFB] font-sohne">
       <Header />
-      <div className="container mx-auto px-4 py-12">
-        {}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            How SoulTalk Works
+
+      {/* Hero Section */}
+      <div className="relative pt-32 pb-16 overflow-hidden">
+        <div className="container mx-auto px-4 text-center">
+          <span className="inline-block px-4 py-1.5 mb-6 text-sm font-semibold tracking-wide text-[#25A8A0] uppercase bg-[#25A8A0]/10 rounded-full">
+            The Journey to Wellness
+          </span>
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-8 tracking-tight">
+            How SoulTalk <span className="text-[#25A8A0]">Works</span>
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Getting started with professional mental health support is simple. Follow these four easy steps 
-            to begin your journey toward better mental wellness.
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            Whether you're seeking support or providing it, we've built a platform that simplifies every step of the way.
           </p>
         </div>
+      </div>
 
-        {}
-        <div className="mb-20">
-          <div className="space-y-16">
-            {steps.map((step, index) => (
-              <div key={index} className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-12`}>
-                <div className="lg:w-1/2">
-                  <div className="flex items-center mb-6">
-                    <div className="w-16 h-16 bg-gradient-to-br from-[#25A8A0] to-green-600 rounded-2xl flex items-center justify-center mr-4">
-                      <span className="text-2xl font-bold text-white">{step.number}</span>
-                    </div>
-                    <step.icon className="h-8 w-8 text-[#25A8A0]" />
-                  </div>
-                  <h3 className="text-3xl font-bold text-gray-900 mb-4">{step.title}</h3>
-                  <p className="text-lg text-gray-600 mb-6 leading-relaxed">{step.description}</p>
-                  <ul className="space-y-3">
-                    {step.details.map((detail, detailIndex) => (
-                      <li key={detailIndex} className="flex items-center space-x-3">
-                        <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
-                        <span className="text-gray-700">{detail}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="lg:w-1/2">
-                  <div className="bg-gradient-to-br from-blue-50 to-green-50 rounded-2xl p-8 shadow-lg">
-                    <div className="w-24 h-24 bg-gradient-to-br from-[#25A8A0] to-green-600 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                      <step.icon className="h-12 w-12 text-white" />
-                    </div>
-                    <div className="text-center">
-                      <h4 className="text-xl font-bold text-gray-900 mb-2">Step {step.number}</h4>
-                      <p className="text-gray-600">{step.title}</p>
+      {/* Tab Switcher */}
+      <div className="container mx-auto px-4 mb-20 text-center">
+        <div className="inline-flex p-1 bg-white rounded-2xl shadow-sm border border-gray-100">
+          <button
+            onClick={() => setActiveTab('seekers')}
+            className={`px-8 py-3 rounded-xl font-bold transition-all duration-300 ${activeTab === 'seekers' ? 'bg-[#25A8A0] text-white shadow-lg shadow-[#25A8A0]/20' : 'text-gray-500 hover:text-gray-700'}`}
+          >
+            For Seekers
+          </button>
+          <button
+            onClick={() => setActiveTab('professionals')}
+            className={`px-8 py-3 rounded-xl font-bold transition-all duration-300 ${activeTab === 'professionals' ? 'bg-[#25A8A0] text-white shadow-lg shadow-[#25A8A0]/20' : 'text-gray-500 hover:text-gray-700'}`}
+          >
+            For Professionals
+          </button>
+        </div>
+      </div>
+
+      {/* Steps Section */}
+      <div className="container mx-auto px-4 py-10">
+        <div className="grid grid-cols-1 gap-24 relative">
+          {/* Connecting line for desktop */}
+          <div className="hidden lg:block absolute left-1/2 top-20 bottom-20 w-px bg-gradient-to-b from-blue-200 via-[#25A8A0]/30 to-green-200 -translate-x-1/2 -z-10"></div>
+
+          {currentSteps.map((step, index) => (
+            <div key={index} className={`flex flex-col lg:flex-row items-center gap-16 ${index % 2 === 1 ? 'lg:flex-row-reverse' : ''}`}>
+              {/* Image/Visual Part */}
+              <div className="lg:w-1/2 w-full">
+                <div className="relative futuristic-card group">
+                  <div className={`absolute -inset-4 ${step.color}/10 rounded-3xl blur-2xl group-hover:opacity-100 opacity-0 transition-opacity duration-500`}></div>
+                  <div className="relative bg-white p-2 rounded-3xl shadow-2xl overflow-hidden">
+                    <div className={`h-80 w-full rounded-2xl flex items-center justify-center bg-gradient-to-br from-gray-50 to-white relative overflow-hidden`}>
+                      <step.icon className={`w-24 h-24 ${step.color.replace('bg-', 'text-')} relative z-10 transition-transform duration-500 group-hover:scale-110`} />
+                      <div className="absolute bottom-6 right-8 text-8xl font-black text-gray-100/80 -z-0 select-none">
+                        {step.number}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+
+              {/* Text Part */}
+              <div className="lg:w-1/2 w-full space-y-6">
+                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl ${step.color} text-white shadow-lg mb-2`}>
+                  <step.icon className="w-6 h-6" />
+                </div>
+                <h2 className="text-4xl font-bold text-gray-900 leading-tight">
+                  <span className="block text-sm font-bold text-[#25A8A0] uppercase tracking-wider mb-2">Step {step.number}</span>
+                  {step.title}
+                </h2>
+                <p className="text-lg text-gray-600 leading-relaxed">
+                  {step.description}
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
+                  {step.details.map((detail, dIdx) => (
+                    <div key={dIdx} className="flex items-center gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-50 flex items-center justify-center">
+                        <CheckCircle className="w-4 h-4 text-green-500" />
+                      </div>
+                      <span className="text-gray-700 text-sm font-medium">{detail}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
+      </div>
 
-        {}
-        <div className="mb-20">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Choose SoulTalk?</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              We're committed to providing the highest quality mental health support with industry-leading security and care
-            </p>
+      {/* Features Grid */}
+      <div className="bg-white py-24 border-y border-gray-100 mt-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Thousands Choose SoulTalk</h2>
+            <p className="text-gray-600 max-w-xl mx-auto italic">"A platform built with empathy and the latest technology"</p>
           </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
-              <div key={index} className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <feature.icon className="h-8 w-8 text-blue-600" />
+              <div key={index} className="p-8 rounded-2xl bg-[#F8FAFB] hover:bg-white hover:shadow-xl transition-all duration-300 border border-transparent hover:border-[#25A8A0]/20 group">
+                <div className="w-14 h-14 bg-white rounded-xl shadow-sm flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <feature.icon className="w-7 h-7 text-[#25A8A0]" />
                 </div>
-                <h3 className="font-bold text-lg mb-2">{feature.title}</h3>
-                <p className="text-gray-600 text-sm">{feature.description}</p>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
               </div>
             ))}
           </div>
         </div>
+      </div>
 
-        {}
-        <div className="mb-20">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
-            <p className="text-lg text-gray-600">
-              Get answers to common questions about our platform and services
-            </p>
-          </div>
-
-          <div className="max-w-3xl mx-auto space-y-6">
+      {/* FAQ Accordion Placeholder (Simple View) */}
+      <div className="container mx-auto px-4 py-24">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center text-balance">Frequently Asked Questions</h2>
+          <div className="space-y-4">
             {faqs.map((faq, index) => (
-              <div key={index} className="bg-white border-0 shadow-lg rounded-lg p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-3">{faq.question}</h3>
-                <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
+              <div key={index} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center justify-between">
+                  {faq.question}
+                </h3>
+                <p className="text-gray-600 leading-relaxed text-sm">
+                  {faq.answer}
+                </p>
               </div>
             ))}
           </div>
         </div>
+      </div>
 
-        {}
-        <div className="text-center bg-gradient-to-r from-[#25A8A0] to-green-600 rounded-2xl p-12 text-white">
-          <h2 className="text-3xl font-bold mb-4">Ready to Start Your Mental Health Journey?</h2>
-          <p className="text-xl mb-8 opacity-90">
-            Join thousands of people who have found support and healing through SoulTalk
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/services">
-              <button className="border-2 border-white text-white hover:bg-white hover:text-[#25A8A0] font-semibold px-8 py-3 rounded-lg transition-colors">
-                Explore Our Services
-              </button>
-            </Link>
+      {/* CTA Section */}
+      <div className="container mx-auto px-4 pb-24">
+        <div className="relative bg-[#25A8A0] rounded-[2rem] p-12 md:p-20 overflow-hidden text-center text-white">
+          <div className="relative z-10 max-w-2xl mx-auto">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Start Your Journey?</h2>
+            <p className="text-xl mb-10 text-white/90">
+              Join SoulTalk today and connect with experts who can help you thrive.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link to="/auth" className="w-full sm:w-auto px-8 py-4 bg-white text-[#25A8A0] font-bold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+                Get Started Now
+              </Link>
+              <Link to="/services" className="w-full sm:w-auto px-8 py-4 bg-[#1e8a82] text-white font-bold rounded-xl hover:bg-[#186a64] transition-all flex items-center justify-center gap-2">
+                Explore Services <ArrowRight className="w-5 h-5" />
+              </Link>
+            </div>
           </div>
         </div>
       </div>

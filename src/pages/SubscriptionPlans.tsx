@@ -1,16 +1,25 @@
 import { API_BASE_URL } from "../config";
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Check, Shield } from 'lucide-react';
+import { Check } from 'lucide-react';
 
 import { useAuth } from '../contexts/AuthContext';
 import { FaSpinner } from 'react-icons/fa';
 
 const SubscriptionPlans: React.FC = () => {
-    const { user, fetchWithAuth } = useAuth();
+    const { user, fetchWithAuth, isLoading } = useAuth();
     const [isProcessing, setIsProcessing] = React.useState<string | null>(null);
 
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-blue-50">
+                <FaSpinner className="animate-spin text-4xl text-[#25A8A0]" />
+            </div>
+        );
+    }
+
     const handlePayment = async (planName: string, amount: number) => {
+        if (isLoading) return; // Prevent action while checking auth status
+
         if (!user) {
             window.location.href = '/auth?mode=signup';
             return;
@@ -53,7 +62,7 @@ const SubscriptionPlans: React.FC = () => {
     const plans = [
         {
             name: 'Premium',
-            price: 99,
+            price: 5000,
             description: 'Perfect for getting started on your wellness journey',
             features: [
                 '20 therapy sessions per month',
@@ -69,7 +78,7 @@ const SubscriptionPlans: React.FC = () => {
         },
         {
             name: 'Pro',
-            price: 199,
+            price: 9500,
             description: 'Comprehensive support for your mental health',
             features: [
                 '100 therapy sessions per month',
@@ -86,7 +95,7 @@ const SubscriptionPlans: React.FC = () => {
         },
         {
             name: 'Plus',
-            price: 299,
+            price: 13500,
             description: 'For those needing comprehensive care',
             features: [
                 'Unlimited therapy sessions per month',
@@ -134,7 +143,8 @@ const SubscriptionPlans: React.FC = () => {
                                 <h3 className="text-2xl font-bold text-gray-900 mb-1">{plan.name}</h3>
                                 <p className="text-gray-600 mb-4">{plan.description}</p>
                                 <div className="flex items-end mb-4">
-                                    <span className="text-5xl font-bold text-gray-900">${plan.price}</span>
+                                    <span className="text-2xl font-bold text-gray-900 mr-2">ETB</span>
+                                    <span className="text-5xl font-bold text-gray-900">{plan.price.toLocaleString()}</span>
                                     <span className="text-base text-gray-500 ml-1 mb-1">/month</span>
                                 </div>
                                 <div>

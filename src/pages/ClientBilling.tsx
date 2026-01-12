@@ -11,13 +11,15 @@ import AICompanion from "../components/AICompanion"
 
 const ClientBilling: React.FC = () => {
     const { theme } = useTheme()
-    const { user, fetchWithAuth } = useAuth()
+    const { user, fetchWithAuth, isLoading } = useAuth()
     const [activePlan, setActivePlan] = useState('Free')
     const [billingHistory, setBillingHistory] = useState<any[]>([])
     const [loadingHistory, setLoadingHistory] = useState(true)
     const [isProcessing, setIsProcessing] = useState(false)
 
     React.useEffect(() => {
+        if (isLoading || !user) return;
+
         const fetchHistory = async () => {
             try {
                 const response = await fetchWithAuth(API_BASE_URL + '/api/auth/payment/history/')
@@ -27,10 +29,10 @@ const ClientBilling: React.FC = () => {
                     // Determine active plan based on latest successful payment
                     const latestSuccess = data.find((p: any) => p.status === 'success')
                     if (latestSuccess) {
-                        // Logic to determine plan from amount -> for now simplistic
-                        if (parseFloat(latestSuccess.amount) >= 299) setActivePlan('Plus')
-                        else if (parseFloat(latestSuccess.amount) >= 199) setActivePlan('Pro')
-                        else if (parseFloat(latestSuccess.amount) >= 99) setActivePlan('Premium')
+                        // Logic to determine plan from amount
+                        if (parseFloat(latestSuccess.amount) >= 13500) setActivePlan('Plus')
+                        else if (parseFloat(latestSuccess.amount) >= 9500) setActivePlan('Pro')
+                        else if (parseFloat(latestSuccess.amount) >= 5000) setActivePlan('Premium')
                     }
                 }
             } catch (error) {
@@ -40,12 +42,22 @@ const ClientBilling: React.FC = () => {
             }
         }
 
-        if (user) {
-            fetchHistory()
-        }
-    }, [user, fetchWithAuth])
+        fetchHistory()
+    }, [user, fetchWithAuth, isLoading])
+
+    if (isLoading) {
+        return (
+            <div className={`min-h-screen flex items-center justify-center transition-all duration-500 ${theme === "dark" ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"}`}>
+                <div className="w-10 h-10 border-4 border-[#25A8A0] border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        );
+    }
 
     const handlePayment = async (amount: number) => {
+        if (!user) {
+            window.location.href = '/auth?mode=login';
+            return;
+        }
         setIsProcessing(true);
         try {
             const response = await fetchWithAuth(API_BASE_URL + '/api/auth/payment/initialize/', {
@@ -225,7 +237,7 @@ const ClientBilling: React.FC = () => {
                                 </div>
                                 <div className="text-right">
                                     <div className="text-3xl font-bold">
-                                        {activePlan === 'Premium' ? '$99' : activePlan === 'Pro' ? '$199' : activePlan === 'Plus' ? '$299' : '$0'}
+                                        {activePlan === 'Premium' ? 'ETB 5,000' : activePlan === 'Pro' ? 'ETB 9,500' : activePlan === 'Plus' ? 'ETB 13,500' : 'ETB 0'}
                                         <span className="text-sm font-normal opacity-80">/mo</span>
                                     </div>
                                     <div className="flex gap-3 mt-4 justify-end">
@@ -277,48 +289,50 @@ const ClientBilling: React.FC = () => {
                                                 <td colSpan={4} className="py-8 text-center text-gray-500">No payment history found</td>
                                             </tr>
                                         ) : (
-                                            billingHistory.map((item: any) => (
-                                                <tr key={item.id} className={`group text-sm transition-colors ${theme === "dark" ? "hover:bg-gray-700/50" : "hover:bg-gray-50 text-gray-700"}`}>
-                                                    <td className="py-6 text-center font-medium text-base">{new Date(item.created_at).toLocaleDateString()}</td>
-                                                    <td className="py-6 text-center font-bold text-base">{item.currency} {item.amount}</td>
-                                                    <td className="py-6 text-center">
-                                                        <span
-                                                            className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide border
+                                            billingHistory
+                                                .filter((item: any) => item.status === 'success' || item.status === 'paid')
+                                                .map((item: any) => (
+                                                    <tr key={item.id} className={`group text-sm transition-colors ${theme === "dark" ? "hover:bg-gray-700/50" : "hover:bg-gray-50 text-gray-700"}`}>
+                                                        <td className="py-6 text-center font-medium text-base">{new Date(item.created_at).toLocaleDateString()}</td>
+                                                        <td className="py-6 text-center font-bold text-base">ETB {item.amount}</td>
+                                                        <td className="py-6 text-center">
+                                                            <span
+                                                                className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide border
                                                             ${item.status === 'success' ? "border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-transparent" :
-                                                                    item.status === 'pending' ? "border-amber-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-transparent" :
-                                                                        "bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-transparent"}`}
-                                                            style={
-                                                                theme !== 'dark'
-                                                                    ? (item.status === 'pending' ? { backgroundColor: '#ffffff', color: '#d97706' }
-                                                                        : item.status === 'success' ? { backgroundColor: '#ffffff', color: '#059669' }
-                                                                            : {})
-                                                                    : {}
-                                                            }
-                                                        >
-                                                            {item.status}
-                                                        </span>
-                                                    </td>
-                                                    <td className="py-6 text-center">
-                                                        {item.status === 'pending' && (
-                                                            <button
-                                                                onClick={() => handlePayment(parseFloat(item.amount))}
-                                                                className={`p-2 rounded-lg hover:!bg-[rgba(37,168,160,0.1)] dark:hover:!bg-gray-800 transition-colors text-xs font-bold text-[#25A8A0] hover:!text-[#25A8A0]`}
+                                                                        item.status === 'pending' ? "border-amber-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-transparent" :
+                                                                            "bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-transparent"}`}
+                                                                style={
+                                                                    theme !== 'dark'
+                                                                        ? (item.status === 'pending' ? { backgroundColor: '#ffffff', color: '#d97706' }
+                                                                            : item.status === 'success' ? { backgroundColor: '#ffffff', color: '#059669' }
+                                                                                : {})
+                                                                        : {}
+                                                                }
                                                             >
-                                                                Retry
-                                                            </button>
-                                                        )}
-                                                        {item.status === 'success' && (
-                                                            <button
-                                                                onClick={() => handleDownloadReceipt(item)}
-                                                                className={`p-2 rounded-lg hover:!bg-[rgba(37,168,160,0.1)] dark:hover:!bg-gray-600 transition-colors text-[#25A8A0] hover:!text-[#25A8A0]`}
-                                                                title="Download Receipt"
-                                                            >
-                                                                <FaDownload className="w-4 h-4" />
-                                                            </button>
-                                                        )}
-                                                    </td>
-                                                </tr>
-                                            ))
+                                                                {item.status}
+                                                            </span>
+                                                        </td>
+                                                        <td className="py-6 text-center">
+                                                            {item.status === 'pending' && (
+                                                                <button
+                                                                    onClick={() => handlePayment(parseFloat(item.amount))}
+                                                                    className={`p-2 rounded-lg hover:!bg-[rgba(37,168,160,0.1)] dark:hover:!bg-gray-800 transition-colors text-xs font-bold text-[#25A8A0] hover:!text-[#25A8A0]`}
+                                                                >
+                                                                    Retry
+                                                                </button>
+                                                            )}
+                                                            {item.status === 'success' && (
+                                                                <button
+                                                                    onClick={() => handleDownloadReceipt(item)}
+                                                                    className={`p-2 rounded-lg hover:!bg-[rgba(37,168,160,0.1)] dark:hover:!bg-gray-600 transition-colors text-[#25A8A0] hover:!text-[#25A8A0]`}
+                                                                    title="Download Receipt"
+                                                                >
+                                                                    <FaDownload className="w-4 h-4" />
+                                                                </button>
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                ))
                                         )}
                                     </tbody>
                                 </table>

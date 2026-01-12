@@ -79,8 +79,8 @@ function App() {
                 <Route path="/professionals" element={<Professionals />} />
                 <Route path="/booking" element={<Booking />} />
                 <Route path="/find-listener" element={<FindListener />} />
-                <Route path="/pricing" element={<><Header /><Pricing /></>} />
-                <Route path="/about" element={<><Header /><About /></>} />
+                <Route path="/pricing" element={<Pricing />} />
+                <Route path="/about" element={<About />} />
                 <Route path="/services" element={<Services />} />
                 <Route path="/how-it-works" element={<HowItWorks />} />
                 <Route path="/auth" element={<Auth />} />

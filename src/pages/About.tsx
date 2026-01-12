@@ -1,96 +1,138 @@
 import React from 'react';
-import { Target, Lightbulb } from 'lucide-react';
+import { Target, Lightbulb, Shield, Users, Zap } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import Header from './Header';
 
 const About: React.FC = () => {
+  const stats = [
+    { label: 'Licensed Therapists', value: '500+' },
+    { label: 'Happy Users', value: '25k+' },
+    { label: 'Sessions Completed', value: '100k+' },
+    { label: 'Specializations', value: '40+' }
+  ];
+
+  const values = [
+    {
+      icon: Shield,
+      title: 'Radical Privacy',
+      description: 'Your data is encrypted and your identity protected. We never compromise on confidentiality.'
+    },
+    {
+      icon: Users,
+      title: 'Compassionate Care',
+      description: 'We believe empathy is the foundation of healing. Our network is built on human connection.'
+    },
+    {
+      icon: Zap,
+      title: 'Innovation',
+      description: 'Leveraging AI and modern technology to make therapy more accessible and effective than ever.'
+    }
+  ];
+
   return (
-    <div className="container mx-auto px-4 py-12">
-      {}
-      <div className="text-center mb-16">
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">About SoulTalk</h1>
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-          We're on a mission to make mental health support accessible, affordable, and effective for everyone. 
-          Your wellness journey matters, and we're here to support you every step of the way.
-        </p>
-      </div>
+    <div className="min-h-screen bg-white font-sohne">
+      <Header />
 
-      {}
-      <div className="grid md:grid-cols-2 gap-8 mb-16">
-        <div className="bg-white border-0 shadow-lg rounded-lg p-6">
-          <div className="w-12 h-12 bg-[#25A8A0] rounded-lg flex items-center justify-center mb-4">
-            <Target className="h-6 w-6 text-white" />
-          </div>
-          <h2 className="text-2xl font-bold mb-4">Our Mission</h2>
-          <p className="text-gray-600 leading-relaxed">
-            To democratize mental health care by providing secure, accessible, and personalized support through 
-            innovative technology and compassionate human connection. We believe everyone deserves quality mental 
-            health care, regardless of their location, schedule, or circumstances.
-          </p>
-        </div>
-
-        <div className="bg-white border-0 shadow-lg rounded-lg p-6">
-          <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mb-4">
-            <Lightbulb className="h-6 w-6 text-white" />
-          </div>
-          <h2 className="text-2xl font-bold mb-4">Our Vision</h2>
-          <p className="text-gray-600 leading-relaxed">
-            A world where mental health support is as accessible as physical health care, where stigma is eliminated, 
-            and where every person has the tools and support they need to thrive emotionally and mentally. We envision 
-            a future where seeking help is seen as a sign of strength.
+      {/* Hero Section */}
+      <div className="relative pt-32 pb-24 overflow-hidden">
+        <div className="container mx-auto px-4 relative z-10 text-center">
+          <span className="inline-block px-4 py-1.5 mb-6 text-sm font-black tracking-widest text-[#25A8A0] uppercase bg-[#25A8A0]/10 rounded-full">
+            Our Mission
+          </span>
+          <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-8 tracking-tighter">
+            Healing the World, <br /><span className="text-[#25A8A0]">One Talk at a Time.</span>
+          </h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed font-medium">
+            SoulTalk was founded on a simple belief: mental health care is a human right, not a luxury.
+            We're building the infrastructure for a more resilient world.
           </p>
         </div>
       </div>
 
-      {}
-      <div className="mb-16">
-        <div className="bg-white border-0 shadow-lg rounded-lg overflow-hidden">
-          <div className="relative w-full h-64 bg-gradient-to-r from-blue-500 to-green-500">
-            <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-              <div className="text-center">
-                <h2 className="text-3xl font-bold text-white mb-4">Our Story</h2>
-                <p className="text-lg text-blue-100 max-w-2xl mx-auto leading-relaxed px-4">
-                  Founded in 2025, SoulTalk was born from a shared passion for mental wellness and a desire to leverage 
-                  technology to make a positive impact. We saw the need for a more accessible, affordable, and personalized 
-                  approach to mental health support.
-                </p>
+      {/* Stats Section */}
+      <div className="bg-[#25A8A0] py-20">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center text-white">
+                <div className="text-5xl font-black mb-2 leading-none">{stat.value}</div>
+                <div className="text-white/70 font-bold uppercase tracking-wider text-xs">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Story Section */}
+      <div className="container mx-auto px-4 py-24">
+        <div className="flex flex-col lg:flex-row items-center gap-16">
+          <div className="lg:w-1/2">
+            <h2 className="text-4xl font-bold text-gray-900 mb-6 leading-tight">Our Story: From a Small Idea to a Global Movement</h2>
+            <p className="text-lg text-gray-600 mb-6 leading-relaxed">
+              In 2024, a group of psychologists and tech innovators came together with a single goal: to solve the accessibility crisis in mental health. We saw millions of people struggling in silence because therapy was either too expensive or too far away.
+            </p>
+            <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+              We built SoulTalk to bridge that gap. Today, were a team of over 50 professionals working around the clock to ensure that anyone, anywhere, can find the support they need.
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-100">
+                <Target className="w-5 h-5 text-[#25A8A0]" />
+                <span className="font-bold text-gray-900 text-sm">Targeted Solutions</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-100">
+                <Lightbulb className="w-5 h-5 text-blue-500" />
+                <span className="font-bold text-gray-900 text-sm">Innovative Tech</span>
               </div>
             </div>
           </div>
+          <div className="lg:w-1/2 relative">
+            <div className="relative z-10 rounded-[3rem] overflow-hidden shadow-2xl rotate-2">
+              <img
+                src="https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                alt="Team collaboration"
+                className="w-full h-[500px] object-cover"
+              />
+            </div>
+            <div className="absolute -top-8 -right-8 w-64 h-64 bg-[#25A8A0]/10 rounded-full -z-0 blur-3xl"></div>
+            <div className="absolute -bottom-8 -left-8 w-64 h-64 bg-blue-100 rounded-full -z-0 blur-3xl"></div>
+          </div>
         </div>
       </div>
 
-      {}
-      <div className="mb-16">
-        <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">Our Values</h2>
-        <div className="grid md:grid-cols-3 gap-8">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-[#25A8A0] rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl font-bold text-white">1</span>
-            </div>
-            <h3 className="text-xl font-bold mb-3">Accessibility</h3>
-            <p className="text-gray-600">
-              Mental health support should be available to everyone, regardless of location, time, or financial situation.
-            </p>
+      {/* Values Section */}
+      <div className="bg-[#F8FAFB] py-24">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Values that Drive Us</h2>
+            <p className="text-lg text-gray-500 max-w-xl mx-auto italic">"Integrity is the compass that guides our every decision"</p>
           </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            {values.map((v, i) => (
+              <div key={i} className="group p-10 bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-2">
+                <div className="w-14 h-14 bg-[#25A8A0]/10 rounded-2xl flex items-center justify-center text-[#25A8A0] mb-8 group-hover:scale-110 group-hover:rotate-3 transition-transform">
+                  <v.icon className="w-7 h-7" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">{v.title}</h3>
+                <p className="text-gray-600 leading-relaxed font-normal">{v.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
-          <div className="text-center">
-            <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl font-bold text-white">2</span>
-            </div>
-            <h3 className="text-xl font-bold mb-3">Privacy</h3>
-            <p className="text-gray-600">
-              We maintain the highest standards of confidentiality and security to protect our users' personal information.
-            </p>
-          </div>
-
-          <div className="text-center">
-            <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl font-bold text-white">3</span>
-            </div>
-            <h3 className="text-xl font-bold mb-3">Quality</h3>
-            <p className="text-gray-600">
-              All our professionals are licensed, verified, and committed to providing the highest quality of care.
-            </p>
-          </div>
+      {/* Join Us Section */}
+      <div className="container mx-auto px-4 py-24 text-center">
+        <h2 className="text-4xl font-bold text-gray-900 mb-8">Want to Join the Mission?</h2>
+        <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
+          We're always looking for licensed professionals and passionate builders to join our growing team.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link to="/auth" className="px-10 py-5 bg-[#25A8A0] text-white font-black text-lg rounded-2xl shadow-xl hover:scale-105 transition-all">
+            Join as a Professional
+          </Link>
+          <Link to="/contact" className="px-10 py-5 bg-white text-gray-900 border-2 border-gray-900 font-black text-lg rounded-2xl hover:bg-gray-900 hover:text-white transition-all">
+            Contact Support
+          </Link>
         </div>
       </div>
     </div>
