@@ -75,7 +75,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               email: userData.email,
               type: userData.role,
               role: userData.role,
-              avatar: userData.profile_photo ? `${API_BASE_URL}${userData.profile_photo}` : '',
+              avatar: userData.profile_photo
+                ? (String(userData.profile_photo).startsWith('http') ? userData.profile_photo : `${API_BASE_URL}${userData.profile_photo}`)
+                : '',
               verified: userData.verified,
               verificationStatus: userData.verification_status,
               rejectionReason: userData.rejection_reason,
@@ -183,7 +185,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           email: userData.email,
           type: userData.role,
           role: userData.role,
-          avatar: userData.profile_photo ? `${API_BASE_URL}${userData.profile_photo}` : '',
+          avatar: userData.profile_photo
+            ? (String(userData.profile_photo).startsWith('http') ? userData.profile_photo : `${API_BASE_URL}${userData.profile_photo}`)
+            : '',
           verified: userData.verified,
           verificationStatus: userData.verification_status,
           rejectionReason: userData.rejection_reason,
