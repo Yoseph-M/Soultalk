@@ -1,7 +1,7 @@
 "use client"
 import { API_BASE_URL } from "../config";
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import {
     FaUser, FaEnvelope, FaShieldAlt, FaCamera, FaSave, FaSpinner,
     FaGraduationCap, FaBriefcase, FaCertificate
@@ -34,7 +34,7 @@ interface ProfessionalProfileData {
 
 const ProfessionalProfile: React.FC = () => {
     const { theme } = useTheme()
-    const { user, fetchWithAuth, isLoading: authLoading } = useAuth()
+    const { user, fetchWithAuth, refreshUser, isLoading: authLoading } = useAuth()
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
@@ -59,6 +59,7 @@ const ProfessionalProfile: React.FC = () => {
     const [idImageFile, setIdImageFile] = useState<File | null>(null)
     const [certificateFile, setCertificateFile] = useState<File | null>(null)
     const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
 
     const getImageUrl = (path: string | null) => {
         if (!path) return null;
@@ -140,6 +141,7 @@ const ProfessionalProfile: React.FC = () => {
 
             if (response.ok) {
                 const updatedData = await response.json()
+                await refreshUser();
                 setProfile(prev => ({
                     ...prev,
                     avatar: updatedData.profile_photo,
@@ -245,9 +247,13 @@ const ProfessionalProfile: React.FC = () => {
 
                         <div className="grid md:grid-cols-3 gap-8">
                             <div className="md:col-span-1 flex flex-col items-center">
-                                <label className="relative group cursor-pointer mb-4">
+                                <div
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="relative group cursor-pointer mb-4"
+                                >
                                     <input
                                         type="file"
+                                        ref={fileInputRef}
                                         accept="image/*"
                                         className="hidden"
                                         onChange={handleAvatarChange}
@@ -255,14 +261,20 @@ const ProfessionalProfile: React.FC = () => {
                                     <img
                                         src={previewUrl || getImageUrl(profile.avatar || null) || `https://ui-avatars.com/api/?name=${profile.first_name}+${profile.last_name}&background=random`}
                                         alt="Profile"
-                                        className={`w-40 h-40 rounded-3xl border-4 object-cover shadow-2xl transition-all ${theme === "dark" ? "border-white/10" : "border-slate-50"}`}
+                                        className={`w-40 h-40 rounded-3xl border-4 object-cover shadow-2xl transition-all duration-300 group-hover:scale-[1.02] ${theme === "dark" ? "border-white/10" : "border-slate-50"}`}
                                     />
-                                    <div className="absolute inset-0 bg-black/40 rounded-3xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <FaCamera className="text-white w-6 h-6" />
+                                    <div className="absolute inset-0 bg-black/40 rounded-3xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                        <FaCamera className="text-white w-8 h-8 transform group-hover:scale-110 transition-transform" />
                                     </div>
-                                </label>
+                                </div>
                                 <div className="text-center">
-                                    <p className="text-xs font-black text-[#25A8A0] uppercase tracking-widest mb-1">Profile Photo</p>
+                                    <button
+                                        type="button"
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className="text-xs font-black text-[#25A8A0] uppercase tracking-widest mb-2 hover:underline"
+                                    >
+                                        Change Photo
+                                    </button>
                                     <p className="text-[10px] font-bold opacity-40">Visible to all potential clients</p>
                                 </div>
                             </div>

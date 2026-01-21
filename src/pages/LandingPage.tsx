@@ -4,6 +4,7 @@ import { FaFacebook, FaInstagram, FaLinkedin } from 'react-icons/fa';
 import { FaAward, FaXTwitter } from 'react-icons/fa6';
 import { FaRegClock, FaLock, FaCertificate } from 'react-icons/fa';
 import { FaStar, FaStarHalfAlt } from 'react-icons/fa';
+import { User } from 'lucide-react';
 import Header from './Header';
 import mhVideo from '../assets/video/V1.mp4';
 import Logo from '../assets/images/stlogo.svg';
@@ -269,8 +270,8 @@ const LandingPage: React.FC = () => {
               <p className="text-gray-700 mb-6 leading-relaxed italic z-10">"SoulTalk changed my life. The therapists are incredibly professional and caring. I finally found the support I needed to overcome my anxiety."</p>
               { }
               <div className="flex items-center z-10">
-                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mr-4 shadow-lg ring-4 ring-white group-hover:ring-[#25A8A0]/20 transition-all">
-                  <span className="text-gray-900 font-bold text-lg">SM</span>
+                <div className="w-16 h-16 bg-[#25A8A0]/10 rounded-full flex items-center justify-center mr-4 shadow-lg ring-4 ring-white group-hover:ring-[#25A8A0]/20 transition-all">
+                  <User className="text-[#25A8A0] w-8 h-8" />
                 </div>
                 <div>
                   <div className="font-bold text-gray-900 text-lg">Sarah M.</div>
@@ -291,8 +292,8 @@ const LandingPage: React.FC = () => {
               </div>
               <p className="text-gray-700 mb-6 leading-relaxed italic z-10">"The convenience of having therapy sessions from home made all the difference. My therapist helped me through a difficult time with compassion and expertise."</p>
               <div className="flex items-center z-10">
-                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mr-4 shadow-lg ring-4 ring-white group-hover:ring-[#25A8A0]/20 transition-all">
-                  <span className="text-gray-900 font-bold text-lg">JD</span>
+                <div className="w-16 h-16 bg-[#25A8A0]/10 rounded-full flex items-center justify-center mr-4 shadow-lg ring-4 ring-white group-hover:ring-[#25A8A0]/20 transition-all">
+                  <User className="text-[#25A8A0] w-8 h-8" />
                 </div>
                 <div>
                   <div className="font-bold text-gray-900 text-lg">James D.</div>
@@ -313,8 +314,8 @@ const LandingPage: React.FC = () => {
               </div>
               <p className="text-gray-700 mb-6 leading-relaxed italic z-10">"As a busy parent, finding time for therapy seemed impossible. SoulTalk's flexible scheduling and caring professionals made it work for my life."</p>
               <div className="flex items-center z-10">
-                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mr-4 shadow-lg ring-4 ring-white group-hover:ring-[#25A8A0]/20 transition-all">
-                  <span className="text-gray-900 font-bold text-lg">ML</span>
+                <div className="w-16 h-16 bg-[#25A8A0]/10 rounded-full flex items-center justify-center mr-4 shadow-lg ring-4 ring-white group-hover:ring-[#25A8A0]/20 transition-all">
+                  <User className="text-[#25A8A0] w-8 h-8" />
                 </div>
                 <div>
                   <div className="font-bold text-gray-900 text-lg">Maria L.</div>
@@ -335,8 +336,8 @@ const LandingPage: React.FC = () => {
               </div>
               <p className="text-gray-700 mb-6 leading-relaxed italic z-10">"SoulTalk provides an excellent platform for connecting with clients. The technology is seamless, and I can focus on what I do best - helping people heal and grow."</p>
               <div className="flex items-center z-10">
-                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mr-4 shadow-lg ring-4 ring-white group-hover:ring-[#25A8A0]/20 transition-all">
-                  <span className="text-gray-900 font-bold text-lg">DR</span>
+                <div className="w-16 h-16 bg-[#25A8A0]/10 rounded-full flex items-center justify-center mr-4 shadow-lg ring-4 ring-white group-hover:ring-[#25A8A0]/20 transition-all">
+                  <User className="text-[#25A8A0] w-8 h-8" />
                 </div>
                 <div>
                   <div className="font-bold text-gray-900 text-lg">Dr. Rachel K.</div>
@@ -357,8 +358,8 @@ const LandingPage: React.FC = () => {
               </div>
               <p className="text-gray-700 mb-6 leading-relaxed italic z-10">"The flexibility to set my own schedule while maintaining a meaningful practice has been incredible. SoulTalk's support team is always there when I need them."</p>
               <div className="flex items-center z-10">
-                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mr-4 shadow-lg ring-4 ring-white group-hover:ring-[#25A8A0]/20 transition-all">
-                  <span className="text-gray-900 font-bold text-lg">MT</span>
+                <div className="w-16 h-16 bg-[#25A8A0]/10 rounded-full flex items-center justify-center mr-4 shadow-lg ring-4 ring-white group-hover:ring-[#25A8A0]/20 transition-all">
+                  <User className="text-[#25A8A0] w-8 h-8" />
                 </div>
                 <div>
                   <div className="font-bold text-gray-900 text-lg">Dr. Michael T.</div>
@@ -378,8 +379,8 @@ const LandingPage: React.FC = () => {
               </div>
               <p className="text-gray-700 mb-6 leading-relaxed italic z-10">"Working with SoulTalk has allowed me to reach clients I never could before. The platform's security and professionalism give me complete confidence."</p>
               <div className="flex items-center z-10">
-                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mr-4 shadow-lg ring-4 ring-white group-hover:ring-[#25A8A0]/20 transition-all">
-                  <span className="text-gray-900 font-bold text-lg">LC</span>
+                <div className="w-16 h-16 bg-[#25A8A0]/10 rounded-full flex items-center justify-center mr-4 shadow-lg ring-4 ring-white group-hover:ring-[#25A8A0]/20 transition-all">
+                  <User className="text-[#25A8A0] w-8 h-8" />
                 </div>
                 <div>
                   <div className="font-bold text-gray-900 text-lg">Lisa C.</div>

@@ -7,7 +7,9 @@ from .views import (
     MoodUpdateListCreateView, ConnectionListCreateView, ConnectionDetailView, UpdateOnlineStatusView, DirectMessageView,
     PublicUserDetailView, InitiateLiveSessionView, InitializePaymentView, VerifyPaymentView,
     PaymentListView, PaymentCallbackView, JournalEntryListCreateView, JournalEntryDetailView,
-    ProfessionalEarningsView, BankListView, WithdrawalRequestView
+    ProfessionalEarningsView, BankListView, WithdrawalRequestView,
+    ServiceRequestListCreateView, ServiceRequestDetailView, 
+    ServiceProposalListCreateView, ServiceProposalActionView
 )
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -45,4 +47,8 @@ urlpatterns = [
     path('payout/earnings/', ProfessionalEarningsView.as_view(), name='payout_earnings'),
     path('payout/banks/', BankListView.as_view(), name='payout_banks'),
     path('payout/withdraw/', WithdrawalRequestView.as_view(), name='payout_withdraw'),
+    path('service-requests/', ServiceRequestListCreateView.as_view(), name='service_request_list_create'),
+    path('service-requests/<int:pk>/', ServiceRequestDetailView.as_view(), name='service_request_detail'),
+    path('service-proposals/', ServiceProposalListCreateView.as_view(), name='service_proposal_list_create'),
+    path('service-proposals/<int:pk>/action/', ServiceProposalActionView.as_view(), name='service_proposal_action'),
 ]

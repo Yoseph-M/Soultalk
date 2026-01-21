@@ -6,8 +6,7 @@ import {
     FaBell,
     FaUser,
     FaCog,
-    FaMoon,
-    FaSun,
+
     FaTimes,
     FaSignOutAlt,
     FaUsers,
@@ -51,7 +50,7 @@ const NotificationItem = ({ notification, theme, onClick }: { notification: any;
 );
 
 const ProfessionalHeader: React.FC = () => {
-    const { theme, toggleTheme } = useTheme();
+    const { theme } = useTheme();
     const navigate = useNavigate();
     const location = useLocation();
     const { user, logout, fetchWithAuth } = useAuth();
@@ -124,34 +123,28 @@ const ProfessionalHeader: React.FC = () => {
                     }`}
             >
                 <div className="container mx-auto px-4 lg:px-6">
-                    <div className="flex items-center h-16 lg:h-20 px-4">
+                    <div className="flex items-center gap-8 h-16 lg:h-20 px-4">
                         {/* Left section: Logo & Nav */}
                         <div className="flex items-center gap-8 z-10 flex-shrink-0">
                             <Link to="/professionals" className="flex items-center gap-2">
                                 <img src={Logo} alt="SoulTalk" className="h-12 w-auto" />
                             </Link>
-                            <nav className="hidden lg:flex">
+                            <nav className="hidden lg:flex gap-8">
                                 <Link
                                     to="/clients"
-                                    className={`flex items-center space-x-2 px-6 py-2.5 rounded-full transition-all duration-300 ${location.pathname === '/clients'
-                                        ? theme === 'dark'
-                                            ? 'bg-[#25A8A0] text-white shadow-lg shadow-[#25A8A0]/20 scale-105 font-bold'
-                                            : 'bg-white text-[#25A8A0] shadow-lg scale-105 font-bold'
-                                        : theme === 'dark'
-                                            ? 'text-gray-300 hover:text-[#25A8A0] hover:bg-[#25A8A0]/10 font-medium'
-                                            : 'text-white/90 hover:text-white hover:bg-white/10 font-medium'
-                                        }`}
+                                    className={
+                                        location.pathname === "/clients" ? 'active-nav-link' : 'nav-link'
+                                    }
                                 >
-                                    <FaUsers className="w-4 h-4" />
-                                    <span>My Clients</span>
+                                    My Clients
                                 </Link>
+
                             </nav>
                         </div>
 
-                        {/* Right Group: Search + Actions */}
-                        <div className="flex-1 flex items-center justify-end gap-8 z-10">
-                            {/* Search Bar */}
-                            <div className="max-w-2xl w-full hidden xl:block">
+                        {/* Centered Search Bar */}
+                        <div className="flex-1 flex justify-center hidden xl:flex">
+                            <div className="max-w-2xl w-full">
                                 <div className={`relative transition-all duration-300 ${searchFocused ? "scale-105" : ""}`}>
                                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 z-10">
                                         <FaSearch className="w-4 h-4 text-gray-400" />
@@ -182,17 +175,16 @@ const ProfessionalHeader: React.FC = () => {
                                     )}
                                 </div>
                             </div>
+                        </div>
+
+                        {/* Right Group: Search + Actions */}
+                        <div className="flex-shrink-0 flex items-center justify-end gap-8 z-10">
+
 
                             {/* Action Icons */}
                             <div className="flex items-center gap-8">
 
-                                <button
-                                    onClick={toggleTheme}
-                                    className={`p-2.5 rounded-xl transition-all duration-200 ${theme === "dark" ? "text-white hover:bg-white/10" : "text-white hover:bg-white/20"}`}
-                                    title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-                                >
-                                    {theme === 'dark' ? <FaSun className="w-5 h-5" /> : <FaMoon className="w-5 h-5" />}
-                                </button>
+
 
                                 <div className="relative" ref={notificationsRef}>
                                     <button
@@ -256,7 +248,7 @@ const ProfessionalHeader: React.FC = () => {
                                         title="Profile"
                                     >
                                         {user?.avatar ? (
-                                            <img src={user.avatar.startsWith('http') ? user.avatar : `${API_BASE_URL}${user.avatar}`} alt="" className="w-full h-full rounded-full object-cover" />
+                                            <img src={user.avatar} alt="" className="w-full h-full rounded-full object-cover" />
                                         ) : (
                                             user?.name?.charAt(0).toUpperCase() || 'P'
                                         )}
@@ -271,7 +263,7 @@ const ProfessionalHeader: React.FC = () => {
                                                 <div className="flex flex-col items-center mb-6 pt-2">
                                                     <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-3 shadow-lg ring-4 overflow-hidden ${theme === 'dark' ? 'bg-[#25A8A0] ring-gray-700/50' : 'bg-teal-50 ring-teal-50'}`}>
                                                         {user?.avatar ? (
-                                                            <img src={user.avatar.startsWith('http') ? user.avatar : `${API_BASE_URL}${user.avatar}`} alt="" className="w-full h-full object-cover" />
+                                                            <img src={user.avatar} alt="" className="w-full h-full object-cover" />
                                                         ) : (
                                                             <span className={`text-4xl font-bold ${theme === 'dark' ? 'text-white' : 'text-[#25A8A0]'}`}>{user?.name?.charAt(0).toUpperCase() || 'P'}</span>
                                                         )}
@@ -336,7 +328,7 @@ const ProfessionalHeader: React.FC = () => {
                         </div>
                     </div>
                 </div>
-            </header>
+            </header >
 
             {mobileMenuOpen && (
                 <div className="lg:hidden fixed inset-0 z-[60]">
@@ -356,11 +348,13 @@ const ProfessionalHeader: React.FC = () => {
                                 <Link to="/clients" onClick={() => setMobileMenuOpen(false)} className={`flex items-center gap-3 p-3 rounded-xl ${theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}>
                                     <FaUsers className="w-5 h-5" /> My Clients
                                 </Link>
+
                             </nav>
                         </div>
                     </div>
                 </div>
-            )}
+            )
+            }
         </>
     );
 };

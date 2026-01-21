@@ -2,15 +2,12 @@ import React, { useState } from 'react';
 import { Mail, Lock, User, FileText, Eye, EyeOff, ArrowRight, ChevronDown, Calendar as CalendarIcon, Hash } from 'lucide-react';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
-import Logo from '../assets/images/stlogo.svg';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
 import { useAuth } from '../contexts/AuthContext';
 import { countries } from '../data/countries';
 import { Metadata, type CountryCode } from 'libphonenumber-js';
-import metadata from 'libphonenumber-js/metadata.min.json';
 
-const metadataObj = new Metadata(metadata);
 
 const Auth: React.FC = () => {
   const location = useLocation();
@@ -31,6 +28,7 @@ const Auth: React.FC = () => {
     idNumber: '',
     issuingAuthority: '',
     specialization: '',
+    location: '',
   });
   // Update proStep default and total steps
   const [proStep, setProStep] = useState(1);
@@ -84,7 +82,8 @@ const Auth: React.FC = () => {
           if (detectedCountry) {
             setFormData(prev => ({
               ...prev,
-              countryCode: detectedCountry.dial_code
+              countryCode: detectedCountry.dial_code,
+              location: data.city ? `${data.city}, ${data.country_name}` : data.country_name
             }));
           }
         }
@@ -110,9 +109,9 @@ const Auth: React.FC = () => {
 
     if (selectedCountry) {
       try {
-        const m = new Metadata(metadata);
+        const m = new Metadata();
         m.selectNumberingPlan(selectedCountry.code as CountryCode);
-        const lengths = m.numberingPlan.possibleLengths();
+        const lengths = m.numberingPlan?.possibleLengths();
         if (lengths && lengths.length > 0) {
           limit = Math.max(...lengths);
         }
@@ -124,39 +123,6 @@ const Auth: React.FC = () => {
     const value = e.target.value.replace(/\D/g, '').slice(0, limit);
     setFormData(prev => ({ ...prev, phone: value }));
     if (showStepErrors) setShowStepErrors(false);
-  };
-
-  const handleDOBChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value.replace(/\D/g, '');
-
-    if (value.length > 8) value = value.slice(0, 8);
-
-    let formatted = '';
-    if (value.length > 0) {
-      formatted += value.slice(0, 2);
-      if (value.length > 2) {
-        formatted += '/' + value.slice(2, 4);
-        if (value.length > 4) {
-          formatted += '/' + value.slice(4, 8);
-        }
-      }
-    }
-
-    // For DatePicker selected prop, we need a Date object or null
-    // We update the display value via raw input if possible, or just parse it
-    if (value.length === 8) {
-      const day = parseInt(value.slice(0, 2));
-      const month = parseInt(value.slice(2, 4)) - 1;
-      const year = parseInt(value.slice(4, 8));
-      const date = new Date(year, month, day);
-      if (!isNaN(date.getTime()) && date.getFullYear() === year && date.getMonth() === month && date.getDate() === day) {
-        const isoDate = date.toISOString().split('T')[0];
-        setFormData(prev => ({ ...prev, dob: isoDate }));
-      }
-    } else {
-      // Keep track of the partial date string if needed, but for now we'll let DatePicker handle it
-      // Actually, we should probably store the raw string in formData for the input display
-    }
   };
 
   const validateStep = (step: number) => {
@@ -276,6 +242,7 @@ const Auth: React.FC = () => {
               idNumber: formData.idNumber,
               issuingAuthority: formData.issuingAuthority,
               specialization: formData.specialization,
+              location: (formData as any).location,
               singleDocFile: certificates,
               idImageFile: idImageFront,
               idImageBackFile: idImageBack,
@@ -293,7 +260,8 @@ const Auth: React.FC = () => {
             lastName: formData.lastName,
             phone: `${formData.countryCode} ${formData.phone}`,
             dob: formData.dob,
-            userType: 'client'
+            userType: 'client',
+            location: (formData as any).location
           });
           // Redirection will be handled by the useEffect
         }
@@ -301,41 +269,53 @@ const Auth: React.FC = () => {
     } catch (error) {
       console.error(error);
 
-      // Parse backend error messages
+      // Improved Error Handling: Show exact backend message
+      let errorMsg = "An unexpected error occurred.";
       if (error instanceof Error) {
         try {
           const errorObj = JSON.parse(error.message);
 
-          // Handle specific error cases
-          if (errorObj.email && errorObj.email.includes('This field must be unique.')) {
-            alert('This email is already registered. Please use a different email or try logging in.');
-            setErrors(prev => ({ ...prev, email: 'This email is already registered. Please use a different email or try logging in.' }));
-            if (isProfessional && !isLogin) { // Only for professional signup
-              setProStep(1);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
+          // Check for field-specific errors first to be more precise
+          const fieldErrors: { [key: string]: string } = {};
+          const messages: string[] = [];
+          let hasFieldErrors = false;
+
+          for (const key in errorObj) {
+            if (key === 'detail' || key === 'non_field_errors') continue;
+
+            hasFieldErrors = true;
+            if (Array.isArray(errorObj[key])) {
+              const msg = errorObj[key].join(" ");
+              messages.push(`${key}: ${msg}`);
+              fieldErrors[key] = msg;
+            } else if (typeof errorObj[key] === 'string') {
+              messages.push(`${key}: ${errorObj[key]}`);
+              fieldErrors[key] = errorObj[key];
             }
-          } else if (errorObj.username && errorObj.username.includes('already exists')) {
-            alert('This email is already registered. Please use a different email or try logging in.');
-            setErrors(prev => ({ ...prev, email: 'This email is already registered. Please use a different email or try logging in.' }));
-            if (isProfessional && !isLogin) { // Only for professional signup
-              setProStep(1);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+
+          if (hasFieldErrors) {
+            errorMsg = messages.join("\n");
+            setErrors(prev => ({ ...prev, ...fieldErrors }));
+          } else if (errorObj.detail || errorObj.non_field_errors) {
+            errorMsg = errorObj.detail || (Array.isArray(errorObj.non_field_errors) ? errorObj.non_field_errors.join(" ") : errorObj.non_field_errors);
+
+            // Map common backend errors to user-friendly ones
+            if (errorMsg === "No active account found with the given credentials") {
+              errorMsg = isLogin ? "Incorrect email or password. Please try again." : "Registration failed. Please check your details.";
+            } else if (errorMsg.includes("user with this email already exists")) {
+              errorMsg = "An account with this email already exists.";
             }
-          } else {
-            // Generic error message
-            const errorMsg = 'Registration failed. Please check your information and try again.';
-            alert(errorMsg);
-            setErrors(prev => ({ ...prev, email: errorMsg }));
           }
         } catch {
-          // If error message is not JSON
-          const errorMsg = 'Authentication failed. Please check your credentials.';
-          alert(errorMsg);
-          setErrors(prev => ({ ...prev, email: errorMsg }));
+          // If NOT JSON, just use the string message
+          errorMsg = error.message || "Authentication failed. Please check your credentials.";
         }
-      } else {
-        const errorMsg = 'An unexpected error occurred. Please try again.';
-        alert(errorMsg);
+      }
+
+      alert(errorMsg);
+      // Ensure at least one error field is set to show visual feedback if generic
+      if (!Object.keys(errors).length) {
         setErrors(prev => ({ ...prev, email: errorMsg }));
       }
     }
@@ -814,7 +794,7 @@ const Auth: React.FC = () => {
                             const selected = countries.find(c => c.dial_code === formData.countryCode);
                             if (selected) {
                               try {
-                                const m = new Metadata(metadata);
+                                const m = new Metadata();
                                 m.selectNumberingPlan(selected.code as CountryCode);
                                 const numberingPlan = m.numberingPlan;
                                 if (numberingPlan) {
@@ -860,8 +840,10 @@ const Auth: React.FC = () => {
                           autoComplete="off"
                           popperPlacement="top-start"
                           onChangeRaw={(e) => {
-                            if (!e || !e.target || typeof e.target.value !== 'string') return;
-                            let input = e.target.value.replace(/\D/g, '');
+                            if (!e || !e.target) return;
+                            const target = e.target as HTMLInputElement;
+                            if (typeof target.value !== 'string') return;
+                            let input = target.value.replace(/\D/g, '');
                             if (input.length > 8) input = input.slice(0, 8);
 
                             let d = input.slice(0, 2);
@@ -884,7 +866,7 @@ const Auth: React.FC = () => {
                               }
                             }
 
-                            e.target.value = formatted;
+                            target.value = formatted;
 
                             if (input.length === 8) {
                               const dayNum = parseInt(d);
@@ -932,8 +914,8 @@ const Auth: React.FC = () => {
                         >
                           <span className={formData.idType ? 'text-gray-900' : 'text-gray-400'}>
                             {formData.idType ?
-                              ['Passport', 'National ID', 'Professional ID', "Driver's License"].find(
-                                (_, i) => ['passport', 'national_id', 'professional_id', 'drivers_license'][i] === formData.idType
+                              ['Passport', 'National ID', "Driver's License"].find(
+                                (_, i) => ['passport', 'national_id', 'drivers_license'][i] === formData.idType
                               )
                               : 'Select ID Type'}
                           </span>
@@ -951,7 +933,6 @@ const Auth: React.FC = () => {
                               {[
                                 { value: 'passport', label: 'Passport' },
                                 { value: 'national_id', label: 'National ID' },
-                                { value: 'professional_id', label: 'Professional ID' },
                                 { value: 'drivers_license', label: "Driver's License" }
                               ].map((item) => (
                                 <button

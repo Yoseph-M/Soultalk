@@ -44,6 +44,8 @@ const InstantSupport: React.FC = () => {
     const [debouncedSearch, setDebouncedSearch] = useState('');
 
     useEffect(() => {
+        let isMounted = true;
+
         const fetchOnlineProfessionals = async () => {
             if (!user) return;
             try {
@@ -53,10 +55,9 @@ const InstantSupport: React.FC = () => {
                     return `${API_BASE_URL}${path}`;
                 };
 
-
-                // Fetch all professionals (in a real app, optimize this to only fetch online)
+                // Fetch all professionals
                 const response = await fetchWithAuth(API_BASE_URL + '/api/auth/professionals/');
-                if (response.ok) {
+                if (response.ok && isMounted) {
                     const data = await response.json();
                     const formatted: Professional[] = data.map((user: any) => ({
                         id: user.id.toString(),
@@ -65,10 +66,10 @@ const InstantSupport: React.FC = () => {
                         title: 'Mental Wellness Expert',
                         rating: user.rating || 5.0,
                         reviewCount: user.review_count || 0,
-                        specializations: user.specialization ? [user.specialization] : ['Wellness Support'],
+                        specializations: user.specialization ? user.specialization.split(',').map((s: string) => s.trim()).filter(Boolean) : ['Wellness Support'],
                         languages: user.languages || ['English'],
                         sessionsCompleted: user.sessions_completed || 0,
-                        isOnline: user.is_online || false, // Ensure this maps correctly
+                        isOnline: user.is_online || false,
                         bio: user.bio || `Dedicated to helping individuals find balance.`,
                         image: getImageUrl(user.profile_photo, `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.username),
                         location: user.location || 'Global',
@@ -77,21 +78,25 @@ const InstantSupport: React.FC = () => {
                         badges: user.verified ? ['Verified'] : []
                     }));
 
-                    // Filter mainly for online status (mock or real)
-                    // For demo purposes if api active status isn't reliable, we might want to mock some as online, 
-                    // but the instruction says "collect online professionals".
-                    // I'll trust the checked `isOnline`.
+                    // Only show currently available professionals
                     setProfessionals(formatted.filter(p => p.isOnline));
                 }
             } catch (error) {
                 console.error("Error fetching professionals:", error);
             } finally {
-                setLoading(false);
+                if (isMounted) setLoading(false);
             }
         };
 
         if (!isLoading) {
             fetchOnlineProfessionals();
+
+            // Poll for updates every 10 seconds to remove busy professionals
+            const interval = setInterval(fetchOnlineProfessionals, 10000);
+            return () => {
+                isMounted = false;
+                clearInterval(interval);
+            };
         }
     }, [fetchWithAuth, user, isLoading]);
 
@@ -202,7 +207,10 @@ const InstantSupport: React.FC = () => {
 
                                     <div className="flex flex-wrap gap-2 mb-8">
                                         {p.specializations.slice(0, 3).map(s => (
-                                            <span key={s} className={`text-[10px] font-bold px-3 py-1.5 rounded-xl border uppercase tracking-wider ${theme === 'dark' ? 'bg-gray-700 text-gray-400 border-gray-600' : 'bg-gray-50 text-gray-600 border-gray-100'}`}>
+                                            <span key={s} className={`text-[10px] font-black px-3 py-1.5 rounded-lg uppercase tracking-wider transition-all duration-300 hover:scale-105 select-none ${theme === 'dark'
+                                                ? 'bg-teal-500/10 text-teal-400 border border-teal-500/20'
+                                                : 'bg-teal-50 text-teal-700 border border-teal-100 shadow-sm'
+                                                }`}>
                                                 {s}
                                             </span>
                                         ))}

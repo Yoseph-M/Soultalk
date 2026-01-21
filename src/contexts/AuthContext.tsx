@@ -13,6 +13,7 @@ interface User {
   rejectionReason?: string;
   rejectionReasonType?: string;
   notSignedIn?: boolean;
+  bio?: string;
 }
 
 interface AuthContextType {
@@ -78,7 +79,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               verified: userData.verified,
               verificationStatus: userData.verification_status,
               rejectionReason: userData.rejection_reason,
-              rejectionReasonType: userData.rejection_reason_type
+              rejectionReasonType: userData.rejection_reason_type,
+              bio: userData.bio
             });
           } else {
             console.warn('Init auth failed, logging out');
@@ -106,7 +108,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (!response.ok) {
         const errorData = await response.json();
         console.error('Login error details:', errorData);
-        throw new Error(errorData.detail || 'Login failed');
+        // Throw full object stringified so Auth.tsx can parse it
+        throw new Error(JSON.stringify(errorData));
       }
 
       const data = await response.json();
@@ -124,11 +127,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           email: userData.email,
           type: userData.role,
           role: userData.role,
-          avatar: userData.profile_photo ? `${API_BASE_URL}${userData.profile_photo}` : '',
+          avatar: userData.profile_photo
+            ? (String(userData.profile_photo).startsWith('http') ? userData.profile_photo : `${API_BASE_URL}${userData.profile_photo}`)
+            : '',
           verified: userData.verified,
           verificationStatus: userData.verification_status,
           rejectionReason: userData.rejection_reason,
-          rejectionReasonType: userData.rejection_reason_type
+          rejectionReasonType: userData.rejection_reason_type,
+          bio: userData.bio
         };
 
         // Security: If professional/listener is not verified, do NOT sign them in
@@ -181,7 +187,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           verified: userData.verified,
           verificationStatus: userData.verification_status,
           rejectionReason: userData.rejection_reason,
-          rejectionReasonType: userData.rejection_reason_type
+          rejectionReasonType: userData.rejection_reason_type,
+          bio: userData.bio
         };
         setUser(userObj);
         localStorage.setItem('user', JSON.stringify(userObj));
@@ -207,6 +214,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (userData.idType) formData.append('id_type', userData.idType);
       if (userData.idNumber) formData.append('id_number_input', userData.idNumber);
       if (userData.issuingAuthority) formData.append('issuing_authority_input', userData.issuingAuthority);
+      if (userData.location) formData.append('location', userData.location);
 
       if (userData.profilePhotoFile) {
         formData.append('profile_photo', userData.profilePhotoFile);

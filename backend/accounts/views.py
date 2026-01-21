@@ -8,9 +8,14 @@ from google import genai
 from .serializers import (
     UserSerializer, ChatSessionSerializer, ChatMessageSerializer,
     AppointmentSerializer, NotificationSerializer, MoodUpdateSerializer, ConnectionSerializer,
-    PaymentSerializer, JournalEntrySerializer, WithdrawalSerializer
+    PaymentSerializer, JournalEntrySerializer, WithdrawalSerializer,
+    ServiceRequestSerializer, ServiceProposalSerializer
 )
-from .models import User, ChatSession, ChatMessage, Appointment, Notification, MoodUpdate, Connection, ProfessionalProfile, Payment, JournalEntry, Withdrawal
+from .models import (
+    User, ChatSession, ChatMessage, Appointment, Notification, MoodUpdate, 
+    Connection, ProfessionalProfile, Payment, JournalEntry, Withdrawal,
+    ServiceRequest, ServiceProposal
+)
 import uuid
 import requests
 import json
@@ -798,3 +803,108 @@ class WithdrawalRequestView(views.APIView):
                 
         except Exception as e:
             return Response({'error': f"Exception during payout: {str(e)}"}, status=500)
+
+class ServiceRequestListCreateView(generics.ListCreateAPIView):
+    serializer_class = ServiceRequestSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role in ['client', 'seeker']:
+            return ServiceRequest.objects.filter(client=user)
+        elif user.role in ['professional', 'listener']:
+            # Professionals/Listeners see open requests
+            return ServiceRequest.objects.filter(status='open')
+        return ServiceRequest.objects.all()
+
+    def perform_create(self, serializer):
+        if self.request.user.role not in ['client', 'seeker', 'admin']:
+            raise ValidationError(f"Only clients and seekers can create service requests. Your current role is: {self.request.user.role}")
+        serializer.save(client=self.request.user)
+
+class ServiceRequestDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = ServiceRequestSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        return ServiceRequest.objects.all()
+
+class ServiceProposalListCreateView(generics.ListCreateAPIView):
+    serializer_class = ServiceProposalSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        request_id = self.request.query_params.get('request_id')
+        if not request_id:
+            return ServiceProposal.objects.none()
+        
+        service_request = get_object_or_404(ServiceRequest, id=request_id)
+        # Client sees all proposals for their request
+        if self.request.user == service_request.client:
+            return ServiceProposal.objects.filter(request=service_request)
+        # Professional sees only their own proposal for this request
+        if self.request.user.role in ['professional', 'listener']:
+            return ServiceProposal.objects.filter(request=service_request, professional=self.request.user)
+        
+        return ServiceProposal.objects.none()
+
+    def perform_create(self, serializer):
+        if self.request.user.role not in ['professional', 'listener']:
+            raise ValidationError("Only professionals and listeners can submit proposals.")
+        
+        request_id = self.request.data.get('request')
+        service_request = get_object_or_404(ServiceRequest, id=request_id)
+        
+        if service_request.status != 'open':
+            raise ValidationError("This request is no longer open.")
+            
+        if ServiceProposal.objects.filter(request=service_request, professional=self.request.user).exists():
+            raise ValidationError("You have already submitted a proposal for this request.")
+            
+        serializer.save(professional=self.request.user)
+
+class ServiceProposalActionView(views.APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, pk):
+        proposal = get_object_or_404(ServiceProposal, id=pk)
+        action = request.data.get('action') # 'accept' or 'reject'
+        
+        if proposal.request.client != request.user:
+            return Response({'error': 'Only the client who created the request can perform this action.'}, status=403)
+            
+        if action == 'accept':
+            proposal.status = 'accepted'
+            proposal.save()
+            
+            # Close the request or move to in_progress
+            proposal.request.status = 'in_progress'
+            proposal.request.save()
+            
+            # Reject other proposals
+            proposal.request.proposals.exclude(id=proposal.id).update(status='rejected')
+            
+            # Create a Connection
+            Connection.objects.get_or_create(
+                client=proposal.request.client,
+                professional=proposal.professional,
+                defaults={'status': 'accepted'}
+            )
+            
+            # Notify professional
+            Notification.objects.create(
+                user=proposal.professional,
+                title="Proposal Accepted!",
+                message=f"Your proposal for '{proposal.request.title}' has been accepted by {request.user.username}.",
+                type='general',
+                link='/professionals' # Or link to chat
+            )
+            
+            return Response({'status': 'proposal accepted and connection created'})
+            
+        elif action == 'reject':
+            proposal.status = 'rejected'
+            proposal.save()
+            return Response({'status': 'proposal rejected'})
+            
+        return Response({'error': 'Invalid action'}, status=400)

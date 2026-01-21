@@ -1,23 +1,16 @@
-"use client"
 import { API_BASE_URL } from "../config";
-
-import type React from "react"
-import { useState, useEffect } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import React, { useState, useEffect } from "react"
+import { Link, useNavigate, useLocation } from "react-router-dom"
+import WarningModal from "../components/WarningModal";
 import {
   FaRobot,
   FaCalendarAlt,
   FaStar,
-  FaPhoneAlt,
-  FaExclamationTriangle,
-  FaWallet,
-  FaQuoteLeft,
-  FaVideo,
   FaCalendarPlus,
-  FaClock,
-  FaComments,
-  FaFileMedical,
-  FaChevronRight
+  FaChevronRight,
+  FaBriefcase,
+  FaQuoteLeft,
+  FaVideo
 } from "react-icons/fa"
 import DashboardHeader from "./DashboardHeader"
 import { useTheme } from "../contexts/ThemeContext"
@@ -203,56 +196,6 @@ const MoodChart: React.FC<{ moodData: Array<{ date: string; mood: number }> }> =
   )
 }
 
-const WalletWidget: React.FC = () => {
-  const { theme } = useTheme()
-  return (
-    <div className={`rounded-3xl p-8 transition-all duration-300 border ${theme === "dark" ? "bg-gray-800 border-gray-700 text-white" : "bg-white border-gray-100 shadow-sm"}`}>
-      <div className="flex items-center space-x-4 mb-6">
-        <div className="p-3 bg-teal-100 dark:bg-teal-900/30 rounded-2xl">
-          <FaWallet className="w-6 h-6 text-teal-600" />
-        </div>
-        <div>
-          <h3 className="text-xl font-black">Account</h3>
-          <p className="text-xs opacity-50">Current Plan & Subscription</p>
-        </div>
-      </div>
-      <div className="space-y-4">
-        <div className={`p-6 rounded-2xl border-2 ${theme === "dark" ? "bg-teal-900/10 border-teal-800" : "bg-teal-50 border-teal-100"}`}>
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-[10px] font-black uppercase tracking-widest text-teal-600">Active Plan</p>
-            <span className="px-2 py-0.5 bg-teal-500 text-white text-[8px] font-black rounded-full shadow-lg shadow-teal-500/20">LIVE</span>
-          </div>
-          <p className="text-xl font-black text-teal-600">Premium Explorer</p>
-        </div>
-        <Link to="/billing" className="block w-full py-3.5 bg-teal-600 hover:bg-teal-700 text-white text-center rounded-2xl font-black text-sm transition-all hover:shadow-lg hover:shadow-teal-500/20 active:scale-95">
-          Manage Plan
-        </Link>
-      </div>
-    </div>
-  )
-}
-
-const CrisisCorner: React.FC = () => {
-  const { theme } = useTheme()
-  return (
-    <div className={`rounded-3xl p-8 transition-all duration-300 border ${theme === "dark" ? "bg-red-900/10 border-red-950 text-white" : "bg-red-50/50 border-red-100"}`}>
-      <div className="flex items-center space-x-4 mb-4">
-        <div className="p-3 bg-red-100 dark:bg-red-900/50 rounded-2xl">
-          <FaExclamationTriangle className="w-6 h-6 text-red-600" />
-        </div>
-        <h3 className="text-xl font-black text-red-600">Crisis Help</h3>
-      </div>
-      <p className={`text-xs mb-6 leading-relaxed ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
-        Need immediate support? Help is available 24/7.
-      </p>
-      <Link to="/crisis-support" className="uppercase tracking-[0.2em] block w-full py-4 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-black flex items-center justify-center gap-3 transition-all active:scale-95 shadow-lg shadow-red-500/10">
-        <FaPhoneAlt className="w-3 h-3" />
-        <span className="text-xs">Emergency Support</span>
-      </Link>
-    </div>
-  )
-}
-
 const Dashboard: React.FC = () => {
   const { theme } = useTheme()
   const { user, fetchWithAuth, isLoading } = useAuth()
@@ -264,17 +207,33 @@ const Dashboard: React.FC = () => {
   const [moodData, setMoodData] = useState<any[]>([])
   const [loadingMood, setLoadingMood] = useState(true)
   const [hasFetched, setHasFetched] = useState(false)
-  const navigate = useNavigate()
+  const [showWarning, setShowWarning] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const alertShown = React.useRef(false);
 
   useEffect(() => {
     if (!isLoading && !user) {
       navigate('/auth')
       return
     }
-    if (user && (user.type === 'professional' || user.type === 'listener')) {
-      navigate('/professionals')
+
+    // Skip all checks if already on target page
+    if (location.pathname === '/profile') {
+      return;
     }
-  }, [user, navigate, isLoading])
+
+    if (user && (user.role === 'professional' || user.role === 'listener')) {
+      navigate('/professionals')
+      return;
+    }
+
+    // Obligate Client to set Profile Photo
+    if (user && !user.avatar && !alertShown.current) {
+      setShowWarning(true);
+      alertShown.current = true;
+    }
+  }, [user, navigate, isLoading, location.pathname])
 
 
 
@@ -375,9 +334,9 @@ const Dashboard: React.FC = () => {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {[
             { to: "/ai-chat", icon: FaRobot, title: "AI Companion", desc: "Supportive AI" },
-            { to: "/diagnosis", icon: FaFileMedical, title: "Diagnosis", desc: "Assessments" },
+            { to: "/booking", icon: FaCalendarPlus, title: "Book Session", desc: "Find expert" },
             { to: "/schedule", icon: FaCalendarAlt, title: "Timeline", desc: "Manage sessions" },
-            { to: "/booking", icon: FaCalendarPlus, title: "Book Session", desc: "Find professional" },
+            { to: "/marketplace", icon: FaBriefcase, title: "Care Requests", desc: "Post needs" },
           ].map((item, idx) => (
             <Link
               key={idx}
@@ -506,11 +465,22 @@ const Dashboard: React.FC = () => {
                 <MoodChart moodData={moodData} />
               )}
             </div>
-            <CrisisCorner />
           </div>
         </div>
       </div>
       <AICompanion />
+      <WarningModal
+        isOpen={showWarning}
+        onClose={() => setShowWarning(false)}
+        title="Complete Your Profile"
+        message="To provide you with the best experience and personalized care, we need a few more details."
+        missingItems={['Profile Photo']}
+        actionLabel="Go to Profile"
+        onAction={() => {
+          setShowWarning(false);
+          navigate('/profile');
+        }}
+      />
     </div >
   )
 }

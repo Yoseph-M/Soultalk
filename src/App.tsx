@@ -42,6 +42,8 @@ import ProfessionalSettings from './pages/ProfessionalSettings';
 import ProfessionalPayments from './pages/ProfessionalPayments';
 import ProfessionalHistory from './pages/ProfessionalHistory';
 import VerificationPending from './pages/VerificationPending';
+import OpportunityBoard from './pages/OpportunityBoard';
+import ClientPost from './pages/ClientPost';
 
 function App() {
   // Initialize state based on sessionStorage and current path
@@ -110,6 +112,8 @@ function App() {
                 <Route path="/crisis-support" element={<CrisisSupport />} />
                 <Route path="/instant-support" element={<InstantSupport />} />
                 <Route path="/verification-pending" element={<VerificationPending />} />
+                <Route path="/marketplace" element={<ClientPost />} />
+                <Route path="/opportunities" element={<OpportunityBoard />} />
               </Routes>
             </div>
           </Router>

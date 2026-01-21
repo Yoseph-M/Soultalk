@@ -210,6 +210,7 @@ class UserSerializer(serializers.ModelSerializer):
             profile, _ = ClientProfile.objects.get_or_create(user=instance)
             if 'phone' in profile_data: profile.phone = profile_data['phone']
             if 'dob' in profile_data: profile.dob = profile_data['dob']
+            if 'profile_photo' in profile_data: profile.profile_photo = profile_data['profile_photo']
             profile.save()
         elif instance.role == 'professional':
             profile, _ = ProfessionalProfile.objects.get_or_create(user=instance)
@@ -226,6 +227,7 @@ class UserSerializer(serializers.ModelSerializer):
                 profile = instance.client_profile
                 data['phone'] = profile.phone
                 data['dob'] = profile.dob
+                data['profile_photo'] = profile.profile_photo.url if profile.profile_photo else None
             elif instance.role == 'professional' and hasattr(instance, 'professional_profile'):
                 profile = instance.professional_profile
                 data['phone'] = profile.phone
@@ -362,3 +364,50 @@ class WithdrawalSerializer(serializers.ModelSerializer):
         model = Withdrawal
         fields = '__all__'
         read_only_fields = ['user', 'status', 'reference', 'created_at', 'updated_at']
+
+from .models import ServiceRequest, ServiceProposal
+
+class ServiceProposalSerializer(serializers.ModelSerializer):
+    professional_name = serializers.SerializerMethodField()
+    professional_image = serializers.SerializerMethodField()
+    professional_specialization = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ServiceProposal
+        fields = ['id', 'request', 'professional', 'professional_name', 'professional_image', 'professional_specialization', 'message', 'fee', 'status', 'created_at']
+        read_only_fields = ['professional', 'status', 'created_at']
+
+    def get_professional_name(self, obj):
+        return obj.professional.get_full_name().strip() or obj.professional.username
+
+    def get_professional_image(self, obj):
+        try:
+            if hasattr(obj.professional, 'professional_profile') and obj.professional.professional_profile.profile_photo:
+                return obj.professional.professional_profile.profile_photo.url
+        except:
+            pass
+        return None
+    
+    def get_professional_specialization(self, obj):
+        try:
+            if hasattr(obj.professional, 'professional_profile'):
+                return obj.professional.professional_profile.specialization
+        except:
+            pass
+        return None
+
+class ServiceRequestSerializer(serializers.ModelSerializer):
+    client_name = serializers.SerializerMethodField()
+    proposals_count = serializers.SerializerMethodField()
+    proposals = ServiceProposalSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ServiceRequest
+        fields = ['id', 'client', 'client_name', 'category', 'title', 'description', 'preferred_session_type', 'budget', 'status', 'created_at', 'proposals_count', 'proposals']
+        read_only_fields = ['client', 'status', 'created_at']
+
+    def get_client_name(self, obj):
+        return obj.client.get_full_name().strip() or obj.client.username
+
+    def get_proposals_count(self, obj):
+        return obj.proposals.count()

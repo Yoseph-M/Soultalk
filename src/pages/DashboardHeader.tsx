@@ -204,25 +204,23 @@ const DashboardHeader: React.FC = () => {
                 <div className="flex items-center gap-8">
                   <Link
                     to="/find-listener"
-                    className={`relative flex items-center px-4 py-2 font-bold tracking-tight ${theme === "dark" ? "text-[#25A8A0]" : "text-white"
-                      }`}
+                    className={
+                      location.pathname === "/find-listener" ? 'active-nav-link' : 'nav-link'
+                    }
                   >
-                    <span>Support</span>
-                    {location.pathname === "/find-listener" && (
-                      <div className={`absolute bottom-0 left-4 right-4 h-1 rounded-full ${theme === "dark" ? "bg-[#25A8A0]" : "bg-white"}`}></div>
-                    )}
+                    Support
                   </Link>
+
+
 
                   {user?.type === 'admin' && (
                     <Link
                       to="/admin"
-                      className={`relative flex items-center px-4 py-2 font-bold tracking-tight ${theme === "dark" ? "text-[#25A8A0]" : "text-white"
-                        }`}
+                      className={
+                        location.pathname === "/admin" ? 'active-nav-link' : 'nav-link'
+                      }
                     >
-                      <span>Admin</span>
-                      {location.pathname === "/admin" && (
-                        <div className={`absolute bottom-0 left-4 right-4 h-1 rounded-full ${theme === "dark" ? "bg-[#25A8A0]" : "bg-white"}`}></div>
-                      )}
+                      Admin
                     </Link>
                   )}
                 </div>
@@ -496,8 +494,8 @@ const DashboardHeader: React.FC = () => {
               </button>
             </div>
           </div>
-        </div>
-      </header>
+        </div >
+      </header >
 
       {mobileMenuOpen && (
         <div className="lg:hidden fixed inset-0 z-[60]">
@@ -532,6 +530,8 @@ const DashboardHeader: React.FC = () => {
                   <FaUser className="w-5 h-5" />
                   <span className="font-medium">Find Support</span>
                 </Link>
+
+
 
                 {quickActions.map((action) => (
                   <Link

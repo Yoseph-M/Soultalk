@@ -40,6 +40,7 @@ class ClientProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='client_profile')
     phone = models.CharField(max_length=20, blank=True, null=True)
     dob = models.DateField(blank=True, null=True)
+    profile_photo = models.ImageField(upload_to='profiles/', blank=True, null=True)
     
     def __str__(self):
         return f"Client: {self.user.username}"
@@ -54,14 +55,13 @@ class ProfessionalProfile(models.Model):
         ('passport', 'International Passport'),
         ('national_id', 'National ID Card'),
         ('driver_license', 'Driver\'s License'),
-        ('professional_id', 'Professional ID / License'),
     )
     profile_photo = models.ImageField(upload_to='profiles/', blank=True, null=True)
     id_type = models.CharField(max_length=50, choices=ID_TYPE_CHOICES, blank=True, null=True)
     id_image = models.ImageField(upload_to='ids/', blank=True, null=True)
     id_image_back = models.ImageField(upload_to='ids/', blank=True, null=True)
     certificates = models.FileField(upload_to='certificates/', blank=True, null=True)
-    rating = models.DecimalField(max_digits=3, decimal_places=2, default=5.00)
+    rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)
     review_count = models.IntegerField(default=0)
     sessions_completed = models.IntegerField(default=0)
     location = models.CharField(max_length=100, default='Global')
@@ -281,4 +281,45 @@ class JournalEntry(models.Model):
         return f"{self.professional.username} - {self.entry_type} - {self.created_at}"
     
     class Meta:
+        ordering = ['-created_at']
+
+class ServiceRequest(models.Model):
+    STATUS_CHOICES = (
+        ('open', 'Open'),
+        ('in_progress', 'In Progress'),
+        ('closed', 'Closed'),
+    )
+    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='service_requests')
+    category = models.CharField(max_length=100) # e.g. "Anxiety", "Depression", "General Counseling"
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    preferred_session_type = models.CharField(max_length=20, default='video') # 'video', 'audio', 'chat'
+    budget = models.CharField(max_length=100, blank=True, null=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Request: {self.title} by {self.client.username}"
+
+    class Meta:
+        ordering = ['-created_at']
+
+class ServiceProposal(models.Model):
+    STATUS_CHOICES = (
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected'),
+    )
+    request = models.ForeignKey(ServiceRequest, on_delete=models.CASCADE, related_name='proposals')
+    professional = models.ForeignKey(User, on_delete=models.CASCADE, related_name='service_proposals')
+    message = models.TextField()
+    fee = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Proposal from {self.professional.username} for {self.request.title}"
+
+    class Meta:
+        unique_together = ('request', 'professional')
         ordering = ['-created_at']

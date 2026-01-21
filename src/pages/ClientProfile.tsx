@@ -1,7 +1,7 @@
 "use client"
 import { API_BASE_URL } from "../config";
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import {
     FaUser, FaEnvelope, FaPhone, FaShieldAlt, FaCamera, FaSave, FaSpinner,
     FaUserSecret, FaLock, FaChartLine
@@ -34,10 +34,13 @@ interface ProfileData {
 
 const ClientProfile: React.FC = () => {
     const { theme } = useTheme()
-    const { user, fetchWithAuth, isLoading: authLoading } = useAuth()
+    const { user, fetchWithAuth, refreshUser, isLoading: authLoading } = useAuth()
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+    const [profilePhotoFile, setProfilePhotoFile] = useState<File | null>(null)
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
 
     const [profile, setProfile] = useState<ProfileData>({
         display_name: "",
@@ -60,6 +63,13 @@ const ClientProfile: React.FC = () => {
         "Trauma", "Self-esteem", "Grief", "Sleep", "Mindfulness"
     ]
 
+    const getImageUrl = (path: string | null) => {
+        if (!path) return null;
+        if (path.startsWith('http')) return path;
+        if (path.startsWith('data:')) return path;
+        return `${API_BASE_URL}${path}`;
+    };
+
     useEffect(() => {
         const fetchProfile = async () => {
             if (!user) return
@@ -75,7 +85,7 @@ const ClientProfile: React.FC = () => {
                         last_name: data.last_name || "",
                         email: data.email || "",
                         phone: data.phone || "",
-                        avatar: data.avatar || `https://ui-avatars.com/api/?name=${data.first_name}+${data.last_name}&background=random`,
+                        avatar: data.profile_photo || null,
                         // Mocking these for now as backend might not have them yet
                         language: data.language || "English",
                         communication_preference: data.communication_preference || ['chat'],
@@ -95,34 +105,43 @@ const ClientProfile: React.FC = () => {
         }
     }, [user, authLoading, fetchWithAuth])
 
+    const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (file) {
+            setProfilePhotoFile(file)
+            const reader = new FileReader()
+            reader.onloadend = () => {
+                setPreviewUrl(reader.result as string)
+            }
+            reader.readAsDataURL(file)
+        }
+    }
+
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault()
         setSaving(true)
         setMessage(null)
 
         try {
-            // Map the frontend 'display_name' to 'username' if we want to change it, 
-            // but for now let's focus on first_name, last_name, and phone
-            const updateData = {
-                first_name: profile.first_name,
-                last_name: profile.last_name,
-                phone: profile.phone,
-                // Add other fields that UserSerializer expects
+            const formData = new FormData()
+            formData.append('first_name', profile.first_name)
+            formData.append('last_name', profile.last_name)
+            formData.append('phone', profile.phone)
+            formData.append('display_name', profile.display_name)
+            formData.append('is_anonymous', String(profile.is_anonymous))
+
+            if (profilePhotoFile) {
+                formData.append('profile_photo', profilePhotoFile)
             }
 
             const response = await fetchWithAuth(API_BASE_URL + '/api/auth/me/', {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updateData)
+                body: formData
             })
 
             if (response.ok) {
+                await refreshUser();
                 setMessage({ type: 'success', text: 'Changes saved successfully.' })
-                // Update local storage user name if needed
-                if (user) {
-                    const updatedUser = { ...user, name: `${profile.first_name} ${profile.last_name}`.trim() }
-                    // If your AuthContext supports updating user state, call it here
-                }
             } else {
                 const errorData = await response.json();
                 setMessage({ type: 'error', text: `Failed to save changes: ${JSON.stringify(errorData)}` })
@@ -202,19 +221,35 @@ const ClientProfile: React.FC = () => {
                         <div className="grid md:grid-cols-3 gap-8">
                             {/* Avatar Column */}
                             <div className="md:col-span-1 flex flex-col items-center">
-                                <div className="relative group cursor-pointer mb-4">
-                                    <img
-                                        src={profile.avatar}
-                                        alt="Profile"
-                                        className="w-32 h-32 rounded-full border-4 border-gray-100 dark:border-gray-700 object-cover shadow-lg"
+                                <div
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="relative group cursor-pointer mb-4"
+                                >
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        onChange={handleAvatarChange}
+                                        accept="image/*"
+                                        className="hidden"
                                     />
-                                    <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <FaCamera className="text-white w-6 h-6" />
+                                    <img
+                                        src={previewUrl || getImageUrl(profile.avatar) || `https://ui-avatars.com/api/?name=${profile.first_name}+${profile.last_name}&background=random`}
+                                        alt="Profile"
+                                        className={`w-36 h-36 rounded-3xl border-4 object-cover shadow-2xl transition-all duration-300 group-hover:scale-[1.02] ${theme === "dark" ? "border-white/10" : "border-gray-100"}`}
+                                    />
+                                    <div className="absolute inset-0 bg-black/40 rounded-3xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                        <FaCamera className="text-white w-8 h-8 transform group-hover:scale-110 transition-transform" />
                                     </div>
                                 </div>
                                 <div className="text-center">
-                                    <p className="text-xs font-bold text-[#25A8A0] uppercase tracking-wider mb-1">Public Avatar</p>
-                                    <p className="text-[10px] opacity-60">Visible to listeners & simple connection</p>
+                                    <button
+                                        type="button"
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className="text-xs font-black text-[#25A8A0] uppercase tracking-widest mb-2 hover:underline"
+                                    >
+                                        Change Photo
+                                    </button>
+                                    <p className="text-[10px] opacity-40 font-bold">Square images work best</p>
                                 </div>
                             </div>
 
