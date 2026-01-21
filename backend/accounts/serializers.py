@@ -206,18 +206,50 @@ class UserSerializer(serializers.ModelSerializer):
                     setattr(instance, attr, value)
         instance.save()
 
-        if instance.role == 'client':
-            profile, _ = ClientProfile.objects.get_or_create(user=instance)
-            if 'phone' in profile_data: profile.phone = profile_data['phone']
-            if 'dob' in profile_data: profile.dob = profile_data['dob']
-            if 'profile_photo' in profile_data: profile.profile_photo = profile_data['profile_photo']
-            profile.save()
-        elif instance.role == 'professional':
-            profile, _ = ProfessionalProfile.objects.get_or_create(user=instance)
-            for attr, value in profile_data.items():
-                setattr(profile, attr, value)
-            profile.save()
-            
+        # Update profile with rudimentary error handling for file storage (Vercel read-only)
+        from django.db import transaction
+        try:
+            with transaction.atomic():
+                if instance.role == 'client':
+                    profile, _ = ClientProfile.objects.get_or_create(user=instance)
+                    if 'phone' in profile_data: profile.phone = profile_data['phone']
+                    if 'dob' in profile_data: profile.dob = profile_data['dob']
+                    if 'profile_photo' in profile_data: profile.profile_photo = profile_data['profile_photo']
+                    profile.save()
+                elif instance.role == 'professional':
+                    profile, _ = ProfessionalProfile.objects.get_or_create(user=instance)
+                    for attr, value in profile_data.items():
+                        setattr(profile, attr, value)
+                    profile.save()
+        except Exception as e:
+            print(f"Error saving profile (likely file storage issue): {e}")
+            # Fallback: Try saving WITHOUT the problematic file fields
+            try:
+                # We need to re-fetch the profile to discard any partial state if not covered by atomic rollback
+                # (transaction.atomic handles DB rollback, but python object might be dirty, so we fetch cleanly or just reset attr)
+                file_fields = ['profile_photo', 'id_image', 'id_image_back', 'certificates']
+                
+                if instance.role == 'client':
+                    profile, _ = ClientProfile.objects.get_or_create(user=instance)
+                    # Re-apply only non-file fields
+                    if 'phone' in profile_data: profile.phone = profile_data['phone']
+                    if 'dob' in profile_data: profile.dob = profile_data['dob']
+                    profile.save()
+                    print("Recovered: Saved client profile without files.")
+                    
+                elif instance.role == 'professional':
+                    profile, _ = ProfessionalProfile.objects.get_or_create(user=instance)
+                    # Re-apply only non-file fields
+                    for attr, value in profile_data.items():
+                         if attr not in file_fields:
+                             setattr(profile, attr, value)
+                    profile.save()
+                    print("Recovered: Saved professional profile without files.")
+            except Exception as e2:
+                print(f"Critical error during recovery save: {e2}")
+                # If even this fails, then bubble up
+                raise e2
+
         return instance
 
     def to_representation(self, instance):
