@@ -162,10 +162,14 @@ if USE_S3:
     
     # Supabase Public URL logic
     # Public URLs look like: https://[project-id].supabase.co/storage/v1/object/public/[bucket]/[file]
+    AWS_S3_CUSTOM_DOMAIN = None
     if AWS_S3_ENDPOINT_URL:
-        # Extract project ID from: https://[project-id].storage.supabase.co/...
-        project_id = AWS_S3_ENDPOINT_URL.split('//')[1].split('.')[0]
-        AWS_S3_CUSTOM_DOMAIN = f"{project_id}.supabase.co/storage/v1/object/public/{AWS_STORAGE_BUCKET_NAME}"
+        try:
+            # Extract project ID from: https://[project-id].storage.supabase.co/...
+            project_id = AWS_S3_ENDPOINT_URL.split('//')[1].split('.')[0]
+            AWS_S3_CUSTOM_DOMAIN = f"{project_id}.supabase.co/storage/v1/object/public/{AWS_STORAGE_BUCKET_NAME}"
+        except Exception:
+            pass
     
     STORAGES = {
         "default": {
@@ -187,7 +191,10 @@ if USE_S3:
     }
     
     # Force MEDIA_URL to use the public Supabase CDN
-    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
+    if AWS_S3_CUSTOM_DOMAIN:
+        MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
+    else:
+        MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/" if AWS_S3_ENDPOINT_URL else '/media/'
 else:
     # Local storage fallback
     STORAGES = {
