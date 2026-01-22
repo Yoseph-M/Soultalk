@@ -34,7 +34,7 @@ interface ProfessionalProfileData {
 
 const ProfessionalProfile: React.FC = () => {
     const { theme } = useTheme()
-    const { user, fetchWithAuth, refreshUser, isLoading: authLoading } = useAuth()
+    const { user, fetchWithAuth, refreshUser, updateUser, isLoading: authLoading } = useAuth()
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
@@ -142,6 +142,9 @@ const ProfessionalProfile: React.FC = () => {
             if (response.ok) {
                 const updatedData = await response.json()
                 await refreshUser();
+                if (previewUrl) {
+                    updateUser({ avatar: previewUrl });
+                }
                 setProfile(prev => ({
                     ...prev,
                     avatar: updatedData.profile_photo,

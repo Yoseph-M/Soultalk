@@ -22,6 +22,7 @@ interface AuthContextType {
   logout: () => void;
   signup: (userData: any) => Promise<void>;
   refreshUser: () => Promise<void>;
+  updateUser: (data: Partial<User>) => void;
   isLoading: boolean;
   fetchWithAuth: (url: string, options?: RequestInit) => Promise<Response>;
 }
@@ -202,6 +203,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
+  const updateUser = useCallback((data: Partial<User>) => {
+    setUser(prev => {
+      if (!prev) return null;
+      const updated = { ...prev, ...data };
+      localStorage.setItem('user', JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
+
   const signup = async (userData: any) => {
     setIsLoading(true);
     try {
@@ -336,7 +346,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [refreshAccessToken]);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, signup, refreshUser, isLoading, fetchWithAuth }}>
+    <AuthContext.Provider value={{ user, login, logout, signup, refreshUser, updateUser, isLoading, fetchWithAuth }}>
       {children}
     </AuthContext.Provider>
   );

@@ -34,7 +34,7 @@ interface ProfileData {
 
 const ClientProfile: React.FC = () => {
     const { theme } = useTheme()
-    const { user, fetchWithAuth, refreshUser, isLoading: authLoading } = useAuth()
+    const { user, fetchWithAuth, refreshUser, updateUser, isLoading: authLoading } = useAuth()
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
@@ -141,6 +141,9 @@ const ClientProfile: React.FC = () => {
 
             if (response.ok) {
                 await refreshUser();
+                if (previewUrl) {
+                    updateUser({ avatar: previewUrl });
+                }
                 setMessage({ type: 'success', text: 'Changes saved successfully.' })
             } else {
                 const errorData = await response.json();
@@ -233,7 +236,7 @@ const ClientProfile: React.FC = () => {
                                         className="hidden"
                                     />
                                     <img
-                                        src={previewUrl || getImageUrl(profile.avatar) || `https://ui-avatars.com/api/?name=${profile.first_name}+${profile.last_name}&background=random`}
+                                        src={previewUrl || getImageUrl(profile.avatar || null) || `https://ui-avatars.com/api/?name=${profile.first_name}+${profile.last_name}&background=random`}
                                         alt="Profile"
                                         onError={(e) => {
                                             e.currentTarget.src = `https://ui-avatars.com/api/?name=${profile.first_name}+${profile.last_name}&background=random`;
