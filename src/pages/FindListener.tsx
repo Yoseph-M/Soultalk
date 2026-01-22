@@ -149,26 +149,24 @@ const FindListener: React.FC = () => {
                 </Link>
 
                 {/* Hero Section Card */}
-                <div className="bg-[#25A8A0] rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden mb-12">
-                    <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                <div className="bg-[#25A8A0] rounded-2xl md:rounded-[2.5rem] p-6 md:p-10 text-white shadow-2xl relative overflow-hidden mb-8 md:mb-12">
+                    <div className="absolute top-0 right-0 w-64 md:w-96 h-64 md:h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
                     <div className="relative z-10">
-                        <h1 className="text-3xl md:text-4xl font-bold mb-4 text-center">Find Your Perfect Support</h1>
-                        <p className="text-white/90 text-lg mb-8 max-w-3xl mx-auto text-center leading-relaxed">
+                        <h1 className="text-2xl md:text-4xl font-bold mb-3 md:mb-4 text-center">Find Your Perfect Support</h1>
+                        <p className="text-white/90 text-sm md:text-lg mb-6 md:mb-8 max-w-3xl mx-auto text-center leading-relaxed">
                             Connect with compassionate experts ready to support your mental wellness journey.
-                            Select a professional below for quick comparison and action.
                         </p>
 
-                        <div className="flex flex-col md:flex-row md:items-center gap-4 border-t border-white/10 pt-8 mt-2 justify-end">
+                        <div className="flex flex-col md:flex-row md:items-center gap-4 border-t border-white/10 pt-6 md:pt-8 mt-2 justify-between">
                             <div className="flex items-center gap-3">
-                                <Filter className="w-5 h-5 text-white/80" />
-                                <span className="text-sm font-semibold text-white/60">Refine by:</span>
+                                <Filter className="w-4 h-4 md:w-5 md:h-5 text-white/80" />
+                                <span className="text-xs md:text-sm font-semibold text-white/60">Filters:</span>
                             </div>
-                            <div className="flex flex-wrap gap-4 items-center">
-
+                            <div className="flex flex-col sm:flex-row gap-3 items-center w-full md:w-auto">
                                 <select
                                     value={specializationFilter}
                                     onChange={e => setSpecializationFilter(e.target.value)}
-                                    className="bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-sm font-medium focus:ring-2 focus:ring-white/30 outline-none transition-all hover:bg-white/20 text-white cursor-pointer"
+                                    className="w-full sm:w-auto bg-white/10 border border-white/20 rounded-xl px-4 py-2 text-sm font-medium focus:ring-2 focus:ring-white/30 outline-none transition-all hover:bg-white/20 text-white cursor-pointer"
                                 >
                                     <option value="all" className="bg-[#25A8A0]">All Expertises</option>
                                     {allSpecializations.map(s => (
@@ -178,7 +176,7 @@ const FindListener: React.FC = () => {
                                 <select
                                     value={sortBy}
                                     onChange={e => setSortBy(e.target.value as any)}
-                                    className="bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-sm font-medium focus:ring-2 focus:ring-white/30 outline-none transition-all hover:bg-white/20 text-white cursor-pointer"
+                                    className="w-full sm:w-auto bg-white/10 border border-white/20 rounded-xl px-4 py-2 text-sm font-medium focus:ring-2 focus:ring-white/30 outline-none transition-all hover:bg-white/20 text-white cursor-pointer"
                                 >
                                     <option value="rating" className="bg-[#25A8A0]">Highly Rated</option>
                                 </select>
@@ -198,14 +196,14 @@ const FindListener: React.FC = () => {
                             className={`group flex flex-col rounded-[2.5rem] overflow-hidden transition-all duration-500 shadow-xl border ${theme === 'dark' ? 'bg-gray-800 border-gray-700 hover:shadow-teal-500/10 hover:border-teal-500/50' : 'bg-white border-gray-100/50 hover:shadow-teal-200/40 hover:border-teal-100'}`}
                         >
                             <div className="p-4">
-                                <div className="relative h-64 overflow-hidden rounded-[2rem]">
+                                <div className="relative h-48 md:h-64 overflow-hidden rounded-[1.5rem] md:rounded-[2rem]">
                                     <img src={listener.image} alt={listener.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                                    <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-2xl shadow-lg flex items-center gap-1.5">
-                                        <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                                        <span className="text-sm font-bold text-gray-800">{listener.rating.toFixed(1)}</span>
+                                    <div className="absolute top-3 right-3 md:top-4 md:right-4 bg-white/95 backdrop-blur-md px-2 py-1 md:px-3 md:py-1.5 rounded-xl md:rounded-2xl shadow-lg flex items-center gap-1.5">
+                                        <Star className="w-3.5 h-3.5 md:w-4 md:h-4 text-yellow-500 fill-yellow-500" />
+                                        <span className="text-xs md:text-sm font-bold text-gray-800">{listener.rating.toFixed(1)}</span>
                                     </div>
-                                    <div className="absolute bottom-4 left-4 right-4 transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
+                                    <div className="absolute bottom-3 left-3 right-3 md:bottom-4 md:left-4 md:right-4 transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
                                         <div className="flex items-center gap-3 text-white text-xs font-medium">
                                             <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Fast Response</span>
                                             <span className="flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5" /> Verified</span>
@@ -214,10 +212,10 @@ const FindListener: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="p-8 flex flex-col flex-1">
-                                <div className="mb-4">
-                                    <p className="text-teal-500 text-xs font-black uppercase tracking-[0.2em] mb-1">{listener.title}</p>
-                                    <h3 className={`text-2xl font-bold group-hover:text-teal-500 transition-colors ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                            <div className="p-6 md:p-8 flex flex-col flex-1">
+                                <div className="mb-3 md:mb-4">
+                                    <p className="text-teal-500 text-[10px] md:text-xs font-black uppercase tracking-[0.2em] mb-1">{listener.title}</p>
+                                    <h3 className={`text-xl md:text-2xl font-bold group-hover:text-teal-500 transition-colors ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                                         {listener.name.split(' ').map(n => n.charAt(0).toUpperCase() + n.slice(1).toLowerCase()).join(' ')}
                                     </h3>
                                 </div>

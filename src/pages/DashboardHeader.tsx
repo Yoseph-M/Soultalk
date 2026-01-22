@@ -17,7 +17,7 @@ import {
   FaCrown,
   FaHistory, FaChevronRight, FaCheckDouble
 } from "react-icons/fa"
-import { HiOutlineMenuAlt3 } from "react-icons/hi"
+
 import { MdDashboard } from "react-icons/md"
 import STLogoLight from "../assets/images/ST_logo.svg"
 import STLogoDark from "../assets/images/stlogo.svg"
@@ -75,7 +75,6 @@ const DashboardHeader: React.FC = () => {
   const location = useLocation()
   const [profileOpen, setProfileOpen] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [searchFocused, setSearchFocused] = useState(false)
   const [activeTab, setActiveTab] = useState<'all' | 'unread'>('all')
 
@@ -198,7 +197,7 @@ const DashboardHeader: React.FC = () => {
             {/* Left section: Logo & Nav */}
             <div className="flex items-center gap-12 z-10 flex-shrink-0">
               <Link to="/dashboard" className="flex items-center">
-                <img src={theme === 'dark' ? STLogoLight : STLogoDark} alt="SoulTalk" className="h-16 md:h-12 w-auto rounded-full" />
+                <img src={theme === 'dark' ? STLogoLight : STLogoDark} alt="SoulTalk" className="h-10 lg:h-12 w-auto rounded-full" />
               </Link>
               <nav className="hidden lg:flex">
                 <div className="flex items-center gap-8">
@@ -228,11 +227,11 @@ const DashboardHeader: React.FC = () => {
             </div>
 
             {/* Center section: Search Bar */}
-            <div className="flex-1 flex justify-center px-8">
-              <div className="max-w-2xl w-full hidden xl:block">
+            <div className="flex-1 flex justify-center px-4 lg:px-8">
+              <div className="max-w-2xl w-full">
                 <div className={`relative group transition-all duration-500 ${searchFocused ? "scale-[1.02]" : ""}`}>
-                  <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none z-10">
-                    <FaSearch className={`w-4 h-4 transition-colors duration-300 ${searchFocused ? "text-[#25A8A0]" : "text-gray-400"}`} />
+                  <div className="absolute inset-y-0 left-0 pl-4 lg:pl-5 flex items-center pointer-events-none z-10">
+                    <FaSearch className={`w-3.5 h-3.5 lg:w-4 lg:h-4 transition-colors duration-300 ${searchFocused ? "text-[#25A8A0]" : "text-gray-400"}`} />
                   </div>
                   <input
                     type="text"
@@ -240,22 +239,22 @@ const DashboardHeader: React.FC = () => {
                     onChange={(e) => setGlobalSearch(e.target.value)}
                     onFocus={() => setSearchFocused(true)}
                     onBlur={() => setSearchFocused(false)}
-                    placeholder="Search for listeners, topics..."
-                    className={`w-full pl-14 pr-12 py-3.5 rounded-[1.25rem] border-2 transition-all duration-500 font-medium ${searchFocused
+                    placeholder="Search..."
+                    className={`w-full pl-10 lg:pl-14 pr-10 lg:pr-12 py-2 lg:py-3.5 rounded-xl lg:rounded-[1.25rem] border-2 transition-all duration-500 font-medium text-sm lg:text-base ${searchFocused
                       ? theme === "dark"
-                        ? "border-[#25A8A0] ring-8 ring-[#25A8A0]/5 bg-gray-800 text-white placeholder-gray-500 shadow-2xl"
-                        : "border-[#25A8A0]/20 ring-8 ring-[#25A8A0]/5 bg-white text-gray-900 placeholder-gray-400 shadow-2xl"
+                        ? "border-[#25A8A0] ring-4 lg:ring-8 ring-[#25A8A0]/5 bg-gray-800 text-white placeholder-gray-500 shadow-2xl"
+                        : "border-[#25A8A0]/20 ring-4 lg:ring-8 ring-[#25A8A0]/5 bg-white text-gray-900 placeholder-gray-400 shadow-2xl"
                       : theme === "dark"
                         ? "border-transparent bg-gray-800/50 text-white placeholder-gray-500"
-                        : "border-transparent bg-gray-900/30 text-white placeholder-white/60 hover:bg-gray-900/40"
+                        : "border-transparent bg-gray-900/10 text-gray-900 placeholder-gray-500 hover:bg-gray-900/20"
                       } focus:outline-none`}
                   />
                   {globalSearch && (
                     <button
                       onClick={() => setGlobalSearch("")}
-                      className="absolute inset-y-0 right-0 pr-5 flex items-center text-gray-400 hover:text-red-500 transition-colors"
+                      className="absolute inset-y-0 right-0 pr-4 lg:pr-5 flex items-center text-gray-400 hover:text-red-500 transition-colors"
                     >
-                      <FaTimes className="w-4 h-4" />
+                      <FaTimes className="w-3.5 h-3.5 lg:w-4 lg:h-4" />
                     </button>
                   )}
                 </div>
@@ -263,7 +262,7 @@ const DashboardHeader: React.FC = () => {
             </div>
 
             {/* Right section: Actions */}
-            <div className="flex items-center gap-10 z-10 flex-shrink-0">
+            <div className="flex items-center gap-4 sm:gap-6 lg:gap-10 z-10 flex-shrink-0">
               <div className="relative" ref={notificationsRef}>
                 <button
                   onClick={() => setNotificationsOpen(!notificationsOpen)}
@@ -418,11 +417,11 @@ const DashboardHeader: React.FC = () => {
 
                 {profileOpen && (
                   <div
-                    className={`absolute right-0 mt-4 w-72 rounded-[2rem] shadow-2xl border backdrop-blur-xl z-50 transform transition-all duration-300 p-2 ${theme === "dark" ? "bg-gray-800/95 border-gray-700 shadow-black/40" : "bg-white border-gray-100 shadow-teal-900/10"}`}
+                    className={`absolute right-0 mt-4 w-72 rounded-2xl shadow-2xl border backdrop-blur-xl z-50 transform transition-all duration-300 p-2 ${theme === "dark" ? "bg-gray-800/95 border-gray-700 shadow-black/40" : "bg-white border-gray-100 shadow-teal-900/10"}`}
                   >
                     <div className="p-4">
-                      <div className="flex flex-col items-center mb-6 pt-2">
-                        <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-3 shadow-lg ring-4 overflow-hidden ${theme === 'dark' ? 'bg-[#25A8A0] ring-gray-700/50' : 'bg-teal-50 ring-teal-50'}`}>
+                      <div className="flex items-center space-x-4 mb-6 pt-2 px-2">
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center shadow-lg ring-2 overflow-hidden ${theme === 'dark' ? 'bg-[#25A8A0] ring-gray-700/50' : 'bg-teal-50 ring-teal-50'}`}>
                           {user?.avatar ? (
                             <img
                               src={user.avatar}
@@ -433,20 +432,45 @@ const DashboardHeader: React.FC = () => {
                               }}
                             />
                           ) : (
-                            <span className={`text-4xl font-bold ${theme === 'dark' ? 'text-white' : 'text-[#25A8A0]'}`}>{user?.name?.charAt(0).toUpperCase() || 'U'}</span>
+                            <span className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-[#25A8A0]'}`}>{user?.name?.charAt(0).toUpperCase() || 'U'}</span>
                           )}
                         </div>
-                        <p className={`font-bold text-lg ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-                          {user?.name?.split(' ').map(n => n.charAt(0).toUpperCase() + n.slice(1).toLowerCase()).join(' ') || 'User'}
-                        </p>
+                        <div className="flex flex-col">
+                          <p className={`font-bold text-base ${theme === "dark" ? "text-white" : "text-gray-900"} line-clamp-1`}>
+                            {user?.name || 'User'}
+                          </p>
+                          <p className={`text-xs ${theme === "dark" ? "text-gray-500" : "text-gray-400"} line-clamp-1`}>
+                            {user?.email}
+                          </p>
+                        </div>
                       </div>
 
                       <div className="space-y-1.5">
                         <Link
-                          to="/profile"
-                          className={`group flex items-center space-x-3 px-4 py-3 rounded-2xl transition-all duration-200 ${theme === "dark" ? "text-gray-300 hover:text-white hover:bg-[#25A8A0]/10" : "text-gray-700 hover:text-[#25A8A0] hover:bg-teal-50/50"}`}
+                          to="/dashboard"
+                          className={`lg:hidden w-full group flex items-center justify-start space-x-3 px-4 py-2.5 rounded-xl transition-all duration-200 ${theme === "dark" ? "text-gray-300 hover:text-white hover:bg-[#25A8A0]/10" : "text-gray-700 hover:text-[#25A8A0] hover:bg-teal-50/50"}`}
                         >
-                          <div className={`p-2 rounded-xl transition-all duration-200 group-hover:scale-110 ${theme === "dark" ? "bg-gray-700 text-gray-400 group-hover:text-[#25A8A0]" : "bg-gray-50 text-gray-400 group-hover:text-[#25A8A0]"}`}>
+                          <div className={`shrink-0 p-2 rounded-xl transition-all duration-200 group-hover:scale-110 ${theme === "dark" ? "bg-gray-700 text-gray-400 group-hover:text-[#25A8A0]" : "bg-gray-50 text-gray-400 group-hover:text-[#25A8A0]"}`}>
+                            <MdDashboard className="w-4 h-4" />
+                          </div>
+                          <span className="font-semibold text-sm">Dashboard</span>
+                        </Link>
+
+                        <Link
+                          to="/find-listener"
+                          className={`lg:hidden w-full group flex items-center justify-start space-x-3 px-4 py-2.5 rounded-xl transition-all duration-200 ${theme === "dark" ? "text-gray-300 hover:text-white hover:bg-[#25A8A0]/10" : "text-gray-700 hover:text-[#25A8A0] hover:bg-teal-50/50"}`}
+                        >
+                          <div className={`shrink-0 p-2 rounded-xl transition-all duration-200 group-hover:scale-110 ${theme === "dark" ? "bg-gray-700 text-gray-400 group-hover:text-[#25A8A0]" : "bg-gray-50 text-gray-400 group-hover:text-[#25A8A0]"}`}>
+                            <FaSearch className="w-4 h-4" />
+                          </div>
+                          <span className="font-semibold text-sm">Find Support</span>
+                        </Link>
+
+                        <Link
+                          to="/profile"
+                          className={`w-full group flex items-center justify-start space-x-3 px-4 py-2.5 rounded-xl transition-all duration-200 ${theme === "dark" ? "text-gray-300 hover:text-white hover:bg-[#25A8A0]/10" : "text-gray-700 hover:text-[#25A8A0] hover:bg-teal-50/50"}`}
+                        >
+                          <div className={`shrink-0 p-2 rounded-xl transition-all duration-200 group-hover:scale-110 ${theme === "dark" ? "bg-gray-700 text-gray-400 group-hover:text-[#25A8A0]" : "bg-gray-50 text-gray-400 group-hover:text-[#25A8A0]"}`}>
                             <FaUser className="w-4 h-4" />
                           </div>
                           <span className="font-semibold text-sm">My Profile</span>
@@ -454,9 +478,9 @@ const DashboardHeader: React.FC = () => {
 
                         <Link
                           to="/settings"
-                          className={`group flex items-center space-x-3 px-4 py-3 rounded-2xl transition-all duration-200 ${theme === "dark" ? "text-gray-300 hover:text-white hover:bg-[#25A8A0]/10" : "text-gray-700 hover:text-[#25A8A0] hover:bg-teal-50/50"}`}
+                          className={`w-full group flex items-center justify-start space-x-3 px-4 py-2.5 rounded-xl transition-all duration-200 ${theme === "dark" ? "text-gray-300 hover:text-white hover:bg-[#25A8A0]/10" : "text-gray-700 hover:text-[#25A8A0] hover:bg-teal-50/50"}`}
                         >
-                          <div className={`p-2 rounded-xl transition-all duration-200 group-hover:scale-110 ${theme === "dark" ? "bg-gray-700 text-gray-400 group-hover:text-[#25A8A0]" : "bg-gray-50 text-gray-400 group-hover:text-[#25A8A0]"}`}>
+                          <div className={`shrink-0 p-2 rounded-xl transition-all duration-200 group-hover:scale-110 ${theme === "dark" ? "bg-gray-700 text-gray-400 group-hover:text-[#25A8A0]" : "bg-gray-50 text-gray-400 group-hover:text-[#25A8A0]"}`}>
                             <FaCog className="w-4 h-4" />
                           </div>
                           <span className="font-semibold text-sm">Settings</span>
@@ -464,9 +488,9 @@ const DashboardHeader: React.FC = () => {
 
                         <Link
                           to="/billing"
-                          className={`group flex items-center space-x-3 px-4 py-3 rounded-2xl transition-all duration-200 ${theme === "dark" ? "text-gray-300 hover:text-white hover:bg-[#25A8A0]/10" : "text-gray-700 hover:text-[#25A8A0] hover:bg-teal-50/50"}`}
+                          className={`w-full group flex items-center justify-start space-x-3 px-4 py-2.5 rounded-xl transition-all duration-200 ${theme === "dark" ? "text-gray-300 hover:text-white hover:bg-[#25A8A0]/10" : "text-gray-700 hover:text-[#25A8A0] hover:bg-teal-50/50"}`}
                         >
-                          <div className={`p-2 rounded-xl transition-all duration-200 group-hover:scale-110 ${theme === "dark" ? "bg-gray-700 text-gray-400 group-hover:text-[#25A8A0]" : "bg-gray-50 text-gray-400 group-hover:text-[#25A8A0]"}`}>
+                          <div className={`shrink-0 p-2 rounded-xl transition-all duration-200 group-hover:scale-110 ${theme === "dark" ? "bg-gray-700 text-gray-400 group-hover:text-[#25A8A0]" : "bg-gray-50 text-gray-400 group-hover:text-[#25A8A0]"}`}>
                             <FaCrown className="w-4 h-4" />
                           </div>
                           <span className="font-semibold text-sm">Billing</span>
@@ -474,9 +498,9 @@ const DashboardHeader: React.FC = () => {
 
                         <Link
                           to="/session-history"
-                          className={`group flex items-center space-x-3 px-4 py-3 rounded-2xl transition-all duration-200 ${theme === "dark" ? "text-gray-300 hover:text-white hover:bg-[#25A8A0]/10" : "text-gray-700 hover:text-[#25A8A0] hover:bg-teal-50/50"}`}
+                          className={`w-full group flex items-center justify-start space-x-3 px-4 py-2.5 rounded-xl transition-all duration-200 ${theme === "dark" ? "text-gray-300 hover:text-white hover:bg-[#25A8A0]/10" : "text-gray-700 hover:text-[#25A8A0] hover:bg-teal-50/50"}`}
                         >
-                          <div className={`p-2 rounded-xl transition-all duration-200 group-hover:scale-110 ${theme === "dark" ? "bg-gray-700 text-gray-400 group-hover:text-[#25A8A0]" : "bg-gray-50 text-gray-400 group-hover:text-[#25A8A0]"}`}>
+                          <div className={`shrink-0 p-2 rounded-xl transition-all duration-200 group-hover:scale-110 ${theme === "dark" ? "bg-gray-700 text-gray-400 group-hover:text-[#25A8A0]" : "bg-gray-50 text-gray-400 group-hover:text-[#25A8A0]"}`}>
                             <FaHistory className="w-4 h-4" />
                           </div>
                           <span className="font-semibold text-sm">History</span>
@@ -489,9 +513,11 @@ const DashboardHeader: React.FC = () => {
                             logout()
                             navigate('/')
                           }}
-                          className="w-full flex items-center justify-center space-x-3 px-4 py-3 rounded-2xl transition-all duration-300 bg-red-50 hover:bg-red-100 text-red-600 font-bold dark:bg-red-500/10 dark:hover:bg-red-500/20"
+                          className="w-full flex items-center justify-start space-x-3 px-4 py-3 rounded-2xl transition-all duration-300 bg-red-50 hover:bg-red-100 text-red-600 font-bold dark:bg-red-500/10 dark:hover:bg-red-500/20 group"
                         >
-                          <FaSignOutAlt className="w-4 h-4" />
+                          <div className="shrink-0 p-2 rounded-xl bg-white/50 dark:bg-black/20 transition-transform group-hover:scale-110">
+                            <FaSignOutAlt className="w-4 h-4" />
+                          </div>
                           <span>Sign Out</span>
                         </button>
                       </div>
@@ -500,69 +526,10 @@ const DashboardHeader: React.FC = () => {
                 )}
               </div>
 
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className={`lg:hidden p-3 rounded-2xl transition-all duration-300 ${theme === "dark" ? "text-gray-400 hover:text-white bg-gray-800" : "text-gray-500 hover:text-gray-900 bg-gray-100"}`}
-              >
-                <HiOutlineMenuAlt3 className="w-6 h-6" />
-              </button>
-            </div>
-          </div>
-        </div >
-      </header >
-
-      {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-[60]">
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}></div>
-          <div className={`fixed top-0 right-0 h-full w-80 shadow-xl transform transition-transform duration-300 ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}>
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-8">
-                <h2 className={`text-xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>Menu</h2>
-                <button
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`p-2 rounded-xl ${theme === "dark" ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900"}`}
-                >
-                  <FaTimes className="w-5 h-5" />
-                </button>
-              </div>
-
-              <nav className="space-y-4">
-                <Link
-                  to="/dashboard"
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${theme === "dark" ? "text-gray-300 hover:text-white hover:bg-gray-800" : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"}`}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <MdDashboard className="w-5 h-5" />
-                  <span className="font-medium">Dashboard</span>
-                </Link>
-
-                <Link
-                  to="/find-listener"
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${theme === "dark" ? "text-gray-300 hover:text-white hover:bg-gray-800" : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"}`}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <FaUser className="w-5 h-5" />
-                  <span className="font-medium">Find Support</span>
-                </Link>
-
-
-
-                {quickActions.map((action) => (
-                  <Link
-                    key={action.name}
-                    to={action.href}
-                    className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${theme === "dark" ? "bg-gray-800 text-gray-300 hover:text-white" : "bg-gray-100 text-gray-700 hover:text-gray-900"}`}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <action.icon className="w-5 h-5" />
-                    <span className="font-medium">{action.name}</span>
-                  </Link>
-                ))}
-              </nav>
             </div>
           </div>
         </div>
-      )}
+      </header >
     </>
   )
 }

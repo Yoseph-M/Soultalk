@@ -433,7 +433,7 @@ const Auth: React.FC = () => {
           </div>
 
           {/* Right Side - Auth Form */}
-          <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-10 min-h-[650px] flex flex-col justify-center">
+          <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-10 min-h-[auto] md:min-h-[650px] flex flex-col justify-center">
 
 
             {/* Form Header */}
@@ -490,7 +490,7 @@ const Auth: React.FC = () => {
             {(!isProfessional || isLogin) && (
               <form onSubmit={handleSubmit} className="space-y-4">
                 {!isLogin && (
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1.5">First Name</label>
                       <div className="relative">
@@ -616,14 +616,17 @@ const Auth: React.FC = () => {
             {/* Professional Multi-Step Form */}
             {!isLogin && isProfessional && (
               <div className="space-y-4">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-6 px-2">
                   {stepTitles.map((_, idx) => (
                     <div key={idx} className="flex-1 flex flex-col items-center relative">
-                      <div className={`w-8 h-8 flex items-center justify-center rounded-full font-bold text-white transition-all duration-300 text-sm ${proStep === idx + 1 ? 'bg-[#25A8A0] scale-110 shadow-lg' : idx + 1 < proStep ? 'bg-[#25A8A0]/80' : 'bg-gray-300'}`}>
+                      <div className={`w-7 h-7 md:w-8 md:h-8 flex items-center justify-center rounded-full font-bold text-white transition-all duration-300 text-xs md:text-sm ${proStep === idx + 1 ? 'bg-[#25A8A0] scale-110 shadow-lg' : idx + 1 < proStep ? 'bg-[#25A8A0]/80' : 'bg-gray-300'}`}>
                         {idx + 1}
                       </div>
+                      <div className="hidden md:block absolute top-10 text-[10px] font-bold text-gray-500 uppercase tracking-tighter">
+                        {stepTitles[idx]}
+                      </div>
                       {idx < stepTitles.length - 1 && (
-                        <div className={`absolute top-4 left-1/2 w-full h-0.5 ${idx + 1 < proStep ? 'bg-[#25A8A0]' : 'bg-gray-300'}`} style={{ zIndex: -1 }}></div>
+                        <div className={`absolute top-3.5 md:top-4 left-1/2 w-full h-0.5 ${idx + 1 < proStep ? 'bg-[#25A8A0]' : 'bg-gray-300'}`} style={{ zIndex: -1 }}></div>
                       )}
                     </div>
                   ))}
@@ -632,7 +635,7 @@ const Auth: React.FC = () => {
                 {/* Step 1: Account */}
                 {proStep === 1 && (
                   <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1.5">First Name</label>
                         <input
@@ -736,11 +739,8 @@ const Auth: React.FC = () => {
 
                           {isCountryDropdownOpen && (
                             <>
-                              <div
-                                className="fixed inset-0 z-10"
-                                onClick={() => setIsCountryDropdownOpen(false)}
-                              />
-                              <div className="absolute top-full left-0 w-[300px] mt-2 bg-white border border-gray-100 rounded-xl shadow-2xl z-20 flex flex-col overflow-hidden">
+                              <div className="fixed inset-0 z-10" onClick={() => setIsCountryDropdownOpen(false)} />
+                              <div className="absolute top-full left-0 right-0 sm:right-auto sm:w-[300px] mt-2 bg-white border border-gray-100 rounded-xl shadow-2xl z-20 flex flex-col overflow-hidden">
                                 <div className="p-2 border-b border-gray-100 bg-white">
                                   <div className="relative">
                                     <input
@@ -956,7 +956,7 @@ const Auth: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {/* Front of ID */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1.5">ID Image (Front)</label>

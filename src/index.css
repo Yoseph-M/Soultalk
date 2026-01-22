@@ -14,6 +14,81 @@
   /* Slight tightening often found in modern grotesques */
 }
 
+@media (max-width: 640px) {
+  .font-sohne {
+    line-height: 1.5;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 8vw, 3rem) !important;
+    line-height: 1.2 !important;
+  }
+
+  h2 {
+    font-size: clamp(1.5rem, 6vw, 2.25rem) !important;
+  }
+
+  .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .section-spacing {
+    padding-top: 3rem !important;
+    padding-bottom: 3rem !important;
+  }
+}
+
+/* Touch Target Improvements */
+@media (max-width: 768px) {
+
+  button,
+  [role="button"],
+  a {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+    /* Prevents auto-zoom on iOS */
+  }
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.page-transition {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 .font-sohne strong,
 .font-sohne b {
   font-weight: 500;
@@ -224,7 +299,7 @@
 
 .header-floating {
   position: sticky;
-  top: 1rem;
+  top: 0.5rem;
 
   width: calc(100% - 2rem);
   margin: 0 auto;
@@ -237,6 +312,15 @@
   border: 1px solid rgba(0, 0, 0, 0.06);
   transition: all 260ms cubic-bezier(.2, .9, .2, 1);
   height: var(--header-height-lg);
+}
+
+@media (max-width: 768px) {
+  .header-floating {
+    top: 0;
+    width: 100%;
+    border-radius: 0;
+    height: var(--header-height-sm);
+  }
 }
 
 .header-scrolled {
@@ -258,6 +342,12 @@
   transition: background 200ms cubic-bezier(.2, .9, .2, 1), height 200ms cubic-bezier(.2, .9, .2, 1), backdrop-filter 200ms cubic-bezier(.2, .9, .2, 1), box-shadow 200ms cubic-bezier(.2, .9, .2, 1);
 
   height: calc(var(--header-height-sm) + 0.90rem);
+}
+
+@media (max-width: 768px) {
+  .header-scrolled {
+    height: var(--header-height-sm);
+  }
 }
 
 

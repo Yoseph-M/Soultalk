@@ -45,6 +45,8 @@ import VerificationPending from './pages/VerificationPending';
 import OpportunityBoard from './pages/OpportunityBoard';
 import ClientPost from './pages/ClientPost';
 
+
+
 function App() {
   // Initialize state based on sessionStorage and current path
   // Only show splash if it's the first visit AND we are on the landing page
@@ -115,6 +117,7 @@ function App() {
                 <Route path="/marketplace" element={<ClientPost />} />
                 <Route path="/opportunities" element={<OpportunityBoard />} />
               </Routes>
+
             </div>
           </Router>
         </SearchProvider>

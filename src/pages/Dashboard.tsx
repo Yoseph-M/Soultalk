@@ -319,9 +319,9 @@ const Dashboard: React.FC = () => {
   return (
     <div className={`min-h-screen transition-all duration-500 ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
       <DashboardHeader />
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="container mx-auto px-4 py-6 md:py-8 max-w-7xl">
         {/* Hero Section with Daily Quote */}
-        <div className={`rounded-3xl p-8 mb-8 relative overflow-hidden transition-all duration-500 ${theme === "dark" ? "bg-gray-800 text-white" : "bg-teal-600 text-white shadow-2xl shadow-teal-900/20"}`}>
+        <div className={`rounded-3xl p-6 md:p-8 mb-8 relative overflow-hidden transition-all duration-500 ${theme === "dark" ? "bg-gray-800 text-white" : "bg-teal-600 text-white shadow-2xl shadow-teal-900/20"}`}>
           <div className="relative z-10 flex flex-col items-center">
             <div className="w-full max-w-4xl">
               <DailyQuote />

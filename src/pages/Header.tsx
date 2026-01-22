@@ -96,43 +96,73 @@ const Header: React.FC = () => {
         </button>
       </div>
 
-      { }
+      {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div className="md:hidden mt-4 pb-4 border-t border-white/20">
-          <nav className="flex flex-col space-y-2 mt-4">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={
-                  (isActive(item.path) ? 'active-nav-link' : 'nav-link') +
-                  ' text-base py-2 px-4 rounded flex items-center h-12'
-                }
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                {item.label}
-              </Link>
-            ))}
-            {user && (user.type !== 'professional' || user.verified) ? (
+        <div className="fixed inset-0 z-[60] md:hidden">
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-md transition-opacity" onClick={() => setIsMobileMenuOpen(false)}></div>
+          <div className="fixed top-0 right-0 h-full w-4/5 max-w-sm bg-[#25A8A0] shadow-2xl transform transition-transform duration-300 ease-out p-6 flex flex-col">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-2">
+                <img src={Logo} alt="Logo" className="h-10 w-auto" />
+                <span className="text-xl font-bold text-white">SoulTalk</span>
+              </div>
               <button
-                onClick={() => {
-                  logout();
-                  setIsMobileMenuOpen(false);
-                }}
-                className="py-2 px-4 text-left text-white/90 hover:bg-white/10 rounded transition-colors"
-              >
-                Logout
-              </button>
-            ) : (
-              <Link
-                to="/auth"
-                className="py-2 px-4 text-white/90 hover:bg-gradient-to-r hover:from-[#25A8A0] hover:to-green-600 hover:text-white rounded transition-all duration-300"
                 onClick={() => setIsMobileMenuOpen(false)}
+                className="p-2 text-white hover:bg-white/10 rounded-full transition-colors"
               >
-                Get Started
-              </Link>
-            )}
-          </nav>
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            <nav className="flex flex-col space-y-4 flex-1">
+              {navItems.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={
+                    (isActive(item.path) ? 'bg-white text-[#25A8A0]' : 'text-white hover:bg-white/10') +
+                    ' text-lg font-semibold py-3 px-4 rounded-xl transition-all flex items-center h-14'
+                  }
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+
+            <div className="mt-auto pt-6 border-t border-white/20">
+              {user && (user.type !== 'professional' || user.verified) ? (
+                <div className="flex flex-col gap-4">
+                  <Link
+                    to={user.type === 'professional' || user.type === 'listener' ? '/professionals' : '/dashboard'}
+                    className="w-full"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <button className="w-full bg-white text-[#25A8A0] font-bold py-4 rounded-xl shadow-lg">
+                      Dashboard
+                    </button>
+                  </Link>
+                  <button
+                    onClick={() => {
+                      logout();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full py-3 px-4 text-center text-white/80 hover:text-white transition-colors font-medium"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  to="/auth?mode=signup"
+                  className="w-full bg-white text-[#25A8A0] font-bold py-4 rounded-xl shadow-lg flex items-center justify-center"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Get Started
+                </Link>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </header>

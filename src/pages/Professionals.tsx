@@ -224,11 +224,11 @@ const ProfessionalDashboard: React.FC = () => {
             <main className="container mx-auto px-4 py-8 max-w-7xl">
                 <header className="mb-10 animate-fadeIn">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                        <div className={`p-8 rounded-[2rem] flex-1 ${theme === 'dark' ? 'bg-[#151C2C]' : 'bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)]'}`}>
-                            <h1 className={`text-4xl font-black tracking-tight mb-3 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
+                        <div className={`p-6 md:p-8 rounded-[2rem] flex-1 ${theme === 'dark' ? 'bg-[#151C2C]' : 'bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)]'}`}>
+                            <h1 className={`text-3xl md:text-4xl font-black tracking-tight mb-3 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
                                 Welcome Back, <span className="text-[#25A8A0]">{(user?.name?.split(' ')[0] || '').charAt(0).toUpperCase() + (user?.name?.split(' ')[0] || '').slice(1).toLowerCase()}</span>
                             </h1>
-                            <p className={`text-lg font-medium flex items-center gap-2 ${theme === 'dark' ? 'text-gray-400' : 'text-slate-500'}`}>
+                            <p className={`text-base md:text-lg font-medium flex items-center gap-2 ${theme === 'dark' ? 'text-gray-400' : 'text-slate-500'}`}>
                                 <div className={`w-2 h-2 rounded-full ${upcomingSessions.length > 0 ? 'bg-[#25A8A0] animate-pulse' : 'bg-gray-300'}`}></div>
                                 You have <span className={`${upcomingSessions.length > 0 ? 'text-[#25A8A0]' : ''} font-bold`}>{upcomingSessions.length === 0 ? 'no' : upcomingSessions.length} {upcomingSessions.length === 1 ? 'session' : 'sessions'}</span> scheduled for today.
                             </p>

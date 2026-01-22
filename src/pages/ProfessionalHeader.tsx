@@ -12,7 +12,7 @@ import {
     FaUsers,
     FaCreditCard
 } from 'react-icons/fa';
-import { HiOutlineMenuAlt3 } from 'react-icons/hi';
+
 import { MdDashboard } from 'react-icons/md';
 import Logo from '../assets/images/stlogo.svg';
 import { useTheme } from '../contexts/ThemeContext';
@@ -58,7 +58,6 @@ const ProfessionalHeader: React.FC = () => {
     const [search, setSearch] = useState('');
     const [profileOpen, setProfileOpen] = useState(false);
     const [notificationsOpen, setNotificationsOpen] = useState(false);
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [searchFocused, setSearchFocused] = useState(false);
     const [activeTab, setActiveTab] = useState<'all' | 'unread'>('all');
 
@@ -125,9 +124,9 @@ const ProfessionalHeader: React.FC = () => {
                 <div className="container mx-auto px-4 lg:px-6">
                     <div className="flex items-center gap-8 h-16 lg:h-20 px-4">
                         {/* Left section: Logo & Nav */}
-                        <div className="flex items-center gap-8 z-10 flex-shrink-0">
+                        <div className="flex items-center gap-4 lg:gap-8 z-10 flex-shrink-0">
                             <Link to="/professionals" className="flex items-center gap-2">
-                                <img src={Logo} alt="SoulTalk" className="h-12 w-auto" />
+                                <img src={Logo} alt="SoulTalk" className="h-10 lg:h-12 w-auto" />
                             </Link>
                             <nav className="hidden lg:flex gap-8">
                                 <Link
@@ -143,11 +142,11 @@ const ProfessionalHeader: React.FC = () => {
                         </div>
 
                         {/* Centered Search Bar */}
-                        <div className="flex-1 flex justify-center hidden xl:flex">
+                        <div className="flex-1 flex justify-center px-4 lg:px-8">
                             <div className="max-w-2xl w-full">
-                                <div className={`relative transition-all duration-300 ${searchFocused ? "scale-105" : ""}`}>
+                                <div className={`relative transition-all duration-300 ${searchFocused ? "scale-[1.02]" : ""}`}>
                                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 z-10">
-                                        <FaSearch className="w-4 h-4 text-gray-400" />
+                                        <FaSearch className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-gray-400" />
                                     </div>
                                     <input
                                         type="text"
@@ -156,7 +155,7 @@ const ProfessionalHeader: React.FC = () => {
                                         onFocus={() => setSearchFocused(true)}
                                         onBlur={() => setSearchFocused(false)}
                                         placeholder="Search clients..."
-                                        className={`w-full pl-12 pr-12 py-2.5 rounded-2xl border-2 transition-all duration-300 ${searchFocused
+                                        className={`w-full pl-10 lg:pl-12 pr-10 lg:pr-12 py-2 lg:py-2.5 rounded-xl lg:rounded-2xl border-2 transition-all duration-300 text-sm lg:text-base ${searchFocused
                                             ? theme === "dark"
                                                 ? "border-[#25A8A0] ring-4 ring-[#25A8A0]/10 shadow-lg border-gray-700 bg-gray-800/50 text-white placeholder-gray-400"
                                                 : "border-white ring-4 ring-white/20 shadow-lg bg-white text-gray-900 placeholder-gray-400"
@@ -170,7 +169,7 @@ const ProfessionalHeader: React.FC = () => {
                                             onClick={() => setSearch("")}
                                             className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
                                         >
-                                            <FaTimes className="w-4 h-4" />
+                                            <FaTimes className="w-3.5 h-3.5 lg:w-4 lg:h-4" />
                                         </button>
                                     )}
                                 </div>
@@ -178,7 +177,7 @@ const ProfessionalHeader: React.FC = () => {
                         </div>
 
                         {/* Right Group: Search + Actions */}
-                        <div className="flex-shrink-0 flex items-center justify-end gap-8 z-10">
+                        <div className="flex-shrink-0 flex items-center justify-end gap-4 sm:gap-6 lg:gap-8 z-10">
 
 
                             {/* Action Icons */}
@@ -264,11 +263,11 @@ const ProfessionalHeader: React.FC = () => {
 
                                     {profileOpen && (
                                         <div
-                                            className={`absolute right-0 mt-4 w-72 rounded-[2rem] shadow-2xl border backdrop-blur-xl z-50 transform transition-all duration-300 p-2 ${theme === 'dark' ? 'bg-gray-800/95 border-gray-700' : 'bg-white border-gray-100 shadow-teal-900/10'}`}
+                                            className={`absolute right-0 mt-4 w-72 rounded-2xl shadow-2xl border backdrop-blur-xl z-50 transform transition-all duration-300 p-2 ${theme === 'dark' ? 'bg-gray-800/95 border-gray-700' : 'bg-white border-gray-100 shadow-teal-900/10'}`}
                                         >
                                             <div className="p-4">
-                                                <div className="flex flex-col items-center mb-6 pt-2">
-                                                    <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-3 shadow-lg ring-4 overflow-hidden ${theme === 'dark' ? 'bg-[#25A8A0] ring-gray-700/50' : 'bg-teal-50 ring-teal-50'}`}>
+                                                <div className="flex items-center space-x-4 mb-6 pt-2 px-2">
+                                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center shadow-lg ring-2 overflow-hidden ${theme === 'dark' ? 'bg-[#25A8A0] ring-gray-700/50' : 'bg-teal-50 ring-teal-50'}`}>
                                                         {user?.avatar ? (
                                                             <img
                                                                 src={user.avatar}
@@ -279,36 +278,53 @@ const ProfessionalHeader: React.FC = () => {
                                                                 }}
                                                             />
                                                         ) : (
-                                                            <span className={`text-4xl font-bold ${theme === 'dark' ? 'text-white' : 'text-[#25A8A0]'}`}>{user?.name?.charAt(0).toUpperCase() || 'P'}</span>
+                                                            <span className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-[#25A8A0]'}`}>{user?.name?.charAt(0).toUpperCase() || 'P'}</span>
                                                         )}
 
                                                     </div>
-                                                    <p className={`font-bold text-lg ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-                                                        {user?.name?.split(' ').map(n => n.charAt(0).toUpperCase() + n.slice(1).toLowerCase()).join(' ') || 'Professional'}
-                                                    </p>
+                                                    <div className="flex flex-col">
+                                                        <p className={`font-bold text-base ${theme === "dark" ? "text-white" : "text-gray-900"} line-clamp-1`}>
+                                                            {user?.name || 'Professional'}
+                                                        </p>
+                                                        <p className={`text-xs ${theme === "dark" ? "text-gray-500" : "text-gray-400"} line-clamp-1`}>
+                                                            {user?.email}
+                                                        </p>
+                                                    </div>
                                                 </div>
 
                                                 <div className="space-y-1.5">
-                                                    <Link to="/professional/profile" className={`group flex items-center space-x-3 px-4 py-3 rounded-2xl transition-all duration-200 ${theme === 'dark' ? 'text-gray-300 hover:text-white hover:bg-[#25A8A0]/10' : 'text-gray-700 hover:text-[#25A8A0] hover:bg-teal-50/50'}`}>
-                                                        <div className={`p-2 rounded-xl transition-all duration-200 group-hover:scale-110 ${theme === 'dark' ? 'bg-gray-700 text-gray-400 group-hover:text-[#25A8A0]' : 'bg-gray-50 text-gray-400 group-hover:text-[#25A8A0]'}`}>
+                                                    <Link to="/professionals" className={`lg:hidden w-full group flex items-center justify-start space-x-3 px-4 py-2.5 rounded-xl transition-all duration-200 ${theme === 'dark' ? 'text-gray-300 hover:text-white hover:bg-[#25A8A0]/10' : 'text-gray-700 hover:text-[#25A8A0] hover:bg-teal-50/50'}`}>
+                                                        <div className={`shrink-0 p-2 rounded-xl transition-all duration-200 group-hover:scale-110 ${theme === 'dark' ? 'bg-gray-700 text-gray-400 group-hover:text-[#25A8A0]' : 'bg-gray-50 text-gray-400 group-hover:text-[#25A8A0]'}`}>
+                                                            <MdDashboard className="w-4 h-4" />
+                                                        </div>
+                                                        <span className="font-semibold text-sm">Dashboard</span>
+                                                    </Link>
+                                                    <Link to="/clients" className={`lg:hidden w-full group flex items-center justify-start space-x-3 px-4 py-2.5 rounded-xl transition-all duration-200 ${theme === 'dark' ? 'text-gray-300 hover:text-white hover:bg-[#25A8A0]/10' : 'text-gray-700 hover:text-[#25A8A0] hover:bg-teal-50/50'}`}>
+                                                        <div className={`shrink-0 p-2 rounded-xl transition-all duration-200 group-hover:scale-110 ${theme === 'dark' ? 'bg-gray-700 text-gray-400 group-hover:text-[#25A8A0]' : 'bg-gray-50 text-gray-400 group-hover:text-[#25A8A0]'}`}>
+                                                            <FaUsers className="w-4 h-4" />
+                                                        </div>
+                                                        <span className="font-semibold text-sm">My Clients</span>
+                                                    </Link>
+                                                    <Link to="/professional/profile" className={`w-full group flex items-center justify-start space-x-3 px-4 py-2.5 rounded-xl transition-all duration-200 ${theme === 'dark' ? 'text-gray-300 hover:text-white hover:bg-[#25A8A0]/10' : 'text-gray-700 hover:text-[#25A8A0] hover:bg-teal-50/50'}`}>
+                                                        <div className={`shrink-0 p-2 rounded-xl transition-all duration-200 group-hover:scale-110 ${theme === 'dark' ? 'bg-gray-700 text-gray-400 group-hover:text-[#25A8A0]' : 'bg-gray-50 text-gray-400 group-hover:text-[#25A8A0]'}`}>
                                                             <FaUser className="w-4 h-4" />
                                                         </div>
                                                         <span className="font-semibold text-sm">My Profile</span>
                                                     </Link>
-                                                    <Link to="/professional/settings" className={`group flex items-center space-x-3 px-4 py-3 rounded-2xl transition-all duration-200 ${theme === 'dark' ? 'text-gray-300 hover:text-white hover:bg-[#25A8A0]/10' : 'text-gray-700 hover:text-[#25A8A0] hover:bg-teal-50/50'}`}>
-                                                        <div className={`p-2 rounded-xl transition-all duration-200 group-hover:scale-110 ${theme === 'dark' ? 'bg-gray-700 text-gray-400 group-hover:text-[#25A8A0]' : 'bg-gray-50 text-gray-400 group-hover:text-[#25A8A0]'}`}>
+                                                    <Link to="/professional/settings" className={`w-full group flex items-center justify-start space-x-3 px-4 py-2.5 rounded-xl transition-all duration-200 ${theme === 'dark' ? 'text-gray-300 hover:text-white hover:bg-[#25A8A0]/10' : 'text-gray-700 hover:text-[#25A8A0] hover:bg-teal-50/50'}`}>
+                                                        <div className={`shrink-0 p-2 rounded-xl transition-all duration-200 group-hover:scale-110 ${theme === 'dark' ? 'bg-gray-700 text-gray-400 group-hover:text-[#25A8A0]' : 'bg-gray-50 text-gray-400 group-hover:text-[#25A8A0]'}`}>
                                                             <FaCog className="w-4 h-4" />
                                                         </div>
                                                         <span className="font-semibold text-sm">Settings</span>
                                                     </Link>
-                                                    <Link to="/professional/history" className={`group flex items-center space-x-3 px-4 py-3 rounded-2xl transition-all duration-200 ${theme === 'dark' ? 'text-gray-300 hover:text-white hover:bg-[#25A8A0]/10' : 'text-gray-700 hover:text-[#25A8A0] hover:bg-teal-50/50'}`}>
-                                                        <div className={`p-2 rounded-xl transition-all duration-200 group-hover:scale-110 ${theme === 'dark' ? 'bg-gray-700 text-gray-400 group-hover:text-[#25A8A0]' : 'bg-gray-50 text-gray-400 group-hover:text-[#25A8A0]'}`}>
+                                                    <Link to="/professional/history" className={`w-full group flex items-center justify-start space-x-3 px-4 py-2.5 rounded-xl transition-all duration-200 ${theme === 'dark' ? 'text-gray-300 hover:text-white hover:bg-[#25A8A0]/10' : 'text-gray-700 hover:text-[#25A8A0] hover:bg-teal-50/50'}`}>
+                                                        <div className={`shrink-0 p-2 rounded-xl transition-all duration-200 group-hover:scale-110 ${theme === 'dark' ? 'bg-gray-700 text-gray-400 group-hover:text-[#25A8A0]' : 'bg-gray-50 text-gray-400 group-hover:text-[#25A8A0]'}`}>
                                                             <FaUsers className="w-4 h-4" />
                                                         </div>
                                                         <span className="font-semibold text-sm">Session History</span>
                                                     </Link>
-                                                    <Link to="/professional/billing" className={`group flex items-center space-x-3 px-4 py-3 rounded-2xl transition-all duration-200 ${theme === 'dark' ? 'text-gray-300 hover:text-white hover:bg-[#25A8A0]/10' : 'text-gray-700 hover:text-[#25A8A0] hover:bg-teal-50/50'}`}>
-                                                        <div className={`p-2 rounded-xl transition-all duration-200 group-hover:scale-110 ${theme === 'dark' ? 'bg-gray-700 text-gray-400 group-hover:text-[#25A8A0]' : 'bg-gray-50 text-gray-400 group-hover:text-[#25A8A0]'}`}>
+                                                    <Link to="/professional/billing" className={`w-full group flex items-center justify-start space-x-3 px-4 py-2.5 rounded-xl transition-all duration-200 ${theme === 'dark' ? 'text-gray-300 hover:text-white hover:bg-[#25A8A0]/10' : 'text-gray-700 hover:text-[#25A8A0] hover:bg-teal-50/50'}`}>
+                                                        <div className={`shrink-0 p-2 rounded-xl transition-all duration-200 group-hover:scale-110 ${theme === 'dark' ? 'bg-gray-700 text-gray-400 group-hover:text-[#25A8A0]' : 'bg-gray-50 text-gray-400 group-hover:text-[#25A8A0]'}`}>
                                                             <FaCreditCard className="w-4 h-4" />
                                                         </div>
                                                         <span className="font-semibold text-sm">Payment</span>
@@ -321,9 +337,11 @@ const ProfessionalHeader: React.FC = () => {
                                                             logout();
                                                             navigate('/');
                                                         }}
-                                                        className="w-full flex items-center justify-center space-x-3 px-4 py-3 rounded-2xl transition-all duration-300 bg-red-50 hover:bg-red-100 text-red-600 font-bold dark:bg-red-500/10 dark:hover:bg-red-500/20"
+                                                        className="w-full flex items-center justify-start space-x-3 px-4 py-3 rounded-2xl transition-all duration-300 bg-red-50 hover:bg-red-100 text-red-600 font-bold dark:bg-red-500/10 dark:hover:bg-red-500/20 group"
                                                     >
-                                                        <FaSignOutAlt className="w-4 h-4" />
+                                                        <div className="shrink-0 p-2 rounded-xl bg-white/50 dark:bg-black/20 transition-transform group-hover:scale-110">
+                                                            <FaSignOutAlt className="w-4 h-4" />
+                                                        </div>
                                                         <span>Sign Out</span>
                                                     </button>
                                                 </div>
@@ -332,43 +350,11 @@ const ProfessionalHeader: React.FC = () => {
                                     )}
                                 </div>
 
-                                <button
-                                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                                    className={`lg:hidden p-3 rounded-xl transition-all duration-200 ${theme === 'dark' ? 'text-white hover:bg-white/10' : 'text-white hover:bg-white/20'}`}
-                                >
-                                    <HiOutlineMenuAlt3 className="w-6 h-6" />
-                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
             </header >
-
-            {mobileMenuOpen && (
-                <div className="lg:hidden fixed inset-0 z-[60]">
-                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}></div>
-                    <div className={`fixed top-0 right-0 h-full w-80 shadow-xl transform transition-transform duration-300 ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
-                        <div className="p-6">
-                            <div className="flex justify-between items-center mb-8">
-                                <h2 className="text-xl font-bold">Menu</h2>
-                                <button onClick={() => setMobileMenuOpen(false)} className={`p-2 rounded-full ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}`}>
-                                    <FaTimes className="w-5 h-5" />
-                                </button>
-                            </div>
-                            <nav className="space-y-4">
-                                <Link to="/professionals" onClick={() => setMobileMenuOpen(false)} className={`flex items-center gap-3 p-3 rounded-xl ${theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}>
-                                    <MdDashboard className="w-5 h-5" /> Dashboard
-                                </Link>
-                                <Link to="/clients" onClick={() => setMobileMenuOpen(false)} className={`flex items-center gap-3 p-3 rounded-xl ${theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}>
-                                    <FaUsers className="w-5 h-5" /> My Clients
-                                </Link>
-
-                            </nav>
-                        </div>
-                    </div>
-                </div>
-            )
-            }
         </>
     );
 };

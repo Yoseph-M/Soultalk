@@ -115,19 +115,19 @@ const LiveSession: React.FC = () => {
     return (
         <div className="relative w-full h-screen bg-gray-900 overflow-hidden">
             {/* Header Overlay */}
-            <div className="absolute top-0 left-0 right-0 z-50 p-6 bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none">
+            <div className="absolute top-0 left-0 right-0 z-50 p-4 md:p-6 bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none">
                 <div className="max-w-7xl mx-auto flex items-center justify-between pointer-events-auto">
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-teal-500 rounded-full flex items-center justify-center text-white font-black text-xl shadow-lg ring-2 ring-white/20">
+                    <div className="flex items-center gap-3 md:gap-4">
+                        <div className="w-10 h-10 md:w-12 md:h-12 bg-teal-500 rounded-full flex items-center justify-center text-white font-black text-lg md:text-xl shadow-lg ring-2 ring-white/20">
                             {otherUser?.name?.[0] || '...'}
                         </div>
                         <div>
-                            <h2 className="text-white font-black text-lg tracking-tight">
+                            <h2 className="text-white font-black text-sm md:text-lg tracking-tight">
                                 {otherUser?.name || 'Joining Session...'}
                             </h2>
                             <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                                <span className="text-[10px] text-green-400 font-black uppercase tracking-[0.2em]">Encrypted Call</span>
+                                <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-green-500 animate-pulse"></div>
+                                <span className="text-[8px] md:text-[10px] text-green-400 font-black uppercase tracking-[0.2em]">Encrypted Call</span>
                             </div>
                         </div>
                     </div>

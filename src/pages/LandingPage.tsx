@@ -68,8 +68,8 @@ const LandingPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       <Header />
 
-      { }
-      <section className="relative overflow-hidden py-20 px-4 hero-bleed min-h-[105vh]">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden py-16 md:py-20 px-4 hero-bleed min-h-[90vh] md:min-h-[105vh] flex items-center">
         { }
         <video
           className="absolute inset-0 w-full h-full object-cover z-0"
@@ -83,7 +83,7 @@ const LandingPage: React.FC = () => {
         <div className="absolute inset-0 bg-black/40 z-10"></div>
 
         <div className="container mx-auto text-center max-w-5xl relative z-20 mt-20">
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-12 md:mb-16 leading-tight md:leading-[1.15]">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold text-white mb-8 md:mb-16 leading-tight md:leading-[1.15]">
             Your Safe Space for
             <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#25A8A0] to-teal-600 mental-animated">
@@ -91,9 +91,9 @@ const LandingPage: React.FC = () => {
             </span>
           </h1>
 
-          <p className="text-xl md:text-2xl text-white mb-12 leading-relaxed max-w-4xl mx-auto">
+          <p className="text-lg md:text-2xl text-white mb-10 md:mb-12 leading-relaxed max-w-4xl mx-auto opacity-90">
             Connect with licensed mental health professionals through secure, confidential conversations.
-            Get the support you need, when you need it, from the comfort of your own space.
+            Get the support you need, when you need it.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
@@ -156,9 +156,10 @@ const LandingPage: React.FC = () => {
       { }
       <section className="py-24 px-4 bg-gray-50 relative overflow-hidden">
         <div className="container mx-auto relative z-10">
-          <div className="flex flex-col items-center mb-8">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">Why Choose SoulTalk?</h2>
-            <p className="text-lg font-semibold text-[#25A8A0] mt-2">Your trusted platform for mental wellness</p>
+          <div className="flex flex-col items-center mb-12">
+            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4 text-center">Why Choose SoulTalk?</h2>
+            <div className="w-20 h-1.5 bg-[#25A8A0] rounded-full mb-4"></div>
+            <p className="text-lg font-semibold text-[#25A8A0] text-center">Your trusted platform for mental wellness</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 items-start">
             { }
