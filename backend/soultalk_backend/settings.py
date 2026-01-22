@@ -160,21 +160,34 @@ if USE_S3:
     AWS_S3_ADDRESSING_STYLE = 'path'
     AWS_QUERYSTRING_AUTH = False
     
-    # Modern Django 4.2+ Storage Configuration
+    # Supabase Public URL logic
+    # Public URLs look like: https://[project-id].supabase.co/storage/v1/object/public/[bucket]/[file]
+    if AWS_S3_ENDPOINT_URL:
+        # Extract project ID from: https://[project-id].storage.supabase.co/...
+        project_id = AWS_S3_ENDPOINT_URL.split('//')[1].split('.')[0]
+        AWS_S3_CUSTOM_DOMAIN = f"{project_id}.supabase.co/storage/v1/object/public/{AWS_STORAGE_BUCKET_NAME}"
+    
     STORAGES = {
         "default": {
             "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+            "OPTIONS": {
+                "access_key": AWS_ACCESS_KEY_ID,
+                "secret_key": AWS_SECRET_ACCESS_KEY,
+                "bucket_name": AWS_STORAGE_BUCKET_NAME,
+                "endpoint_url": AWS_S3_ENDPOINT_URL,
+                "region_name": AWS_S3_REGION_NAME,
+                "signature_version": "s3v4",
+                "addressing_style": "path",
+                "querystring_auth": False,
+            }
         },
         "staticfiles": {
             "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
         },
     }
-    # Backward compatibility
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     
-    # Supabase S3 URLs usually look like [endpoint]/[bucket]/[path]
-    # We define MEDIA_URL to help Django generate correct absolute links
-    MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/"
+    # Force MEDIA_URL to use the public Supabase CDN
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
 else:
     # Local storage fallback
     STORAGES = {
