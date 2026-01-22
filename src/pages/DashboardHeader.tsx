@@ -403,7 +403,14 @@ const DashboardHeader: React.FC = () => {
                   title="Profile"
                 >
                   {user?.avatar ? (
-                    <img src={user.avatar} alt="" className="w-full h-full rounded-full object-cover" />
+                    <img
+                      src={user.avatar}
+                      alt=""
+                      className="w-full h-full rounded-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = `https://ui-avatars.com/api/?name=${user?.name || 'User'}&background=random`;
+                      }}
+                    />
                   ) : (
                     user?.name?.charAt(0).toUpperCase() || 'U'
                   )}
@@ -417,7 +424,14 @@ const DashboardHeader: React.FC = () => {
                       <div className="flex flex-col items-center mb-6 pt-2">
                         <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-3 shadow-lg ring-4 overflow-hidden ${theme === 'dark' ? 'bg-[#25A8A0] ring-gray-700/50' : 'bg-teal-50 ring-teal-50'}`}>
                           {user?.avatar ? (
-                            <img src={user.avatar} alt="" className="w-full h-full object-cover" />
+                            <img
+                              src={user.avatar}
+                              alt=""
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.src = `https://ui-avatars.com/api/?name=${user?.name || 'User'}&background=random`;
+                              }}
+                            />
                           ) : (
                             <span className={`text-4xl font-bold ${theme === 'dark' ? 'text-white' : 'text-[#25A8A0]'}`}>{user?.name?.charAt(0).toUpperCase() || 'U'}</span>
                           )}

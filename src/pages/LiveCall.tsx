@@ -20,45 +20,66 @@ const LiveCall: React.FC = () => {
             return;
         }
 
+        if (!APP_ID || isNaN(APP_ID)) {
+            console.error("VITE_ZEGO_APP_ID is missing or not a number in .env");
+            return;
+        }
+        if (!SERVER_SECRET) {
+            console.error("VITE_ZEGO_SERVER_SECRET is missing in .env");
+            return;
+        }
+
         const myRoomId = roomId || 'default-room';
 
-        // Generate a Kit Token
-        // NOTE: In a production app, you should generate the token on your backend server
-        // to avoid exposing your Server Secret on the client side.
-        const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
-            APP_ID,
-            SERVER_SECRET,
-            myRoomId,
-            user.id.toString(),
-            user.name || user.email.split('@')[0]
-        );
+        if (!containerRef.current) {
+            console.error("Zego container ref is null");
+            return;
+        }
 
-        // Create instance object from Kit Token
-        const zp = ZegoUIKitPrebuilt.create(kitToken);
+        try {
+            // Generate a Kit Token
+            const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
+                APP_ID,
+                SERVER_SECRET,
+                myRoomId,
+                user.id.toString(),
+                user.name || user.email.split('@')[0]
+            );
 
-        // Start the call
-        zp.joinRoom({
-            container: containerRef.current,
-            sharedLinks: [
-                {
-                    name: 'Copy Link',
-                    url: window.location.protocol + '//' + window.location.host + window.location.pathname + '?roomID=' + myRoomId,
-                },
-            ],
-            scenario: {
-                mode: ZegoUIKitPrebuilt.OneONOneCall, // Or GroupCall, VideoConference, etc. based on needs
-            },
-            showScreenSharingButton: true,
-            onLeaveRoom: () => {
-                navigate(-1); // Go back when leaving
-            },
-        });
+            // Create instance object from Kit Token
+            const zp = ZegoUIKitPrebuilt.create(kitToken);
+            if (!zp) {
+                console.error("Failed to create Zego instance");
+                return;
+            }
 
-        // Cleanup function not strictly necessary for the prebuilt as it manages its own lifecycle mostly,
-        // but good practice if there were listeners to remove.
-        return () => {
-            zp.destroy();
-        };
+            // Start the call
+            setTimeout(() => {
+                if (!containerRef.current) return;
+                zp.joinRoom({
+                    container: containerRef.current,
+                    sharedLinks: [
+                        {
+                            name: 'Copy Link',
+                            url: window.location.protocol + '//' + window.location.host + window.location.pathname + '?roomID=' + myRoomId,
+                        },
+                    ],
+                    scenario: {
+                        mode: ZegoUIKitPrebuilt.OneONoneCall,
+                    },
+                    showScreenSharingButton: true,
+                    onLeaveRoom: () => {
+                        navigate(-1);
+                    },
+                });
+            }, 100);
+
+            return () => {
+                zp.destroy();
+            };
+        } catch (err) {
+            console.error("ZegoCloud Error:", err);
+        }
 
     }, [roomId, user, isLoading, navigate]);
 

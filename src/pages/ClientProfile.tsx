@@ -235,6 +235,9 @@ const ClientProfile: React.FC = () => {
                                     <img
                                         src={previewUrl || getImageUrl(profile.avatar) || `https://ui-avatars.com/api/?name=${profile.first_name}+${profile.last_name}&background=random`}
                                         alt="Profile"
+                                        onError={(e) => {
+                                            e.currentTarget.src = `https://ui-avatars.com/api/?name=${profile.first_name}+${profile.last_name}&background=random`;
+                                        }}
                                         className={`w-36 h-36 rounded-3xl border-4 object-cover shadow-2xl transition-all duration-300 group-hover:scale-[1.02] ${theme === "dark" ? "border-white/10" : "border-gray-100"}`}
                                     />
                                     <div className="absolute inset-0 bg-black/40 rounded-3xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
