@@ -222,33 +222,37 @@ class UserSerializer(serializers.ModelSerializer):
                         setattr(profile, attr, value)
                     profile.save()
         except Exception as e:
-            print(f"Error saving profile (likely file storage issue): {e}")
-            # Fallback: Try saving WITHOUT the problematic file fields
+            import traceback
+            error_trace = traceback.format_exc()
+            print(f"Error saving profile with S3: {e}\n{error_trace}")
+            
+            # If it's a storage failure (like S3 credential error), we want to know.
+            # We will still try to save non-file data so the user doesn't get a 500 block,
+            # but we'll include the error in the response if possible or at least log it better.
+            
+            file_fields = ['profile_photo', 'id_image', 'id_image_back', 'certificates']
             try:
-                # We need to re-fetch the profile to discard any partial state if not covered by atomic rollback
-                # (transaction.atomic handles DB rollback, but python object might be dirty, so we fetch cleanly or just reset attr)
-                file_fields = ['profile_photo', 'id_image', 'id_image_back', 'certificates']
-                
                 if instance.role == 'client':
                     profile, _ = ClientProfile.objects.get_or_create(user=instance)
-                    # Re-apply only non-file fields
                     if 'phone' in profile_data: profile.phone = profile_data['phone']
                     if 'dob' in profile_data: profile.dob = profile_data['dob']
                     profile.save()
-                    print("Recovered: Saved client profile without files.")
-                    
                 elif instance.role == 'professional':
                     profile, _ = ProfessionalProfile.objects.get_or_create(user=instance)
-                    # Re-apply only non-file fields
                     for attr, value in profile_data.items():
                          if attr not in file_fields:
                              setattr(profile, attr, value)
                     profile.save()
-                    print("Recovered: Saved professional profile without files.")
+                
+                # We raise a validation error so the user knows the IMAGE failed even if text saved.
+                raise serializers.ValidationError({
+                    "detail": f"Profile text saved, but image upload failed: {str(e)}. Please check your S3/Supabase credentials."
+                })
+            except serializers.ValidationError:
+                raise
             except Exception as e2:
                 print(f"Critical error during recovery save: {e2}")
-                # If even this fails, then bubble up
-                raise e2
+                raise serializers.ValidationError({"detail": f"Total save failure: {str(e)}"})
 
         return instance
 
