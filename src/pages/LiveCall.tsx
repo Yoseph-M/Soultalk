@@ -12,6 +12,7 @@ const LiveCall: React.FC = () => {
     const navigate = useNavigate();
     const { user, isLoading } = useAuth();
     const containerRef = useRef<HTMLDivElement>(null);
+    const zegoInstance = useRef<any>(null);
 
     useEffect(() => {
         if (isLoading) return;
@@ -36,51 +37,63 @@ const LiveCall: React.FC = () => {
             return;
         }
 
-        try {
-            // Generate a Kit Token
-            const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
-                APP_ID,
-                SERVER_SECRET,
-                myRoomId,
-                user.id.toString(),
-                user.name || user.email.split('@')[0]
-            );
+        if (APP_ID && SERVER_SECRET) {
+            try {
+                // Generate a Kit Token
+                const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
+                    APP_ID,
+                    SERVER_SECRET,
+                    myRoomId,
+                    user.id.toString(),
+                    user.name || user.email.split('@')[0]
+                );
 
-            // Create instance object from Kit Token
-            const zp = ZegoUIKitPrebuilt.create(kitToken);
-            if (!zp) {
-                console.error("Failed to create Zego instance");
-                return;
-            }
+                // Create instance object from Kit Token
+                const zp = ZegoUIKitPrebuilt.create(kitToken);
+                zegoInstance.current = zp;
 
-            // Start the call
-            setTimeout(() => {
-                if (!containerRef.current) return;
-                zp.joinRoom({
-                    container: containerRef.current,
-                    sharedLinks: [
-                        {
-                            name: 'Copy Link',
-                            url: window.location.protocol + '//' + window.location.host + window.location.pathname + '?roomID=' + myRoomId,
+                if (!zp) {
+                    console.error("Failed to create Zego instance");
+                    return;
+                }
+
+                // Start the call
+                setTimeout(() => {
+                    if (!containerRef.current) return;
+                    zp.joinRoom({
+                        container: containerRef.current,
+                        sharedLinks: [
+                            {
+                                name: 'Copy Link',
+                                url: window.location.protocol + '//' + window.location.host + window.location.pathname + '?roomID=' + myRoomId,
+                            },
+                        ],
+                        scenario: {
+                            mode: ZegoUIKitPrebuilt.OneONoneCall,
                         },
-                    ],
-                    scenario: {
-                        mode: ZegoUIKitPrebuilt.OneONoneCall,
-                    },
-                    showScreenSharingButton: true,
-                    onLeaveRoom: () => {
-                        navigate(-1);
-                    },
-                });
-            }, 100);
+                        showScreenSharingButton: true,
+                        onLeaveRoom: () => {
+                            zegoInstance.current = null;
+                            navigate(-1);
+                        },
+                    });
+                }, 100);
 
-            return () => {
-                zp.destroy();
-            };
-        } catch (err) {
-            console.error("ZegoCloud Error:", err);
+            } catch (err) {
+                console.error("ZegoCloud Error:", err);
+            }
         }
 
+        return () => {
+            if (zegoInstance.current) {
+                try {
+                    zegoInstance.current.destroy();
+                    zegoInstance.current = null;
+                } catch (e) {
+                    console.log("Zego cleanup info:", e);
+                }
+            }
+        };
     }, [roomId, user, isLoading, navigate]);
 
     if (isLoading) return <div className="h-screen flex items-center justify-center">Loading...</div>;

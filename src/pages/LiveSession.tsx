@@ -53,57 +53,65 @@ const LiveSession: React.FC = () => {
 
         const myRoomId = sessionId;
 
-        try {
-            // Generate a Kit Token
-            const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
-                APP_ID,
-                SERVER_SECRET,
-                myRoomId,
-                String(user.id),
-                user.name || user.email.split('@')[0]
-            );
+        if (APP_ID && SERVER_SECRET) {
+            try {
+                // Generate a Kit Token
+                const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
+                    APP_ID,
+                    SERVER_SECRET,
+                    myRoomId,
+                    String(user.id),
+                    user.name || user.email.split('@')[0]
+                );
 
-            // Create instance object from Kit Token
-            const zp = ZegoUIKitPrebuilt.create(kitToken);
-            zegoInstance.current = zp;
+                // Create instance object from Kit Token
+                const zp = ZegoUIKitPrebuilt.create(kitToken);
+                zegoInstance.current = zp;
 
-            // Parse query params to check for mode (video, voice, chat)
-            const queryParams = new URLSearchParams(window.location.search);
-            const mode = queryParams.get('mode') || 'video';
+                // Parse query params
+                const queryParams = new URLSearchParams(window.location.search);
+                const mode = queryParams.get('mode') || 'video';
 
-            // Start the call
-            zp.joinRoom({
-                container: containerRef.current,
-                sharedLinks: [
-                    {
-                        name: 'Copy Link',
-                        url: window.location.protocol + '//' + window.location.host + window.location.pathname + '?roomID=' + myRoomId,
+                // Start the call
+                zp.joinRoom({
+                    container: containerRef.current,
+                    sharedLinks: [
+                        {
+                            name: 'Copy Link',
+                            url: window.location.protocol + '//' + window.location.host + window.location.pathname + '?roomID=' + myRoomId,
+                        },
+                    ],
+                    scenario: {
+                        mode: ZegoUIKitPrebuilt.OneONoneCall,
                     },
-                ],
-                scenario: {
-                    mode: ZegoUIKitPrebuilt.OneONoneCall,
-                },
-                turnOnCameraWhenJoining: mode === 'video',
-                turnOnMicrophoneWhenJoining: mode === 'voice' || mode === 'video',
-                showMyCameraToggleButton: mode === 'video',
-                showAudioVideoSettingsButton: true,
-                showScreenSharingButton: mode === 'video',
-                showPreJoinView: false,
-                onLeaveRoom: () => {
-                    navigate(-1);
-                },
-            });
-        } catch (err) {
-            console.error("ZegoCloud Error:", err);
-            setError("Failed to initialize calling service. Please check your API keys.");
+                    turnOnCameraWhenJoining: mode === 'video',
+                    turnOnMicrophoneWhenJoining: mode === 'voice' || mode === 'video',
+                    showMyCameraToggleButton: mode === 'video',
+                    showAudioVideoSettingsButton: true,
+                    showScreenSharingButton: mode === 'video',
+                    showPreJoinView: false,
+                    onLeaveRoom: () => {
+                        // Crucial: Clear the instance ref BEFORE navigating to prevent
+                        // double-destroy or access during unmount
+                        zegoInstance.current = null;
+                        navigate(-1);
+                    },
+                });
+            } catch (err) {
+                console.error("ZegoCloud Error:", err);
+                setError("Failed to initialize calling service. Please check your API keys.");
+            }
         }
 
         return () => {
+            // Robust cleanup
             if (zegoInstance.current) {
                 try {
                     zegoInstance.current.destroy();
+                    zegoInstance.current = null;
                 } catch (e) {
-                    console.error("Error destroying Zego instance:", e);
+                    // Ignore destroy errors, usually means already destroyed
+                    console.log("Zego cleanup info:", e);
                 }
             }
         };
