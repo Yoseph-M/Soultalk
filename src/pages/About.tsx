@@ -1,16 +1,8 @@
 import React from 'react';
 import { Target, Lightbulb, Shield, Users, Zap } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import Header from './Header';
 
 const About: React.FC = () => {
-  const stats = [
-    { label: 'Licensed Therapists', value: '500+' },
-    { label: 'Happy Users', value: '25k+' },
-    { label: 'Sessions Completed', value: '100k+' },
-    { label: 'Specializations', value: '40+' }
-  ];
-
   const values = [
     {
       icon: Shield,
@@ -46,20 +38,6 @@ const About: React.FC = () => {
             SoulTalk was founded on a simple belief: mental health care is a human right, not a luxury.
             We're building the infrastructure for a more resilient world.
           </p>
-        </div>
-      </div>
-
-      {/* Stats Section */}
-      <div className="bg-[#25A8A0] py-20">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center text-white">
-                <div className="text-5xl font-black mb-2 leading-none">{stat.value}</div>
-                <div className="text-white/70 font-bold uppercase tracking-wider text-xs">{stat.label}</div>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
 
@@ -117,22 +95,6 @@ const About: React.FC = () => {
               </div>
             ))}
           </div>
-        </div>
-      </div>
-
-      {/* Join Us Section */}
-      <div className="container mx-auto px-4 py-24 text-center">
-        <h2 className="text-4xl font-bold text-gray-900 mb-8">Want to Join the Mission?</h2>
-        <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
-          We're always looking for licensed professionals and passionate builders to join our growing team.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link to="/auth" className="px-10 py-5 bg-[#25A8A0] text-white font-black text-lg rounded-2xl shadow-xl hover:scale-105 transition-all">
-            Join as a Professional
-          </Link>
-          <Link to="/contact" className="px-10 py-5 bg-white text-gray-900 border-2 border-gray-900 font-black text-lg rounded-2xl hover:bg-gray-900 hover:text-white transition-all">
-            Contact Support
-          </Link>
         </div>
       </div>
     </div>

@@ -14,6 +14,8 @@ interface User {
   rejectionReasonType?: string;
   notSignedIn?: boolean;
   bio?: string;
+  rating?: number;
+  sessions_completed?: number;
 }
 
 interface AuthContextType {
@@ -83,7 +85,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               verificationStatus: userData.verification_status,
               rejectionReason: userData.rejection_reason,
               rejectionReasonType: userData.rejection_reason_type,
-              bio: userData.bio
+              bio: userData.bio,
+              rating: userData.rating,
+              sessions_completed: userData.sessions_completed
             });
           } else {
             console.warn('Init auth failed, logging out');
@@ -137,7 +141,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           verificationStatus: userData.verification_status,
           rejectionReason: userData.rejection_reason,
           rejectionReasonType: userData.rejection_reason_type,
-          bio: userData.bio
+          bio: userData.bio,
+          rating: userData.rating,
+          sessions_completed: userData.sessions_completed
         };
 
         // Security: If professional/listener is not verified, do NOT sign them in
@@ -193,7 +199,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           verificationStatus: userData.verification_status,
           rejectionReason: userData.rejection_reason,
           rejectionReasonType: userData.rejection_reason_type,
-          bio: userData.bio
+          bio: userData.bio,
+          rating: userData.rating,
+          sessions_completed: userData.sessions_completed
         };
         setUser(userObj);
         localStorage.setItem('user', JSON.stringify(userObj));

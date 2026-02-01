@@ -10,7 +10,6 @@ import HowItWorks from './pages/HowItWorks';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import Blog from './pages/Blog';
-import Header from './pages/Header';
 import SplashScreen from './pages/SplashScreen';
 import './index.css';
 import Dashboard from './pages/Dashboard';
@@ -19,6 +18,7 @@ import Booking from './pages/Booking';
 import About from './pages/About';
 import Pricing from './pages/Pricing';
 import Contact from './pages/Contact';
+import FAQ from './pages/FAQ';
 import FindListener from './pages/FindListener';
 import Schedule from './pages/Schedule';
 import ProfessionalSchedule from './pages/ProfessionalSchedule';
@@ -88,8 +88,9 @@ function App() {
                 <Route path="/services" element={<Services />} />
                 <Route path="/how-it-works" element={<HowItWorks />} />
                 <Route path="/auth" element={<Auth />} />
-                <Route path="/privacy" element={<><Header /><Privacy /></>} />
-                <Route path="/terms" element={<><Header /><Terms /></>} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/faq" element={<FAQ />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/schedule" element={<Schedule />} />

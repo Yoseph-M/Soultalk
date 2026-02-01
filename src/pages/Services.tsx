@@ -146,7 +146,7 @@ const Services: React.FC = () => {
           <div className="md:w-1/2">
             <h2 className="text-4xl font-bold text-gray-900 mb-6 tracking-tight">Your Safety & Confidentiality is Our Priority</h2>
             <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-              Every interaction on SoulTalk is protected by military-grade encryption. We are 100% HIPAA compliant and committed to the highest ethical standards of care.
+              Every interaction on SoulTalk is protected by military-grade encryption. We are committed to the highest ethical standards of care and global privacy protocols.
             </p>
             <div className="space-y-4">
               {[

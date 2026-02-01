@@ -307,16 +307,25 @@ class ChatSessionSerializer(serializers.ModelSerializer):
 
 class AppointmentSerializer(serializers.ModelSerializer):
     client_name = serializers.SerializerMethodField()
+    client_image = serializers.SerializerMethodField()
     professional_name = serializers.SerializerMethodField()
     professional_image = serializers.SerializerMethodField()
     
     class Meta:
         model = Appointment
-        fields = ['id', 'client', 'professional', 'client_name', 'professional_name', 'professional_image', 'date', 'time', 'status', 'session_type', 'notes', 'created_at']
+        fields = ['id', 'client', 'professional', 'client_name', 'client_image', 'professional_name', 'professional_image', 'date', 'time', 'status', 'session_type', 'notes', 'created_at']
 
     def get_client_name(self, obj):
         name = obj.client.get_full_name().strip()
         return name if name else obj.client.username
+
+    def get_client_image(self, obj):
+        try:
+            if hasattr(obj.client, 'client_profile') and obj.client.client_profile.profile_photo:
+                return obj.client.client_profile.profile_photo.url
+        except:
+            pass
+        return None
 
     def get_professional_name(self, obj):
         name = obj.professional.get_full_name().strip()

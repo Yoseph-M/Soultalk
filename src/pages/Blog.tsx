@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, User, ArrowRight, Clock, BookOpen, MessageCircle, Share2, Search } from 'lucide-react';
+import { User, ArrowRight, Clock, BookOpen, MessageCircle, Share2, Search } from 'lucide-react';
 import Header from './Header';
 
 const Blog: React.FC = () => {
@@ -191,28 +191,25 @@ const Blog: React.FC = () => {
           ))}
         </div>
 
-        {/* Newsletter Section */}
+        {/* CTA Section */}
         <div className="mt-24 bg-gray-900 rounded-[3rem] p-12 lg:p-20 relative overflow-hidden text-center text-white">
           <div className="absolute top-0 right-0 w-96 h-96 bg-[#25A8A0] opacity-10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500 opacity-10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
 
           <div className="relative z-10 max-w-2xl mx-auto">
             <BookOpen className="w-16 h-16 text-[#25A8A0] mx-auto mb-8" />
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">Never Miss an Insight</h2>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Start Your Journey?</h2>
             <p className="text-xl text-gray-400 mb-10 leading-relaxed">
-              Join 10,000+ readers and get a weekly dose of mental wellness, directly to your inbox.
+              Experience the benefits of professional mental health support. Connect with a licensed expert today.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <input
-                type="email"
-                placeholder="your@email.com"
-                className="flex-1 px-8 py-5 bg-white/5 border border-white/10 rounded-2xl text-white focus:bg-white/10 transition-all outline-none"
-              />
-              <button className="px-10 py-5 bg-[#25A8A0] rounded-2xl font-black text-lg hover:bg-[#1e8a82] shadow-xl shadow-[#25A8A0]/20 transition-all">
-                SUBSCRIBE
-              </button>
+            <div className="flex justify-center">
+              <Link to="/auth?mode=signup">
+                <button className="px-12 py-5 bg-[#25A8A0] rounded-[2rem] font-black text-xl hover:bg-[#1e8a82] shadow-2xl shadow-[#25A8A0]/30 transition-all transform hover:scale-105 active:scale-95">
+                  GET STARTED NOW
+                </button>
+              </Link>
             </div>
-            <p className="mt-6 text-sm text-gray-500">We respect your privacy. Unsubscribe at any time.</p>
+            <p className="mt-8 text-sm text-gray-500">Fast, secure, and 100% confidential support.</p>
           </div>
         </div>
       </div>

@@ -172,9 +172,9 @@ const Schedule: React.FC = () => {
 
                                     <div className="flex-1 flex items-center gap-4">
                                         <img
-                                            src={`https://ui-avatars.com/api/?name=${appointment.professional_name}&background=random`}
+                                            src={appointment.professional_image || `https://ui-avatars.com/api/?name=${appointment.professional_name}&background=random`}
                                             alt={appointment.professional_name}
-                                            className="w-16 h-16 rounded-full object-cover border-2 border-[#25A8A0]/20"
+                                            className="w-16 h-16 rounded-full object-cover border-2 border-[#25A8A0]/20 group-hover:scale-105 transition-transform duration-300"
                                         />
                                         <div>
                                             <h3 className="text-xl font-bold mb-1">

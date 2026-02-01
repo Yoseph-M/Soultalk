@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Mail, Lock, User, FileText, Eye, EyeOff, ArrowRight, ChevronDown, Calendar as CalendarIcon, Hash } from 'lucide-react';
+import { Mail, Lock, User, FileText, Eye, EyeOff, ArrowRight, ChevronDown, Calendar as CalendarIcon, Hash, Check, ShieldCheck, Award, ClipboardCheck, UserPlus, FileCheck } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -7,6 +8,7 @@ import { FcGoogle } from 'react-icons/fc';
 import { useAuth } from '../contexts/AuthContext';
 import { countries } from '../data/countries';
 import { Metadata, type CountryCode } from 'libphonenumber-js';
+import { validatePassword, validateEmail } from '../utils/logic';
 
 
 const Auth: React.FC = () => {
@@ -132,8 +134,12 @@ const Auth: React.FC = () => {
           formData.firstName &&
           formData.lastName &&
           formData.email &&
-          formData.password &&
-          formData.password.length >= 8 &&
+          validateEmail(formData.email) &&
+          validatePassword(formData.password, {
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email
+          }).isValid &&
           formData.confirmPassword &&
           (formData.password === formData.confirmPassword)
         );
@@ -156,12 +162,23 @@ const Auth: React.FC = () => {
 
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
-    if (!formData.email) newErrors.email = 'Email is required';
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
+
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!validateEmail(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
     }
+
+    const passwordValidation = validatePassword(formData.password, {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email
+    });
+
+    if (!passwordValidation.isValid) {
+      newErrors.password = passwordValidation.message || 'Invalid password';
+    }
+
     if (!isLogin && !formData.firstName) newErrors.firstName = 'First name is required';
     if (!isLogin && !formData.lastName) newErrors.lastName = 'Last name is required';
     if (!isLogin && formData.password !== formData.confirmPassword) {
@@ -375,6 +392,20 @@ const Auth: React.FC = () => {
           -webkit-box-shadow: 0 0 0 30px white inset !important;
           -webkit-text-fill-color: #111827 !important;
         }
+        .react-datepicker-popper {
+          z-index: 100 !important;
+        }
+        .react-datepicker {
+          border-radius: 1.5rem !important;
+          border: none !important;
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+          overflow: hidden !important;
+        }
+        .react-datepicker__header {
+          background-color: white !important;
+          border-bottom: 1px solid #f3f4f6 !important;
+          padding-top: 1rem !important;
+        }
       `}</style>
 
       {/* Animated background elements */}
@@ -402,32 +433,7 @@ const Auth: React.FC = () => {
               </p>
             </div>
 
-            {/* Premium Trust Indicators */}
-            <div className="grid gap-4 max-w-md">
-              <div className="group flex items-center gap-5 p-5 bg-white/5 backdrop-blur-lg rounded-3xl border border-white/10 hover:bg-white/10 transition-all duration-500">
-                <div className="w-12 h-12 rounded-2xl bg-[#25A8A0] flex items-center justify-center flex-shrink-0 shadow-lg shadow-[#25A8A0]/20 group-hover:scale-110 transition-transform">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
-                </div>
-                <div>
-                  <div className="font-bold text-lg text-white">100% Confidential</div>
-                  <div className="text-white/50 text-sm">Your privacy is our top priority</div>
-                </div>
-              </div>
 
-              <div className="group flex items-center gap-5 p-5 bg-white/5 backdrop-blur-lg rounded-3xl border border-white/10 hover:bg-white/10 transition-all duration-500">
-                <div className="w-12 h-12 rounded-2xl bg-[#25A8A0] flex items-center justify-center flex-shrink-0 shadow-lg shadow-[#25A8A0]/20 group-hover:scale-110 transition-transform">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <div className="font-bold text-lg text-white">Expert Care</div>
-                  <div className="text-white/50 text-sm">Verified and licensed therapists</div>
-                </div>
-              </div>
-            </div>
 
 
           </div>
@@ -616,564 +622,623 @@ const Auth: React.FC = () => {
             {/* Professional Multi-Step Form */}
             {!isLogin && isProfessional && (
               <div className="space-y-4">
-                <div className="flex items-center justify-between mb-6 px-2">
-                  {stepTitles.map((_, idx) => (
-                    <div key={idx} className="flex-1 flex flex-col items-center relative">
-                      <div className={`w-7 h-7 md:w-8 md:h-8 flex items-center justify-center rounded-full font-bold text-white transition-all duration-300 text-xs md:text-sm ${proStep === idx + 1 ? 'bg-[#25A8A0] scale-110 shadow-lg' : idx + 1 < proStep ? 'bg-[#25A8A0]/80' : 'bg-gray-300'}`}>
-                        {idx + 1}
-                      </div>
-                      <div className="hidden md:block absolute top-10 text-[10px] font-bold text-gray-500 uppercase tracking-tighter">
-                        {stepTitles[idx]}
-                      </div>
-                      {idx < stepTitles.length - 1 && (
-                        <div className={`absolute top-3.5 md:top-4 left-1/2 w-full h-0.5 ${idx + 1 < proStep ? 'bg-[#25A8A0]' : 'bg-gray-300'}`} style={{ zIndex: -1 }}></div>
-                      )}
-                    </div>
-                  ))}
+                {/* Creative Progress Indicator */}
+                <div className="relative mb-12 px-4">
+                  <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-100 -translate-y-1/2 rounded-full overflow-hidden">
+                    <motion.div
+                      className="h-full bg-gradient-to-r from-[#25A8A0] to-[#1e8a82]"
+                      initial={{ width: "0%" }}
+                      animate={{ width: `${((proStep - 1) / (totalProSteps - 1)) * 100}%` }}
+                      transition={{ duration: 0.5, ease: "easeInOut" }}
+                    />
+                  </div>
+
+                  <div className="relative flex justify-between items-center">
+                    {[
+                      { icon: UserPlus, label: 'Account' },
+                      { icon: ClipboardCheck, label: 'Personal' },
+                      { icon: ShieldCheck, label: 'ID Check' },
+                      { icon: Award, label: 'Professional' },
+                      { icon: FileCheck, label: 'Documents' }
+                    ].map((step, idx) => {
+                      const isComplete = idx + 1 < proStep;
+                      const isActive = idx + 1 === proStep;
+                      const Icon = step.icon;
+
+                      return (
+                        <div key={idx} className="relative flex flex-col items-center">
+                          <motion.div
+                            initial={false}
+                            animate={{
+                              scale: isActive ? 1.2 : 1,
+                              backgroundColor: isActive || isComplete ? '#25A8A0' : '#F3F4F6',
+                              color: isActive || isComplete ? '#FFFFFF' : '#9CA3AF',
+                            }}
+                            className={`w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center relative z-10 shadow-sm transition-shadow duration-300 ${isActive ? 'shadow-lg shadow-[#25A8A0]/30' : ''}`}
+                          >
+                            {isComplete ? (
+                              <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                              >
+                                <Check className="w-5 h-5 md:w-6 md:h-6 stroke-[3]" />
+                              </motion.div>
+                            ) : (
+                              <Icon className={`w-5 h-5 md:w-6 md:h-6 ${isActive ? 'animate-pulse' : ''}`} />
+                            )}
+
+                            {isActive && (
+                              <motion.div
+                                layoutId="active-indicator"
+                                className="absolute -inset-1.5 border-2 border-[#25A8A0] rounded-[1.2rem] opacity-30"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 0.4 }}
+                                transition={{ duration: 0.3 }}
+                              />
+                            )}
+                          </motion.div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
 
-                {/* Step 1: Account */}
-                {proStep === 1 && (
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">First Name</label>
-                        <input
-                          type="text"
-                          name="firstName"
-                          value={formData.firstName}
-                          onChange={handleInputChange}
-                          className={inputClasses(showStepErrors && !formData.firstName)}
-                          placeholder="Enter your first name"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Last Name</label>
-                        <input
-                          type="text"
-                          name="lastName"
-                          value={formData.lastName}
-                          onChange={handleInputChange}
-                          className={inputClasses(showStepErrors && !formData.lastName)}
-                          placeholder="Enter your last name"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        className={inputClasses(showStepErrors && !formData.email)}
-                        placeholder="Enter your email address"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
-                      <div className="relative">
-                        <input
-                          type={showPassword ? 'text' : 'password'}
-                          name="password"
-                          value={formData.password}
-                          onChange={handleInputChange}
-                          className={simpleInputClassesWithRightIcon(showStepErrors && !formData.password)}
-                          placeholder="Must be at least 8 characters"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#25A8A0] transition-colors"
-                        >
-                          {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                        </button>
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Confirm Password</label>
-                      <div className="relative">
-                        <input
-                          type={showConfirmPassword ? 'text' : 'password'}
-                          name="confirmPassword"
-                          value={formData.confirmPassword}
-                          onChange={handleInputChange}
-                          className={simpleInputClassesWithRightIcon(showStepErrors && (!formData.confirmPassword || formData.password !== formData.confirmPassword))}
-                          placeholder="Re-enter your password"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#25A8A0] transition-colors"
-                        >
-                          {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={proStep}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    className="mt-4"
+                  >
 
-                {/* Step 2: Personal Details */}
-                {proStep === 2 && (
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Phone Number</label>
-                      <div className="flex gap-2">
-                        <div className="w-1/3 relative">
-                          <button
-                            type="button"
-                            onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)}
-                            className={`${inputClasses(false)} flex items-center justify-between pr-2`}
-                          >
-                            {(() => {
-                              const selected = countries.find(c => c.dial_code === formData.countryCode);
-                              return (
-                                <span className="truncate flex items-center gap-2">
-                                  <span className="text-lg leading-none">{selected?.flag}</span>
-                                  <span className="text-gray-900 font-medium">{selected?.dial_code}</span>
-                                </span>
-                              );
-                            })()}
-                            <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isCountryDropdownOpen ? 'rotate-180' : ''}`} />
-                          </button>
-
-                          {isCountryDropdownOpen && (
-                            <>
-                              <div className="fixed inset-0 z-10" onClick={() => setIsCountryDropdownOpen(false)} />
-                              <div className="absolute top-full left-0 right-0 sm:right-auto sm:w-[300px] mt-2 bg-white border border-gray-100 rounded-xl shadow-2xl z-20 flex flex-col overflow-hidden">
-                                <div className="p-2 border-b border-gray-100 bg-white">
-                                  <div className="relative">
-                                    <input
-                                      type="text"
-                                      placeholder="Search country..."
-                                      className="w-full pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#25A8A0] transition-all bg-white"
-                                      value={countrySearch}
-                                      onChange={(e) => setCountrySearch(e.target.value)}
-                                      autoFocus
-                                    />
-                                    <svg className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                    </svg>
-                                  </div>
-                                </div>
-                                <div className="max-h-60 overflow-y-auto custom-scrollbar">
-                                  {countries
-                                    .filter(c =>
-                                      c.name.toLowerCase().includes(countrySearch.toLowerCase()) ||
-                                      c.dial_code.includes(countrySearch)
-                                    )
-                                    .map((c) => (
-                                      <button
-                                        key={c.code}
-                                        type="button"
-                                        className="w-full text-left px-4 py-3 hover:bg-gray-100 flex items-center gap-3 transition-colors border-b border-gray-50 last:border-0"
-                                        onClick={() => {
-                                          handleInputChange({ target: { name: 'countryCode', value: c.dial_code } } as any);
-                                          setIsCountryDropdownOpen(false);
-                                          setCountrySearch('');
-                                        }}
-                                      >
-                                        <span className="text-2xl">{c.flag}</span>
-                                        <span className="text-gray-900 font-medium truncate flex-1">{c.name}</span>
-                                        <span className="text-gray-500 text-sm font-semibold">{c.dial_code}</span>
-                                      </button>
-                                    ))}
-                                </div>
-                              </div>
-                            </>
-                          )}
-                        </div>
-                        <input
-                          type="tel"
-                          name="phone"
-                          value={formData.phone}
-                          onChange={handlePhoneChange}
-                          className={`${inputClasses(showStepErrors && (!formData.phone || formData.phone.length < 5))} flex-1`}
-                          placeholder="Phone number"
-                          maxLength={(() => {
-                            const selected = countries.find(c => c.dial_code === formData.countryCode);
-                            if (selected) {
-                              try {
-                                const m = new Metadata();
-                                m.selectNumberingPlan(selected.code as CountryCode);
-                                const numberingPlan = m.numberingPlan;
-                                if (numberingPlan) {
-                                  const lengths = numberingPlan.possibleLengths();
-                                  if (lengths && lengths.length > 0) {
-                                    return Math.max(...lengths);
-                                  }
-                                }
-                              } catch (err) {
-                                return 15;
-                              }
-                            }
-                            return 15;
-                          })()}
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Date of Birth</label>
-                      <div className="relative">
-                        <DatePicker
-                          selected={formData.dob ? new Date(formData.dob) : null}
-                          onChange={(date: Date | null) => {
-                            if (date) {
-                              const isoDate = date.toISOString().split('T')[0];
-                              setFormData(prev => ({ ...prev, dob: isoDate }));
-                            } else {
-                              setFormData(prev => ({ ...prev, dob: '' }));
-                            }
-                          }}
-                          dateFormat="dd/MM/yyyy"
-                          className={inputClassesWithIcon(showStepErrors && (
-                            !formData.dob || new Date(formData.dob) > new Date(new Date().setFullYear(new Date().getFullYear() - 18))
-                          ))}
-                          placeholderText="DD/MM/YYYY"
-                          showYearDropdown
-                          showMonthDropdown
-                          scrollableYearDropdown
-                          yearDropdownItemNumber={100}
-                          minDate={new Date(1900, 0, 1)}
-                          maxDate={new Date(new Date().setFullYear(new Date().getFullYear() - 18))}
-                          isClearable
-                          autoComplete="off"
-                          popperPlacement="top-start"
-                          onChangeRaw={(e) => {
-                            if (!e || !e.target) return;
-                            const target = e.target as HTMLInputElement;
-                            if (typeof target.value !== 'string') return;
-                            let input = target.value.replace(/\D/g, '');
-                            if (input.length > 8) input = input.slice(0, 8);
-
-                            let d = input.slice(0, 2);
-                            let m = input.slice(2, 4);
-                            let y = input.slice(4, 8);
-
-                            // Validate months and days
-                            if (d && parseInt(d) > 31) d = '31';
-                            if (m && parseInt(m) > 12) m = '12';
-
-                            // Prevent month 0 or day 0 if they enter two digits
-                            if (d.length === 2 && parseInt(d) === 0) d = '01';
-                            if (m.length === 2 && parseInt(m) === 0) m = '01';
-
-                            let formatted = d;
-                            if (input.length > 2) {
-                              formatted += '/' + m;
-                              if (input.length > 4) {
-                                formatted += '/' + y;
-                              }
-                            }
-
-                            target.value = formatted;
-
-                            if (input.length === 8) {
-                              const dayNum = parseInt(d);
-                              const monthNum = parseInt(m) - 1;
-                              const yearNum = parseInt(y);
-
-                              if (yearNum >= 1900) {
-                                const date = new Date(yearNum, monthNum, dayNum);
-                                // Strict date validation (no date rollover)
-                                if (!isNaN(date.getTime()) && date.getFullYear() === yearNum && date.getMonth() === monthNum && date.getDate() === dayNum) {
-                                  // Final check for 18+ and min year 1900
-                                  const eighteenYearsAgo = new Date();
-                                  eighteenYearsAgo.setFullYear(eighteenYearsAgo.getFullYear() - 18);
-
-                                  if (date <= eighteenYearsAgo && yearNum >= 1900) {
-                                    const isoDate = date.toISOString().split('T')[0];
-                                    setFormData(prev => ({ ...prev, dob: isoDate }));
-                                  }
-                                }
-                              } else {
-                                // If year is < 1900, don't update state
-                              }
-                            }
-                          }}
-                        />
-                        <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
-                      </div>
-                      {showStepErrors && formData.dob && new Date(formData.dob) > new Date(new Date().setFullYear(new Date().getFullYear() - 18)) && (
-                        <p className="text-red-500 text-xs mt-1">You must be 18 years or older.</p>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Step 3: ID Verification */}
-                {proStep === 3 && (
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">ID Type</label>
-                      <div className="relative">
-                        <button
-                          type="button"
-                          onClick={() => setIsIdTypeDropdownOpen(!isIdTypeDropdownOpen)}
-                          className={`${inputClassesWithIcon(showStepErrors && !formData.idType)} text-left flex items-center justify-between`}
-                        >
-                          <span className={formData.idType ? 'text-gray-900' : 'text-gray-400'}>
-                            {formData.idType ?
-                              ['Passport', 'National ID', "Driver's License"].find(
-                                (_, i) => ['passport', 'national_id', 'drivers_license'][i] === formData.idType
-                              )
-                              : 'Select ID Type'}
-                          </span>
-                          <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isIdTypeDropdownOpen ? 'rotate-180' : ''}`} />
-                        </button>
-                        <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
-
-                        {isIdTypeDropdownOpen && (
-                          <>
-                            <div
-                              className="fixed inset-0 z-10"
-                              onClick={() => setIsIdTypeDropdownOpen(false)}
+                    {/* Step 1: Account */}
+                    {proStep === 1 && (
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1.5">First Name</label>
+                            <input
+                              type="text"
+                              name="firstName"
+                              value={formData.firstName}
+                              onChange={handleInputChange}
+                              className={inputClasses(showStepErrors && !formData.firstName)}
+                              placeholder="Enter your first name"
                             />
-                            <div className="absolute top-full left-0 w-full mt-2 bg-white border border-gray-100 rounded-xl shadow-xl z-20 py-2 overflow-hidden">
-                              {[
-                                { value: 'passport', label: 'Passport' },
-                                { value: 'national_id', label: 'National ID' },
-                                { value: 'drivers_license', label: "Driver's License" }
-                              ].map((item) => (
-                                <button
-                                  key={item.value}
-                                  type="button"
-                                  className="w-full text-left px-4 py-3 hover:bg-gray-100 flex items-center justify-between transition-colors text-sm font-medium text-gray-700"
-                                  onClick={() => {
-                                    handleInputChange({ target: { name: 'idType', value: item.value } } as any);
-                                    setIsIdTypeDropdownOpen(false);
-                                  }}
-                                >
-                                  {item.label}
-                                  {formData.idType === item.value && (
-                                    <div className="w-2 h-2 rounded-full bg-[#25A8A0]"></div>
-                                  )}
-                                </button>
-                              ))}
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {/* Front of ID */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">ID Image (Front)</label>
-                        <div className={`border-2 border-dashed ${showStepErrors && !idImageFront ? 'border-red-400 bg-red-50' : 'border-gray-300'} rounded-xl p-4 text-center hover:border-[#25A8A0] transition-all cursor-pointer relative overflow-hidden group h-32 flex flex-col items-center justify-center`}>
-                          {idImageFront ? (
-                            <div className="relative w-full h-full rounded-lg overflow-hidden bg-gray-50">
-                              <img src={URL.createObjectURL(idImageFront)} alt="Front Preview" className="w-full h-full object-contain" />
-                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <span className="text-white text-xs font-medium">Change</span>
-                              </div>
-                            </div>
-                          ) : (
-                            <div>
-                              <User className="w-6 h-6 text-gray-400 mx-auto mb-1" />
-                              <span className="text-[#25A8A0] text-xs font-medium">Upload Front</span>
-                            </div>
-                          )}
-                          <input
-                            type="file"
-                            onChange={handleIdImageFrontChange}
-                            accept="image/*"
-                            className="absolute inset-0 opacity-0 cursor-pointer"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Back of ID */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">ID Image (Back)</label>
-                        <div className={`border-2 border-dashed ${showStepErrors && !idImageBack ? 'border-red-400 bg-red-50' : 'border-gray-300'} rounded-xl p-4 text-center hover:border-[#25A8A0] transition-all cursor-pointer relative overflow-hidden group h-32 flex flex-col items-center justify-center`}>
-                          {idImageBack ? (
-                            <div className="relative w-full h-full rounded-lg overflow-hidden bg-gray-50">
-                              <img src={URL.createObjectURL(idImageBack)} alt="Back Preview" className="w-full h-full object-contain" />
-                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <span className="text-white text-xs font-medium">Change</span>
-                              </div>
-                            </div>
-                          ) : (
-                            <div>
-                              <User className="w-6 h-6 text-gray-400 mx-auto mb-1" />
-                              <span className="text-[#25A8A0] text-xs font-medium">Upload Back</span>
-                            </div>
-                          )}
-                          <input
-                            type="file"
-                            onChange={handleIdImageBackChange}
-                            accept="image/*"
-                            className="absolute inset-0 opacity-0 cursor-pointer"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {showStepErrors && (!idImageFront || !idImageBack) && (
-                      <p className="text-red-500 text-xs text-center">Both front and back ID images are required</p>
-                    )}
-                    <p className="text-xs text-gray-500 text-center">Please upload clear images of your ID (both sides).</p>
-                  </div>
-                )}
-
-                {/* Step 4: Professional Info */}
-                {proStep === 4 && (
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Specializations</label>
-                      <div className="relative">
-                        <button
-                          type="button"
-                          onClick={() => setIsSpecializationDropdownOpen(!isSpecializationDropdownOpen)}
-                          className={`${inputClasses(showStepErrors && !formData.specialization)} text-left flex items-center justify-between min-h-[42px] py-1`}
-                        >
-                          <div className="flex flex-wrap gap-1 px-1">
-                            {formData.specialization ? (
-                              formData.specialization.split(',').map(spec => (
-                                <span key={spec} className="bg-[#25A8A0] text-white text-[10px] px-2 py-0.5 rounded-full flex items-center gap-1">
-                                  {['Anxiety', 'Depression', 'Trauma', 'Relationships', 'Addiction', 'Family Therapy', 'Child Psychology', 'PTSD', 'Stress Management', 'Grief Counseling'].find(
-                                    (_, i) => ['anxiety', 'depression', 'trauma', 'relationships', 'addiction', 'family_therapy', 'child_psychology', 'ptsd', 'stress_management', 'grief_counseling'][i] === spec
-                                  ) || spec}
-                                </span>
-                              ))
-                            ) : (
-                              <span className="text-gray-400">Select specializations</span>
-                            )}
                           </div>
-                          <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform flex-shrink-0 mr-2 ${isSpecializationDropdownOpen ? 'rotate-180' : ''}`} />
-                        </button>
-
-                        {isSpecializationDropdownOpen && (
-                          <>
-                            <div
-                              className="fixed inset-0 z-10"
-                              onClick={() => setIsSpecializationDropdownOpen(false)}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1.5">Last Name</label>
+                            <input
+                              type="text"
+                              name="lastName"
+                              value={formData.lastName}
+                              onChange={handleInputChange}
+                              className={inputClasses(showStepErrors && !formData.lastName)}
+                              placeholder="Enter your last name"
                             />
-                            <div className="absolute top-full left-0 w-full mt-2 bg-white border border-gray-100 rounded-xl shadow-xl z-20 py-2 overflow-hidden max-h-64 overflow-y-auto">
-                              {[
-                                { value: 'anxiety', label: 'Anxiety' },
-                                { value: 'depression', label: 'Depression' },
-                                { value: 'trauma', label: 'Trauma' },
-                                { value: 'relationships', label: 'Relationships' },
-                                { value: 'addiction', label: 'Addiction' },
-                                { value: 'family_therapy', label: 'Family Therapy' },
-                                { value: 'child_psychology', label: 'Child Psychology' },
-                                { value: 'ptsd', label: 'PTSD' },
-                                { value: 'stress_management', label: 'Stress Management' },
-                                { value: 'grief_counseling', label: 'Grief Counseling' }
-                              ].map((item) => {
-                                const selectedSpecs = formData.specialization ? formData.specialization.split(',') : [];
-                                const isSelected = selectedSpecs.includes(item.value);
-                                return (
-                                  <button
-                                    key={item.value}
-                                    type="button"
-                                    className="w-full text-left px-4 py-3 hover:bg-gray-100 flex items-center justify-between transition-colors text-sm font-medium text-gray-700"
-                                    onClick={() => {
-                                      let newSpecs;
-                                      if (isSelected) {
-                                        newSpecs = selectedSpecs.filter(s => s !== item.value);
-                                      } else {
-                                        newSpecs = [...selectedSpecs, item.value];
-                                      }
-                                      handleInputChange({ target: { name: 'specialization', value: newSpecs.join(',') } } as any);
-                                    }}
-                                  >
-                                    {item.label}
-                                    {isSelected && (
-                                      <div className="w-4 h-4 rounded-full bg-[#25A8A0] flex items-center justify-center">
-                                        <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+                          <input
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleInputChange}
+                            className={inputClasses(showStepErrors && !formData.email)}
+                            placeholder="Enter your email address"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+                          <div className="relative">
+                            <input
+                              type={showPassword ? 'text' : 'password'}
+                              name="password"
+                              value={formData.password}
+                              onChange={handleInputChange}
+                              className={simpleInputClassesWithRightIcon(showStepErrors && !formData.password)}
+                              placeholder="Must be at least 8 characters"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#25A8A0] transition-colors"
+                            >
+                              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                            </button>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1.5">Confirm Password</label>
+                          <div className="relative">
+                            <input
+                              type={showConfirmPassword ? 'text' : 'password'}
+                              name="confirmPassword"
+                              value={formData.confirmPassword}
+                              onChange={handleInputChange}
+                              className={simpleInputClassesWithRightIcon(showStepErrors && (!formData.confirmPassword || formData.password !== formData.confirmPassword))}
+                              placeholder="Re-enter your password"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#25A8A0] transition-colors"
+                            >
+                              {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Step 2: Personal Details */}
+                    {proStep === 2 && (
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1.5">Phone Number</label>
+                          <div className="flex gap-2">
+                            <div className="w-1/3 relative">
+                              <button
+                                type="button"
+                                onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)}
+                                className={`${inputClasses(false)} flex items-center justify-between pr-2`}
+                              >
+                                {(() => {
+                                  const selected = countries.find(c => c.dial_code === formData.countryCode);
+                                  return (
+                                    <span className="truncate flex items-center gap-2">
+                                      <span className="text-lg leading-none">{selected?.flag}</span>
+                                      <span className="text-gray-900 font-medium">{selected?.dial_code}</span>
+                                    </span>
+                                  );
+                                })()}
+                                <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isCountryDropdownOpen ? 'rotate-180' : ''}`} />
+                              </button>
+
+                              {isCountryDropdownOpen && (
+                                <>
+                                  <div className="fixed inset-0 z-10" onClick={() => setIsCountryDropdownOpen(false)} />
+                                  <div className="absolute top-full left-0 right-0 sm:right-auto sm:w-[300px] mt-2 bg-white border border-gray-100 rounded-xl shadow-2xl z-20 flex flex-col overflow-hidden">
+                                    <div className="p-2 border-b border-gray-100 bg-white">
+                                      <div className="relative">
+                                        <input
+                                          type="text"
+                                          placeholder="Search country..."
+                                          className="w-full pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#25A8A0] transition-all bg-white"
+                                          value={countrySearch}
+                                          onChange={(e) => setCountrySearch(e.target.value)}
+                                          autoFocus
+                                        />
+                                        <svg className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                         </svg>
                                       </div>
-                                    )}
-                                  </button>
-                                );
-                              })}
+                                    </div>
+                                    <div className="max-h-60 overflow-y-auto custom-scrollbar">
+                                      {countries
+                                        .filter(c =>
+                                          c.name.toLowerCase().includes(countrySearch.toLowerCase()) ||
+                                          c.dial_code.includes(countrySearch)
+                                        )
+                                        .map((c) => (
+                                          <button
+                                            key={c.code}
+                                            type="button"
+                                            className="w-full text-left px-4 py-3 hover:bg-gray-100 flex items-center gap-3 transition-colors border-b border-gray-50 last:border-0"
+                                            onClick={() => {
+                                              handleInputChange({ target: { name: 'countryCode', value: c.dial_code } } as any);
+                                              setIsCountryDropdownOpen(false);
+                                              setCountrySearch('');
+                                            }}
+                                          >
+                                            <span className="text-2xl">{c.flag}</span>
+                                            <span className="text-gray-900 font-medium truncate flex-1">{c.name}</span>
+                                            <span className="text-gray-500 text-sm font-semibold">{c.dial_code}</span>
+                                          </button>
+                                        ))}
+                                    </div>
+                                  </div>
+                                </>
+                              )}
                             </div>
+                            <input
+                              type="tel"
+                              name="phone"
+                              value={formData.phone}
+                              onChange={handlePhoneChange}
+                              className={`${inputClasses(showStepErrors && (!formData.phone || formData.phone.length < 5))} flex-1`}
+                              placeholder="Phone number"
+                              maxLength={(() => {
+                                const selected = countries.find(c => c.dial_code === formData.countryCode);
+                                if (selected) {
+                                  try {
+                                    const m = new Metadata();
+                                    m.selectNumberingPlan(selected.code as CountryCode);
+                                    const numberingPlan = m.numberingPlan;
+                                    if (numberingPlan) {
+                                      const lengths = numberingPlan.possibleLengths();
+                                      if (lengths && lengths.length > 0) {
+                                        return Math.max(...lengths);
+                                      }
+                                    }
+                                  } catch (err) {
+                                    return 15;
+                                  }
+                                }
+                                return 15;
+                              })()}
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1.5">Date of Birth</label>
+                          <div className="relative">
+                            <DatePicker
+                              selected={formData.dob ? new Date(formData.dob) : null}
+                              onChange={(date: Date | null) => {
+                                if (date) {
+                                  const isoDate = date.toISOString().split('T')[0];
+                                  setFormData(prev => ({ ...prev, dob: isoDate }));
+                                } else {
+                                  setFormData(prev => ({ ...prev, dob: '' }));
+                                }
+                              }}
+                              dateFormat="dd/MM/yyyy"
+                              className={inputClassesWithIcon(showStepErrors && (
+                                !formData.dob || new Date(formData.dob) > new Date(new Date().setFullYear(new Date().getFullYear() - 18))
+                              ))}
+                              placeholderText="DD/MM/YYYY"
+                              showYearDropdown
+                              showMonthDropdown
+                              scrollableYearDropdown
+                              yearDropdownItemNumber={100}
+                              minDate={new Date(1900, 0, 1)}
+                              maxDate={new Date(new Date().setFullYear(new Date().getFullYear() - 18))}
+                              isClearable
+                              autoComplete="off"
+                              popperPlacement="top-start"
+                              portalId="root"
+                              onChangeRaw={(e) => {
+                                if (!e || !e.target) return;
+                                const target = e.target as HTMLInputElement;
+                                if (typeof target.value !== 'string') return;
+                                let input = target.value.replace(/\D/g, '');
+                                if (input.length > 8) input = input.slice(0, 8);
+
+                                let d = input.slice(0, 2);
+                                let m = input.slice(2, 4);
+                                let y = input.slice(4, 8);
+
+                                // Validate months and days
+                                if (d && parseInt(d) > 31) d = '31';
+                                if (m && parseInt(m) > 12) m = '12';
+
+                                // Prevent month 0 or day 0 if they enter two digits
+                                if (d.length === 2 && parseInt(d) === 0) d = '01';
+                                if (m.length === 2 && parseInt(m) === 0) m = '01';
+
+                                let formatted = d;
+                                if (input.length > 2) {
+                                  formatted += '/' + m;
+                                  if (input.length > 4) {
+                                    formatted += '/' + y;
+                                  }
+                                }
+
+                                target.value = formatted;
+
+                                if (input.length === 8) {
+                                  const dayNum = parseInt(d);
+                                  const monthNum = parseInt(m) - 1;
+                                  const yearNum = parseInt(y);
+
+                                  if (yearNum >= 1900) {
+                                    const date = new Date(yearNum, monthNum, dayNum);
+                                    // Strict date validation (no date rollover)
+                                    if (!isNaN(date.getTime()) && date.getFullYear() === yearNum && date.getMonth() === monthNum && date.getDate() === dayNum) {
+                                      // Final check for 18+ and min year 1900
+                                      const eighteenYearsAgo = new Date();
+                                      eighteenYearsAgo.setFullYear(eighteenYearsAgo.getFullYear() - 18);
+
+                                      if (date <= eighteenYearsAgo && yearNum >= 1900) {
+                                        const isoDate = date.toISOString().split('T')[0];
+                                        setFormData(prev => ({ ...prev, dob: isoDate }));
+                                      }
+                                    }
+                                  } else {
+                                    // If year is < 1900, don't update state
+                                  }
+                                }
+                              }}
+                            />
+                            <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
+                          </div>
+                          {showStepErrors && formData.dob && new Date(formData.dob) > new Date(new Date().setFullYear(new Date().getFullYear() - 18)) && (
+                            <p className="text-red-500 text-xs mt-1">You must be 18 years or older.</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Step 3: ID Verification */}
+                    {proStep === 3 && (
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1.5">ID Type</label>
+                          <div className="relative">
+                            <button
+                              type="button"
+                              onClick={() => setIsIdTypeDropdownOpen(!isIdTypeDropdownOpen)}
+                              className={`${inputClassesWithIcon(showStepErrors && !formData.idType)} text-left flex items-center justify-between`}
+                            >
+                              <span className={formData.idType ? 'text-gray-900' : 'text-gray-400'}>
+                                {formData.idType ?
+                                  ['Passport', 'National ID', "Driver's License"].find(
+                                    (_, i) => ['passport', 'national_id', 'drivers_license'][i] === formData.idType
+                                  )
+                                  : 'Select ID Type'}
+                              </span>
+                              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isIdTypeDropdownOpen ? 'rotate-180' : ''}`} />
+                            </button>
+                            <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
+
+                            {isIdTypeDropdownOpen && (
+                              <>
+                                <div
+                                  className="fixed inset-0 z-10"
+                                  onClick={() => setIsIdTypeDropdownOpen(false)}
+                                />
+                                <div className="absolute top-full left-0 w-full mt-2 bg-white border border-gray-100 rounded-xl shadow-xl z-20 py-2 overflow-hidden">
+                                  {[
+                                    { value: 'passport', label: 'Passport' },
+                                    { value: 'national_id', label: 'National ID' },
+                                    { value: 'drivers_license', label: "Driver's License" }
+                                  ].map((item) => (
+                                    <button
+                                      key={item.value}
+                                      type="button"
+                                      className="w-full text-left px-4 py-3 hover:bg-gray-100 flex items-center justify-between transition-colors text-sm font-medium text-gray-700"
+                                      onClick={() => {
+                                        handleInputChange({ target: { name: 'idType', value: item.value } } as any);
+                                        setIsIdTypeDropdownOpen(false);
+                                      }}
+                                    >
+                                      {item.label}
+                                      {formData.idType === item.value && (
+                                        <div className="w-2 h-2 rounded-full bg-[#25A8A0]"></div>
+                                      )}
+                                    </button>
+                                  ))}
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {/* Front of ID */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1.5">ID Image (Front)</label>
+                            <div className={`border-2 border-dashed ${showStepErrors && !idImageFront ? 'border-red-400 bg-red-50' : 'border-gray-300'} rounded-xl p-4 text-center hover:border-[#25A8A0] transition-all cursor-pointer relative overflow-hidden group h-32 flex flex-col items-center justify-center`}>
+                              {idImageFront ? (
+                                <div className="relative w-full h-full rounded-lg overflow-hidden bg-gray-50">
+                                  <img src={URL.createObjectURL(idImageFront)} alt="Front Preview" className="w-full h-full object-contain" />
+                                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <span className="text-white text-xs font-medium">Change</span>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div>
+                                  <User className="w-6 h-6 text-gray-400 mx-auto mb-1" />
+                                  <span className="text-[#25A8A0] text-xs font-medium">Upload Front</span>
+                                </div>
+                              )}
+                              <input
+                                type="file"
+                                onChange={handleIdImageFrontChange}
+                                accept="image/*"
+                                className="absolute inset-0 opacity-0 cursor-pointer"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Back of ID */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1.5">ID Image (Back)</label>
+                            <div className={`border-2 border-dashed ${showStepErrors && !idImageBack ? 'border-red-400 bg-red-50' : 'border-gray-300'} rounded-xl p-4 text-center hover:border-[#25A8A0] transition-all cursor-pointer relative overflow-hidden group h-32 flex flex-col items-center justify-center`}>
+                              {idImageBack ? (
+                                <div className="relative w-full h-full rounded-lg overflow-hidden bg-gray-50">
+                                  <img src={URL.createObjectURL(idImageBack)} alt="Back Preview" className="w-full h-full object-contain" />
+                                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <span className="text-white text-xs font-medium">Change</span>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div>
+                                  <User className="w-6 h-6 text-gray-400 mx-auto mb-1" />
+                                  <span className="text-[#25A8A0] text-xs font-medium">Upload Back</span>
+                                </div>
+                              )}
+                              <input
+                                type="file"
+                                onChange={handleIdImageBackChange}
+                                accept="image/*"
+                                className="absolute inset-0 opacity-0 cursor-pointer"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {showStepErrors && (!idImageFront || !idImageBack) && (
+                          <p className="text-red-500 text-xs text-center">Both front and back ID images are required</p>
+                        )}
+                        <p className="text-xs text-gray-500 text-center">Please upload clear images of your ID (both sides).</p>
+                      </div>
+                    )}
+
+                    {/* Step 4: Professional Info */}
+                    {proStep === 4 && (
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1.5">Specializations</label>
+                          <div className="relative">
+                            <button
+                              type="button"
+                              onClick={() => setIsSpecializationDropdownOpen(!isSpecializationDropdownOpen)}
+                              className={`${inputClasses(showStepErrors && !formData.specialization)} text-left flex items-center justify-between min-h-[42px] py-1`}
+                            >
+                              <div className="flex flex-wrap gap-1 px-1">
+                                {formData.specialization ? (
+                                  formData.specialization.split(',').map(spec => (
+                                    <span key={spec} className="bg-[#25A8A0] text-white text-[10px] px-2 py-0.5 rounded-full flex items-center gap-1">
+                                      {['Anxiety', 'Depression', 'Trauma', 'Relationships', 'Addiction', 'Family Therapy', 'Child Psychology', 'PTSD', 'Stress Management', 'Grief Counseling'].find(
+                                        (_, i) => ['anxiety', 'depression', 'trauma', 'relationships', 'addiction', 'family_therapy', 'child_psychology', 'ptsd', 'stress_management', 'grief_counseling'][i] === spec
+                                      ) || spec}
+                                    </span>
+                                  ))
+                                ) : (
+                                  <span className="text-gray-400">Select specializations</span>
+                                )}
+                              </div>
+                              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform flex-shrink-0 mr-2 ${isSpecializationDropdownOpen ? 'rotate-180' : ''}`} />
+                            </button>
+
+                            {isSpecializationDropdownOpen && (
+                              <>
+                                <div
+                                  className="fixed inset-0 z-10"
+                                  onClick={() => setIsSpecializationDropdownOpen(false)}
+                                />
+                                <div className="absolute top-full left-0 w-full mt-2 bg-white border border-gray-100 rounded-xl shadow-xl z-20 py-2 overflow-hidden max-h-64 overflow-y-auto">
+                                  {[
+                                    { value: 'anxiety', label: 'Anxiety' },
+                                    { value: 'depression', label: 'Depression' },
+                                    { value: 'trauma', label: 'Trauma' },
+                                    { value: 'relationships', label: 'Relationships' },
+                                    { value: 'addiction', label: 'Addiction' },
+                                    { value: 'family_therapy', label: 'Family Therapy' },
+                                    { value: 'child_psychology', label: 'Child Psychology' },
+                                    { value: 'ptsd', label: 'PTSD' },
+                                    { value: 'stress_management', label: 'Stress Management' },
+                                    { value: 'grief_counseling', label: 'Grief Counseling' }
+                                  ].map((item) => {
+                                    const selectedSpecs = formData.specialization ? formData.specialization.split(',') : [];
+                                    const isSelected = selectedSpecs.includes(item.value);
+                                    return (
+                                      <button
+                                        key={item.value}
+                                        type="button"
+                                        className="w-full text-left px-4 py-3 hover:bg-gray-100 flex items-center justify-between transition-colors text-sm font-medium text-gray-700"
+                                        onClick={() => {
+                                          let newSpecs;
+                                          if (isSelected) {
+                                            newSpecs = selectedSpecs.filter(s => s !== item.value);
+                                          } else {
+                                            newSpecs = [...selectedSpecs, item.value];
+                                          }
+                                          handleInputChange({ target: { name: 'specialization', value: newSpecs.join(',') } } as any);
+                                        }}
+                                      >
+                                        {item.label}
+                                        {isSelected && (
+                                          <div className="w-4 h-4 rounded-full bg-[#25A8A0] flex items-center justify-center">
+                                            <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                            </svg>
+                                          </div>
+                                        )}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </>
+                            )}
+                          </div>
+                          <p className="text-[10px] text-gray-500 mt-2">You can select multiple specializations that apply to your practice.</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Step 5: Documents */}
+                    {proStep === 5 && (
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1.5">Professional Certificates</label>
+                          <div className={`border-2 border-dashed ${showStepErrors && !certificates ? 'border-red-400 bg-red-50' : 'border-gray-300'} rounded-xl p-4 text-center hover:border-[#25A8A0] transition-all cursor-pointer relative overflow-hidden group`}>
+                            {certificates ? (
+                              certificates.type.startsWith('image/') ? (
+                                <div className="relative aspect-video w-full rounded-lg overflow-hidden bg-gray-50 border border-gray-100">
+                                  <img src={URL.createObjectURL(certificates)} alt="Certificate Preview" className="w-full h-full object-contain" />
+                                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <span className="text-white text-sm font-medium">Change Image</span>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="py-4 flex flex-col items-center">
+                                  <FileText className="w-10 h-10 text-[#25A8A0] mb-2" />
+                                  <span className="text-xs font-medium text-gray-700 truncate w-48">{certificates.name}</span>
+                                  <span className="text-[10px] text-gray-500 mt-1 uppercase">PDF Document</span>
+                                </div>
+                              )
+                            ) : (
+                              <div className="py-2">
+                                <FileText className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                                <span className="text-[#25A8A0] font-medium">Upload Certificate</span>
+                              </div>
+                            )}
+                            <input
+                              type="file"
+                              onChange={handleCertificateChange}
+                              accept=".pdf,image/*"
+                              className="absolute inset-0 opacity-0 cursor-pointer"
+                              id="cert-upload"
+                            />
+                          </div>
+                          {certificates && (
+                            <div className="mt-2 text-sm text-green-600 font-medium text-center">{certificates.name}</div>
+                          )}
+                          {!certificates && showStepErrors && (
+                            <p className="text-red-500 text-xs mt-1 text-center font-medium">Certificate is required</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Navigation Buttons */}
+                    <div className="flex gap-3 pt-3">
+                      {proStep > 1 && (
+                        <button
+                          type="button"
+                          onClick={handleProBack}
+                          className="flex-1 px-4 py-2.5 border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-all font-medium text-sm"
+                        >
+                          Back
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={proStep === totalProSteps ? handleSubmit : handleProNext}
+                        disabled={isAuthLoading}
+                        className={`flex-1 bg-gradient-to-r from-[#25A8A0] to-[#1e8a82] text-white py-2.5 rounded-xl transition-all duration-300 font-bold text-sm flex items-center justify-center gap-2 ${isAuthLoading ? 'opacity-70 cursor-not-allowed shadow-none' : 'hover:shadow-xl'}`}
+                      >
+                        {isAuthLoading ? (
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <>
+                            {proStep === totalProSteps
+                              ? (isAuthLoading ? 'Uploading documents...' : 'Complete Registration')
+                              : 'Continue'}
+                            <ArrowRight className="w-5 h-5" />
                           </>
                         )}
-                      </div>
-                      <p className="text-[10px] text-gray-500 mt-2">You can select multiple specializations that apply to your practice.</p>
+                      </button>
                     </div>
-                  </div>
-                )}
-
-                {/* Step 5: Documents */}
-                {proStep === 5 && (
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Professional Certificates</label>
-                      <div className={`border-2 border-dashed ${showStepErrors && !certificates ? 'border-red-400 bg-red-50' : 'border-gray-300'} rounded-xl p-4 text-center hover:border-[#25A8A0] transition-all cursor-pointer relative overflow-hidden group`}>
-                        {certificates ? (
-                          certificates.type.startsWith('image/') ? (
-                            <div className="relative aspect-video w-full rounded-lg overflow-hidden bg-gray-50 border border-gray-100">
-                              <img src={URL.createObjectURL(certificates)} alt="Certificate Preview" className="w-full h-full object-contain" />
-                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <span className="text-white text-sm font-medium">Change Image</span>
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="py-4 flex flex-col items-center">
-                              <FileText className="w-10 h-10 text-[#25A8A0] mb-2" />
-                              <span className="text-xs font-medium text-gray-700 truncate w-48">{certificates.name}</span>
-                              <span className="text-[10px] text-gray-500 mt-1 uppercase">PDF Document</span>
-                            </div>
-                          )
-                        ) : (
-                          <div className="py-2">
-                            <FileText className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                            <span className="text-[#25A8A0] font-medium">Upload Certificate</span>
-                          </div>
-                        )}
-                        <input
-                          type="file"
-                          onChange={handleCertificateChange}
-                          accept=".pdf,image/*"
-                          className="absolute inset-0 opacity-0 cursor-pointer"
-                          id="cert-upload"
-                        />
-                      </div>
-                      {certificates && (
-                        <div className="mt-2 text-sm text-green-600 font-medium text-center">{certificates.name}</div>
-                      )}
-                      {!certificates && showStepErrors && (
-                        <p className="text-red-500 text-xs mt-1 text-center font-medium">Certificate is required</p>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Navigation Buttons */}
-                <div className="flex gap-3 pt-3">
-                  {proStep > 1 && (
-                    <button
-                      type="button"
-                      onClick={handleProBack}
-                      className="flex-1 px-4 py-2.5 border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-all font-medium text-sm"
-                    >
-                      Back
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={proStep === totalProSteps ? handleSubmit : handleProNext}
-                    disabled={isAuthLoading}
-                    className={`flex-1 bg-gradient-to-r from-[#25A8A0] to-[#1e8a82] text-white py-2.5 rounded-xl transition-all duration-300 font-bold text-sm flex items-center justify-center gap-2 ${isAuthLoading ? 'opacity-70 cursor-not-allowed shadow-none' : 'hover:shadow-xl'}`}
-                  >
-                    {isAuthLoading ? (
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    ) : (
-                      <>
-                        {proStep === totalProSteps
-                          ? (isAuthLoading ? 'Uploading documents...' : 'Complete Registration')
-                          : 'Continue'}
-                        <ArrowRight className="w-5 h-5" />
-                      </>
-                    )}
-                  </button>
-                </div>
+                  </motion.div>
+                </AnimatePresence>
               </div>
             )}
 

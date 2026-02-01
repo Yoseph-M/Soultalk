@@ -108,38 +108,31 @@ const DailyQuote: React.FC = () => {
   )
 }
 
+const calculateTimeLeft = (targetDate: Date) => {
+  const now = new Date().getTime()
+  const target = targetDate.getTime()
+  const difference = target - now
+
+  if (difference > -600000) {
+    if (difference > 0) {
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24))
+      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
+
+      if (days > 0) return `${days}d ${hours}h ${minutes}m`
+      return `${hours}h ${minutes}m`
+    }
+    return "Now"
+  }
+  return "Past"
+}
+
 const CountdownTimer: React.FC<{ targetTime: Date }> = ({ targetTime }) => {
-  const [timeLeft, setTimeLeft] = useState("")
+  const [timeLeft, setTimeLeft] = useState(() => calculateTimeLeft(targetTime))
 
   useEffect(() => {
     const timer = setInterval(() => {
-      const now = new Date().getTime()
-      const target = targetTime.getTime()
-      const difference = target - now
-
-      if (difference > -600000) { // Available 10 min before (negative difference means future, but we want button to show up)
-        // Actually, difference = target - now.
-        // If target is 10:00, now is 9:50 -> diff = 10 min (600000ms).
-        // If target is 10:00, now is 10:10 -> diff = -10 min.
-        // The Timer is strictly for display "XXh YYm".
-        // The BUTTON logic is handled separately below.
-
-        if (difference > 0) {
-          const days = Math.floor(difference / (1000 * 60 * 60 * 24))
-          const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-          const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
-
-          if (days > 0) {
-            setTimeLeft(`${days}d ${hours}h ${minutes}m`)
-          } else {
-            setTimeLeft(`${hours}h ${minutes}m`)
-          }
-        } else {
-          setTimeLeft("Now")
-        }
-      } else {
-        setTimeLeft("Past")
-      }
+      setTimeLeft(calculateTimeLeft(targetTime))
     }, 1000)
 
     return () => clearInterval(timer)
@@ -439,13 +432,6 @@ const Dashboard: React.FC = () => {
                         </div>
                         <div className="flex items-center gap-4">
                           <CountdownTimer targetTime={new Date(`${app.date}T${app.time}`)} />
-                          <button
-                            disabled={new Date(`${app.date}T${app.time}`).getTime() - new Date().getTime() > 600000}
-                            onClick={() => navigate(`/live/${app.id}`)}
-                            className="disabled:opacity-20 px-4 py-2 bg-teal-600 text-white text-[10px] font-black rounded-lg transition-all active:scale-95"
-                          >
-                            Enter
-                          </button>
                         </div>
                       </div>
                     </div>

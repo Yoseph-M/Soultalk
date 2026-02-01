@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { UserPlus, Search, MessageCircle, Shield, Clock, CheckCircle, Award, Users, ArrowRight, ClipboardCheck, UserCheck, HeartHandshake } from 'lucide-react';
+import { UserPlus, Search, MessageCircle, Shield, Clock, CheckCircle, Award, Users, ClipboardCheck, UserCheck, HeartHandshake } from 'lucide-react';
 import Header from './Header';
 
 const HowItWorks: React.FC = () => {
@@ -96,7 +95,7 @@ const HowItWorks: React.FC = () => {
     {
       icon: Shield,
       title: 'Secure & Private',
-      description: 'HIPAA-compliant platform with end-to-end encryption'
+      description: 'Advanced data protection with end-to-end encryption'
     },
     {
       icon: Clock,
@@ -112,21 +111,6 @@ const HowItWorks: React.FC = () => {
       icon: Users,
       title: 'Personalized Care',
       description: 'Treatment plans tailored to your unique needs'
-    }
-  ];
-
-  const faqs = [
-    {
-      question: 'How does the matching process work?',
-      answer: 'Our AI-powered system analyzes your preferences, needs, and goals to connect you with licensed professionals who specialize in your specific areas of concern. You can review multiple matches and choose the therapist that feels right for you.'
-    },
-    {
-      question: 'Is my information secure and confidential?',
-      answer: 'Absolutely. We use bank-level encryption and are fully HIPAA compliant. All sessions are private and confidential, and your personal information is never shared without your explicit consent.'
-    },
-    {
-      question: 'What types of therapy sessions are available?',
-      answer: 'We offer video sessions, voice-only calls, and text-based therapy. You can choose the format that makes you most comfortable and switch between them as needed.'
     }
   ];
 
@@ -170,12 +154,10 @@ const HowItWorks: React.FC = () => {
       {/* Steps Section */}
       <div className="container mx-auto px-4 py-10">
         <div className="grid grid-cols-1 gap-24 relative">
-          {/* Connecting line for desktop */}
           <div className="hidden lg:block absolute left-1/2 top-20 bottom-20 w-px bg-gradient-to-b from-blue-200 via-[#25A8A0]/30 to-green-200 -translate-x-1/2 -z-10"></div>
 
           {currentSteps.map((step, index) => (
             <div key={index} className={`flex flex-col lg:flex-row items-center gap-16 ${index % 2 === 1 ? 'lg:flex-row-reverse' : ''}`}>
-              {/* Image/Visual Part */}
               <div className="lg:w-1/2 w-full">
                 <div className="relative futuristic-card group">
                   <div className={`absolute -inset-4 ${step.color}/10 rounded-3xl blur-2xl group-hover:opacity-100 opacity-0 transition-opacity duration-500`}></div>
@@ -190,7 +172,6 @@ const HowItWorks: React.FC = () => {
                 </div>
               </div>
 
-              {/* Text Part */}
               <div className="lg:w-1/2 w-full space-y-6">
                 <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl ${step.color} text-white shadow-lg mb-2`}>
                   <step.icon className="w-6 h-6" />
@@ -235,45 +216,6 @@ const HowItWorks: React.FC = () => {
                 <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
               </div>
             ))}
-          </div>
-        </div>
-      </div>
-
-      {/* FAQ Accordion Placeholder (Simple View) */}
-      <div className="container mx-auto px-4 py-24">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center text-balance">Frequently Asked Questions</h2>
-          <div className="space-y-4">
-            {faqs.map((faq, index) => (
-              <div key={index} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center justify-between">
-                  {faq.question}
-                </h3>
-                <p className="text-gray-600 leading-relaxed text-sm">
-                  {faq.answer}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* CTA Section */}
-      <div className="container mx-auto px-4 pb-24">
-        <div className="relative bg-[#25A8A0] rounded-[2rem] p-12 md:p-20 overflow-hidden text-center text-white">
-          <div className="relative z-10 max-w-2xl mx-auto">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Start Your Journey?</h2>
-            <p className="text-xl mb-10 text-white/90">
-              Join SoulTalk today and connect with experts who can help you thrive.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/auth" className="w-full sm:w-auto px-8 py-4 bg-white text-[#25A8A0] font-bold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all">
-                Get Started Now
-              </Link>
-              <Link to="/services" className="w-full sm:w-auto px-8 py-4 bg-[#1e8a82] text-white font-bold rounded-xl hover:bg-[#186a64] transition-all flex items-center justify-center gap-2">
-                Explore Services <ArrowRight className="w-5 h-5" />
-              </Link>
-            </div>
           </div>
         </div>
       </div>

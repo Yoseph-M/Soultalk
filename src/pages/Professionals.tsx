@@ -10,6 +10,39 @@ import ProfessionalHeader from './ProfessionalHeader';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 
+const calculateTimeLeft = (targetDate: Date) => {
+    const now = new Date().getTime();
+    const target = targetDate.getTime();
+    const difference = target - now;
+
+    if (difference > -600000) {
+        if (difference > 0) {
+            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+
+            if (days > 0) return `${days}d ${hours}h ${minutes}m`;
+            return `${hours}h ${minutes}m`;
+        }
+        return "Now";
+    }
+    return "Past";
+};
+
+const CountdownTimer: React.FC<{ targetTime: Date }> = ({ targetTime }) => {
+    const [timeLeft, setTimeLeft] = React.useState(() => calculateTimeLeft(targetTime));
+
+    React.useEffect(() => {
+        const timer = setInterval(() => {
+            setTimeLeft(calculateTimeLeft(targetTime));
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, [targetTime]);
+
+    return <span className="text-xs font-black text-teal-600 bg-teal-50 dark:bg-teal-900/30 px-3 py-1.5 rounded-xl border border-teal-100 dark:border-teal-800">{timeLeft}</span>;
+};
+
 const ProfessionalDashboard: React.FC = () => {
     const { theme } = useTheme();
     const { user, fetchWithAuth, isLoading } = useAuth();
@@ -25,6 +58,7 @@ const ProfessionalDashboard: React.FC = () => {
     const [sessionsLoading, setSessionsLoading] = useState(false);
     const [requestsLoading, setRequestsLoading] = useState(false);
     const [isOnline, setIsOnline] = useState(false);
+    const playedNoticeIds = React.useRef<Set<number>>(new Set());
     const navigate = useNavigate();
 
     const fetchUpcomingSessions = useCallback(async () => {
@@ -79,10 +113,13 @@ const ProfessionalDashboard: React.FC = () => {
                     const newLiveRequests = data.filter((n: any) =>
                         n.type === 'live_request' &&
                         !n.is_read &&
-                        !notifications.some(existing => existing.id === n.id)
+                        !playedNoticeIds.current.has(n.id)
                     );
 
                     if (newLiveRequests.length > 0) {
+                        // Mark as played immediately
+                        newLiveRequests.forEach((n: any) => playedNoticeIds.current.add(n.id));
+
                         // Play a professional notification sound
                         const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
                         audio.play().catch(e => console.log('Audio play blocked:', e));
@@ -189,6 +226,7 @@ const ProfessionalDashboard: React.FC = () => {
         }
     }, [isLoading, user, fetchProfessionalData, navigate, location.pathname]);
 
+
     const handleConnectionUpdate = async (id: number, status: 'accepted' | 'rejected') => {
         try {
             const response = await fetchWithAuth(`${API_BASE_URL}/api/auth/connections/${id}/`, {
@@ -207,8 +245,8 @@ const ProfessionalDashboard: React.FC = () => {
 
     const stats = [
         { label: 'Total Clients', value: recentClients.length.toString(), icon: Users, color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/20' },
-        { label: 'Live Sessions', value: upcomingSessions.length.toString(), icon: Radio, color: 'text-[#25A8A0]', bg: 'bg-teal-50 dark:bg-teal-900/20' },
-        { label: 'Your Rating', value: '0.0', icon: Award, color: 'text-yellow-500', bg: 'bg-yellow-50 dark:bg-yellow-900/20' },
+        { label: 'Total Sessions', value: (user?.sessions_completed || 0).toString(), icon: Radio, color: 'text-[#25A8A0]', bg: 'bg-teal-50 dark:bg-teal-900/20' },
+        { label: 'Your Rating', value: (user?.rating || 5.0).toFixed(1), icon: Award, color: 'text-yellow-500', bg: 'bg-yellow-50 dark:bg-yellow-900/20' },
     ];
 
     if (isLoading) {
@@ -228,10 +266,6 @@ const ProfessionalDashboard: React.FC = () => {
                             <h1 className={`text-3xl md:text-4xl font-black tracking-tight mb-3 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
                                 Welcome Back, <span className="text-[#25A8A0]">{(user?.name?.split(' ')[0] || '').charAt(0).toUpperCase() + (user?.name?.split(' ')[0] || '').slice(1).toLowerCase()}</span>
                             </h1>
-                            <p className={`text-base md:text-lg font-medium flex items-center gap-2 ${theme === 'dark' ? 'text-gray-400' : 'text-slate-500'}`}>
-                                <div className={`w-2 h-2 rounded-full ${upcomingSessions.length > 0 ? 'bg-[#25A8A0] animate-pulse' : 'bg-gray-300'}`}></div>
-                                You have <span className={`${upcomingSessions.length > 0 ? 'text-[#25A8A0]' : ''} font-bold`}>{upcomingSessions.length === 0 ? 'no' : upcomingSessions.length} {upcomingSessions.length === 1 ? 'session' : 'sessions'}</span> scheduled for today.
-                            </p>
                         </div>
                         <div className="flex items-center gap-3">
 
@@ -490,37 +524,22 @@ const ProfessionalDashboard: React.FC = () => {
                                     </div>
                                 ) : (
                                     upcomingSessions.map(session => (
-                                        <div key={session.id} className={`flex flex-col md:flex-row items-center gap-6 p-6 rounded-2xl border transition-all hover:shadow-lg group ${theme === 'dark' ? 'bg-[#0B1120] border-gray-800' : 'bg-white border-gray-100 hover:border-[#25A8A0]/20'}`}>
-                                            <div className="flex items-center gap-5 w-full md:w-auto">
-                                                <div className="relative">
-                                                    <img src={`https://ui-avatars.com/api/?name=${session.client_name}&background=random`} alt={session.client_name} className="w-16 h-16 rounded-2xl object-cover ring-2 ring-transparent group-hover:ring-[#25A8A0] transition-all" />
-                                                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#25A8A0] border-2 border-white dark:border-[#0B1120] rounded-full flex items-center justify-center">
-                                                        <Video className="w-3 h-3 text-white" />
+                                        <div key={session.id} className={`p-4 rounded-2xl border transition-all duration-300 ${theme === "dark" ? "bg-[#0B1120] border-gray-800" : "bg-gray-50/50 border-gray-100 hover:border-[#25A8A0]/30"}`}>
+                                            <div className="flex items-center justify-between gap-4">
+                                                <div className="flex items-center gap-4">
+                                                    <img
+                                                        src={session.client_image || `https://ui-avatars.com/api/?name=${session.client_name}&background=random`}
+                                                        className="w-12 h-12 rounded-xl object-cover"
+                                                        alt=""
+                                                    />
+                                                    <div>
+                                                        <h4 className="font-black text-sm">{session.client_name || 'Anonymous Client'}</h4>
+                                                        <p className="text-[10px] font-bold opacity-50 uppercase tracking-tighter">{new Date(session.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} • {session.time.substring(0, 5)}</p>
                                                     </div>
                                                 </div>
-                                                <div>
-                                                    <h3 className={`font-bold text-lg mb-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{session.client_name || 'Anonymous Client'}</h3>
-                                                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{session.notes || 'No notes provided'}</p>
+                                                <div className="flex items-center gap-4">
+                                                    <CountdownTimer targetTime={new Date(`${session.date}T${session.time}`)} />
                                                 </div>
-                                            </div>
-                                            <div className="flex items-center gap-6 w-full md:w-auto md:ml-auto justify-between md:justify-end">
-                                                <div className="text-right">
-                                                    <div className={`text-lg font-bold tabular-nums ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{session.time}</div>
-                                                    <div className={`text-xs font-bold uppercase tracking-wide ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>{session.date}</div>
-                                                </div>
-                                                <button
-                                                    disabled={(() => {
-                                                        const now = new Date().getTime();
-                                                        const target = new Date(`${session.date}T${session.time}`).getTime();
-                                                        const diff = target - now;
-                                                        return diff > 600000;
-                                                    })()}
-                                                    onClick={() => navigate(`/live/${session.id}`)}
-                                                    className="px-6 py-2.5 bg-[#25A8A0] text-white font-bold rounded-xl shadow-lg shadow-[#25A8A0]/20 hover:shadow-[#25A8A0]/30 hover:scale-105 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed text-sm"
-                                                >
-                                                    Join
-                                                    <ChevronRight className="w-4 h-4" />
-                                                </button>
                                             </div>
                                         </div>
                                     ))

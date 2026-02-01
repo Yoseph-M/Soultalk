@@ -9,7 +9,8 @@ from .views import (
     PaymentListView, PaymentCallbackView, JournalEntryListCreateView, JournalEntryDetailView,
     ProfessionalEarningsView, BankListView, WithdrawalRequestView,
     ServiceRequestListCreateView, ServiceRequestDetailView, 
-    ServiceProposalListCreateView, ServiceProposalActionView
+    ServiceProposalListCreateView, ServiceProposalActionView,
+    PublicStatsView
 )
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -51,4 +52,5 @@ urlpatterns = [
     path('service-requests/<int:pk>/', ServiceRequestDetailView.as_view(), name='service_request_detail'),
     path('service-proposals/', ServiceProposalListCreateView.as_view(), name='service_proposal_list_create'),
     path('service-proposals/<int:pk>/action/', ServiceProposalActionView.as_view(), name='service_proposal_action'),
+    path('stats/', PublicStatsView.as_view(), name='public_stats'),
 ]

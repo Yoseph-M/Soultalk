@@ -799,10 +799,12 @@ class WithdrawalRequestView(views.APIView):
             else:
                 withdrawal.status = 'failed'
                 withdrawal.save()
-                return Response({'error': f"Chapa Payout Error: {data.get('message', 'Unknown error')}"}, status=400)
-                
+                return Response({'error': data.get('message', 'Direct transfer failed')}, status=400)
         except Exception as e:
-            return Response({'error': f"Exception during payout: {str(e)}"}, status=500)
+            withdrawal.status = 'failed'
+            withdrawal.save()
+            return Response({'error': str(e)}, status=500)
+
 
 class ServiceRequestListCreateView(generics.ListCreateAPIView):
     serializer_class = ServiceRequestSerializer
@@ -908,3 +910,17 @@ class ServiceProposalActionView(views.APIView):
             return Response({'status': 'proposal rejected'})
             
         return Response({'error': 'Invalid action'}, status=400)
+
+class PublicStatsView(views.APIView):
+    permission_classes = (AllowAny,)
+    
+    def get(self, request):
+        total_people = User.objects.filter(role='client').count()
+        total_sessions = Appointment.objects.filter(status='completed').count()
+        total_experts = ProfessionalProfile.objects.filter(verification_status='verified').count()
+        
+        return Response({
+            'people_helped': total_people,
+            'support_sessions': total_sessions,
+            'licensed_experts': total_experts
+        })

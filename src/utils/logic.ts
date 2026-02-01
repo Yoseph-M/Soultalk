@@ -6,21 +6,31 @@ export const validateEmail = (email: string): boolean => {
 export const validatePassword = (
     password: string,
     userInfo: { firstName?: string; lastName?: string; email?: string } = {}
-): { isValid: boolean; message?: string } => {
+): { isValid: boolean; errors: string[]; message?: string } => {
+    const errors: string[] = [];
+
+    if (!password) {
+        return { isValid: false, errors: ['Password is required'], message: 'Password is required' };
+    }
+
     if (password.length < 8) {
-        return { isValid: false, message: 'Password must be at least 8 characters' };
+        errors.push('Password must be at least 8 characters');
     }
     if (!/[A-Z]/.test(password)) {
-        return { isValid: false, message: 'Password must contain at least one uppercase letter' };
+        errors.push('Include at least one uppercase letter');
     }
     if (!/[a-z]/.test(password)) {
-        return { isValid: false, message: 'Password must contain at least one lowercase letter' };
+        errors.push('Include at least one lowercase letter');
     }
     if (!/[0-9]/.test(password)) {
-        return { isValid: false, message: 'Password must contain at least one number' };
+        errors.push('Include at least one number');
     }
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-        return { isValid: false, message: 'Password must contain at least one special character' };
+    // More inclusive special character check (any non-alphanumeric)
+    if (!/[^A-Za-z0-9]/.test(password)) {
+        errors.push('Include at least one special character');
+    }
+    if (/\s/.test(password)) {
+        errors.push('Password cannot contain spaces');
     }
 
     // Security check: Don't allow password to contain or be the same as name/email
@@ -33,11 +43,16 @@ export const validatePassword = (
 
     for (const check of checks) {
         if (check.length >= 3 && lowerPass.includes(check)) {
-            return { isValid: false, message: 'Password cannot contain your name or part of your email' };
+            errors.push('Password cannot contain part of your name or email');
+            break;
         }
     }
 
-    return { isValid: true };
+    return {
+        isValid: errors.length === 0,
+        errors,
+        message: errors[0] // Return the first error as a convenience message
+    };
 };
 
 export const normalizePhoneNumber = (phone: string): string => {
