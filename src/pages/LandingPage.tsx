@@ -11,8 +11,10 @@ import featureProgress from '../assets/images/feature_progress.png';
 import featureCare from '../assets/images/feature_care.png';
 import featureCrisis from '../assets/images/feature_crisis_new.png';
 import { useAuth } from '../contexts/AuthContext';
+import { API_BASE_URL } from '../config';
 
 const CountUp = ({ end, duration = 2000, suffix = '', decimals = 0 }: { end: number, duration?: number, suffix?: string, decimals?: number }) => {
+
   const [count, setCount] = React.useState(0);
   const ref = React.useRef<HTMLSpanElement>(null);
   const [isIntersecting, setIsIntersecting] = React.useState(false);
@@ -71,8 +73,7 @@ const LandingPage: React.FC = () => {
   React.useEffect(() => {
     const fetchStats = async () => {
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
-        const response = await fetch(`${apiUrl}/api/auth/stats/`);
+        const response = await fetch(`${API_BASE_URL}/api/auth/stats/`);
         if (!response.ok) throw new Error('Failed to fetch stats');
         const data = await response.json();
         setStats(data);
@@ -82,6 +83,7 @@ const LandingPage: React.FC = () => {
     };
     fetchStats();
   }, []);
+
 
   const testimonials = [
     {
