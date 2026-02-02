@@ -18,6 +18,10 @@ const renderAuth = () => {
 };
 
 describe('API Integration Tests', () => {
+    const MOCK_EMAIL = 'api-test@example.com';
+    const MOCK_PASSWORD = 'Password123!';
+    const MOCK_INVALID_PASSWORD = 'Secret123!'; // Used for testing error cases
+
     beforeEach(() => {
         vi.clearAllMocks();
         localStorage.clear();
@@ -52,10 +56,10 @@ describe('API Integration Tests', () => {
         renderAuth();
 
         fireEvent.change(screen.getByPlaceholderText(/Enter your email address/i), {
-            target: { value: 'api-test@example.com' }
+            target: { value: MOCK_EMAIL }
         });
         fireEvent.change(screen.getByPlaceholderText(/Must be at least 8 characters/i), {
-            target: { value: 'Password123' }
+            target: { value: MOCK_PASSWORD }
         });
 
         fireEvent.click(screen.getByRole('button', { name: /Sign In/i }));
@@ -83,7 +87,7 @@ describe('API Integration Tests', () => {
         const submitButton = screen.getByRole('button', { name: /Sign In/i });
 
         fireEvent.change(emailInput, { target: { value: 'wrong@example.com' } });
-        fireEvent.change(passwordInput, { target: { value: 'wrong123' } });
+        fireEvent.change(passwordInput, { target: { value: MOCK_INVALID_PASSWORD } });
         fireEvent.click(submitButton);
 
         await waitFor(() => {

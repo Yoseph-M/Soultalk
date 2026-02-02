@@ -49,13 +49,13 @@ describe('Backend Business Logic Unit Tests', () => {
         it('should not allow password to contain user firstName', () => {
             const result = validatePassword('HelloZube1!', { firstName: 'Zube' });
             expect(result.isValid).toBe(false);
-            expect(result.message).toContain('cannot contain your name');
+            expect(result.message).toContain('cannot contain part of your name or email');
         });
 
         it('should not allow password to contain email prefix', () => {
             const result = validatePassword('TestUser123!', { email: 'testuser@gmail.com' });
             expect(result.isValid).toBe(false);
-            expect(result.message).toContain('cannot contain your name or part of your email');
+            expect(result.message).toContain('cannot contain part of your name or email');
         });
 
         it('should return true for valid complex passwords', () => {
