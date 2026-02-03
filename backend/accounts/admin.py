@@ -37,15 +37,15 @@ class BaseUserAdmin(UserAdmin):
         return ""
     refresh_column.short_description = mark_safe('<a href="javascript:location.reload();" style="color: black;"><i class="fas fa-sync"></i></a>')
 
-    list_display = ('profile_photo_preview', 'get_full_name', 'email', 'role', 'is_active', 'refresh_column')
-    list_filter = ('role', 'is_active', 'date_joined')
+    list_display = ('profile_photo_preview', 'get_full_name', 'email', 'is_active', 'refresh_column')
+    list_filter = ('is_active', 'date_joined')
     search_fields = ('first_name', 'last_name', 'email', 'username')
     ordering = ('-date_joined',)
     
     fieldsets = (
         ('General', {'fields': ('username', 'password')}),
         ('Personal Identity', {'fields': ('first_name', 'last_name', 'email')}),
-        ('Access Control & Permissions', {'fields': ('role', 'is_active', 'is_staff', 'is_superuser')}),
+        ('Access Control & Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser')}),
         ('Timeline', {'fields': ('last_login', 'date_joined')}),
     )
 

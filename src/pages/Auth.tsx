@@ -90,7 +90,7 @@ const Auth: React.FC = () => {
           }
         }
       } catch (error) {
-        console.error('Error detecting country:', error);
+        console.warn('Country detection blocked or failed (Common if using Ad-Blockers):', error);
       }
     };
 
