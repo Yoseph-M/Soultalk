@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FcGoogle } from 'react-icons/fc';
+
 import { useAuth } from '../contexts/AuthContext';
 import { countries } from '../data/countries';
 import { Metadata, type CountryCode } from 'libphonenumber-js';
@@ -475,22 +475,7 @@ const Auth: React.FC = () => {
             </div>
 
             {/* Social Login - Only for Login */}
-            {isLogin && (
-              <div className="space-y-3 mb-5">
-                <button className="w-full flex items-center justify-center gap-3 px-4 py-3.5 border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-bold text-gray-700 bg-white shadow-sm">
-                  <FcGoogle className="w-5 h-5" />
-                  Continue with Google
-                </button>
-                <div className="relative my-3">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-200"></div>
-                  </div>
-                  <div className="relative flex justify-center text-xs">
-                    <span className="px-2 bg-white text-gray-500">Or continue with email</span>
-                  </div>
-                </div>
-              </div>
-            )}
+
 
             {/* Client/Simple Professional Form */}
             {(!isProfessional || isLogin) && (
