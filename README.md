@@ -59,9 +59,6 @@ SoulTalk is a full-stack mental health and wellness platform that connects clien
 - **Earnings & Withdrawals** -- Track earnings and request bank withdrawals via Chapa.
 - **Online Status** -- Toggle availability so clients can see who is available.
 
-### For Admins
-- **Admin Dashboard** -- Manage users, verify professionals, and oversee the platform via Django Jazzmin admin panel.
-
 ---
 
 ## Tech Stack
@@ -92,7 +89,6 @@ SoulTalk is a full-stack mental health and wellness platform that connects clien
 | PostgreSQL | Primary database |
 | WhiteNoise | Static file serving |
 | Gunicorn | Production WSGI server |
-| Django Jazzmin | Admin panel theme |
 
 ---
 
@@ -106,7 +102,6 @@ Soultalk/
 │   │   ├── views.py            # API views
 │   │   ├── serializers.py      # DRF serializers
 │   │   ├── urls.py             # API URL routing
-│   │   ├── admin.py            # Admin site configuration
 │   │   └── migrations/         # Database migrations
 │   ├── soultalk_backend/       # Django project settings
 │   │   ├── settings.py         # Configuration (DB, auth, storage, etc.)
@@ -189,9 +184,6 @@ cp .env.example .env        # or create manually
 # Run database migrations
 python3 manage.py migrate
 
-# Create a superuser for the admin panel
-python3 manage.py createsuperuser
-
 # Collect static files
 python3 manage.py collectstatic --noinput
 
@@ -200,7 +192,6 @@ python3 manage.py runserver
 ```
 
 The backend will be available at `http://127.0.0.1:8000`.
-The admin panel is at `http://127.0.0.1:8000/admin`.
 
 ### 3. Frontend Setup
 
@@ -300,8 +291,6 @@ All API endpoints are prefixed with `/api/auth/`. Authentication uses JWT Bearer
 |---|---|---|---|
 | `GET` | `/api/auth/me/` | Get the authenticated user's profile | Yes |
 | `PUT/PATCH` | `/api/auth/me/` | Update the authenticated user's profile | Yes |
-| `GET` | `/api/auth/users/` | List all users (admin only) | Yes |
-| `PATCH` | `/api/auth/users/` | Update any user by ID (admin only) | Yes |
 | `GET` | `/api/auth/professionals/` | List professionals (clients see verified only) | Yes |
 | `GET` | `/api/auth/clients/` | List clients (professionals see connected clients only) | Yes |
 | `GET` | `/api/auth/users/detail/<id>/` | Get public details of a specific user | Yes |
@@ -418,10 +407,9 @@ The backend defines the following models in the `accounts` app:
 
 | Model | Description |
 |---|---|
-| `User` | Custom user extending `AbstractUser` with roles: `client`, `professional`, `admin` |
+| `User` | Custom user extending `AbstractUser` with roles: `client`, `professional` |
 | `ClientProfile` | One-to-one profile for clients (phone, DOB, photo) |
 | `ProfessionalProfile` | One-to-one profile for professionals (specialization, bio, ID documents, certificates, verification status, earnings) |
-| `AdminProfile` | One-to-one profile for admins |
 | `ChatSession` | AI chat session with title and pinning |
 | `ChatMessage` | Individual messages within a chat session (user or assistant role) |
 | `Appointment` | Scheduled session between client and professional (video/audio/chat) |
