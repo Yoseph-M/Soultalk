@@ -40,24 +40,24 @@ SoulTalk is a full-stack mental health and wellness platform that connects clien
 ## Features
 
 ### For Clients
-- **AI Companion** -- Chat with SoulTalk AI (powered by Google Gemini) for instant emotional support, scoped strictly to mental health topics.
-- **Find Professionals** -- Browse and connect with verified mental health professionals.
-- **Live Sessions** -- Start video, audio, or text-based therapy sessions in real time via ZegoCloud.
-- **Appointment Booking** -- Schedule sessions with professionals; automatic cancellation of past or duplicate bookings.
-- **Mood Tracking** -- Log daily mood scores (1--5) with optional notes and view mood history over time.
-- **Service Marketplace** -- Post service requests describing your needs; receive proposals from professionals.
-- **Payments** -- Pay for services securely via Chapa (Ethiopian Birr).
-- **Crisis Support** -- Access dedicated crisis support resources.
-- **Dark Mode** -- Toggle between light and dark themes.
-- **Internationalization** -- Multi-language support via i18next.
+- **AI Companion:** Chat with SoulTalk AI (powered by Google Gemini) for instant emotional support, scoped strictly to mental health topics.
+- **Find Professionals:** Browse and connect with verified mental health professionals.
+- **Live Sessions:** Start video, audio, or text-based therapy sessions in real time via ZegoCloud.
+- **Appointment Booking:** Schedule sessions with professionals; automatic cancellation of past or duplicate bookings.
+- **Mood Tracking:** Log daily mood scores (1-5) with optional notes and view mood history over time.
+- **Service Marketplace:** Post service requests describing your needs; receive proposals from professionals.
+- **Payments:** Pay for services securely via Chapa (Ethiopian Birr).
+- **Crisis Support:** Access dedicated crisis support resources.
+- **Dark Mode:** Toggle between light and dark themes.
+- **Internationalization:** Multi-language support via i18next.
 
 ### For Professionals
-- **Verification Workflow** -- Submit ID documents and certificates during registration; admin reviews and approves.
-- **Client Management** -- View connected clients and appointment history.
-- **Journal Entries** -- Create text, audio, or video journal entries about client sessions.
-- **Opportunity Board** -- Browse open service requests from clients and submit proposals.
-- **Earnings & Withdrawals** -- Track earnings and request bank withdrawals via Chapa.
-- **Online Status** -- Toggle availability so clients can see who is available.
+- **Verification Workflow:** Submit ID documents and certificates during registration for review and approval.
+- **Client Management:** View connected clients and appointment history.
+- **Journal Entries:** Create text, audio, or video journal entries about client sessions.
+- **Opportunity Board:** Browse open service requests from clients and submit proposals.
+- **Earnings & Withdrawals:** Track earnings and request bank withdrawals via Chapa.
+- **Online Status:** Toggle availability so clients can see who is available.
 
 ---
 
@@ -414,7 +414,7 @@ The backend defines the following models in the `accounts` app:
 | `ChatMessage` | Individual messages within a chat session (user or assistant role) |
 | `Appointment` | Scheduled session between client and professional (video/audio/chat) |
 | `Notification` | In-app notifications with type and read status |
-| `MoodUpdate` | Daily mood score (1--5) with optional note |
+| `MoodUpdate` | Daily mood score (1-5) with optional note |
 | `Connection` | Client-professional connection with pending/accepted/rejected status |
 | `DirectMessage` | One-to-one messages between users |
 | `Payment` | Payment records tracked via Chapa (ETB) |
